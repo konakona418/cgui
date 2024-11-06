@@ -21,13 +21,6 @@ typedef struct Window CGUI_Window;
 typedef struct WindowClassFactory CGUI_WindowClassFactory;
 typedef struct WindowClass CGUI_WindowClass;
 
-/* Result and Option of Window. */
-
-/* Result of Window creation. */
-CGUI_Result_Prototype(CGUI_Window, CGUI_Error)
-CGUI_Result_Define(CGUI_Window, CGUI_Error);
-
-
 /* Structure of WindowFactory. */
 typedef struct WindowFactory {
     DWORD dwStyle;
@@ -69,7 +62,7 @@ typedef struct WindowFactory {
 
     void (* setWindowParam)(CGUI_WindowFactory* self, LPVOID lpParam);
 
-    CGUI_Result(CGUI_Window) (* createWindow)(CGUI_WindowFactory* self);
+    CGUI_Result (* createWindow)(CGUI_WindowFactory* self);
 } CGUI_WindowFactory;
 
 /* Constructors and Destructors of WindowFactory. */
@@ -123,7 +116,7 @@ void cgui_windowFactory_setWindowInstance(CGUI_WindowFactory* factory, HINSTANCE
 void cgui_windowFactory_setWindowParam(CGUI_WindowFactory* factory, LPVOID lpParam);
 
 /* Creates a window with the given WindowFactory. */
-CGUI_Result(CGUI_Window) cgui_windowFactory_createWindow(CGUI_WindowFactory* factory);
+CGUI_Result cgui_windowFactory_createWindow(CGUI_WindowFactory* factory);
 
 
 /* Structure of Window. */
@@ -131,9 +124,9 @@ typedef struct Window {
     HWND hwnd;
     int swState;
 
-    CGUI_Result(void) (* show)(CGUI_Window* self);
-    CGUI_Result(void) (* hide)(CGUI_Window* self);
-    CGUI_Result(void) (* setState)(CGUI_Window* self, int swState);
+    CGUI_Result  (* show)(CGUI_Window* self);
+    CGUI_Result  (* hide)(CGUI_Window* self);
+    CGUI_Result  (* setState)(CGUI_Window* self, int swState);
 } CGUI_Window;
 
 /* Constructors and Destructors of Window. */
@@ -143,16 +136,16 @@ typedef struct Window {
 CGUI_Window* cgui_createWindow(HWND hwnd);
 
 /* Destroys a Window struct. */
-CGUI_Result(void) cgui_destroyWindow(CGUI_Window* self);
+CGUI_Result  cgui_destroyWindow(CGUI_Window* self);
 
 /* Methods of Window. */
-CGUI_Result(void) cgui_window_show(CGUI_Window* self);
+CGUI_Result  cgui_window_show(CGUI_Window* self);
 
 /* Hides the window. */
-CGUI_Result(void) cgui_window_hide(CGUI_Window* self);
+CGUI_Result cgui_window_hide(CGUI_Window* self);
 
 /* Sets the state of the window. e.g. SW_SHOW to show the window. */
-CGUI_Result(void) cgui_window_setState(CGUI_Window* self, int swState);
+CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);
 
 
 /* Structure of WindowClassFactory.
@@ -196,9 +189,9 @@ typedef struct WindowClass {
 } CGUI_WindowClass;
 
 /* Registers a window class. */
-CGUI_Result(void) cgui_registerWindowClass(CGUI_WindowClass* wc);
+CGUI_Result cgui_registerWindowClass(CGUI_WindowClass* wc);
 
 /* Destroys a window class. */
-CGUI_Result(void) cgui_destroyWindowClass(CGUI_WindowClass* self);
+CGUI_Result cgui_destroyWindowClass(CGUI_WindowClass* self);
 
 #endif //CGUI_WINDOW_H

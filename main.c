@@ -3,12 +3,13 @@
 #include "deps/win32/window.h"
 
 int main(void) {
+
     CGUI_WindowClassFactory* wndClassFactory = cgui_createWindowClassFactory();
     wndClassFactory->setWindowClassName(wndClassFactory, "CGUI_Window");
     wndClassFactory->setWindowInstance(wndClassFactory, GetModuleHandle(NULL));
     wndClassFactory->setWindowProc(wndClassFactory, DefWindowProc);
     CGUI_WindowClass* wndClass = wndClassFactory->createWindowClass(wndClassFactory);
-    cgui_registerWindowClass(wndClass);
+    unwrap(cgui_registerWindowClass(wndClass));
     cgui_destroyWindowClassFactory(wndClassFactory);
 
     CGUI_WindowFactory* wndFactory = cgui_createWindowFactory();
@@ -18,13 +19,13 @@ int main(void) {
     wndFactory->setWindowSize(wndFactory, 640, 480);
     wndFactory->setWindowPosition(wndFactory, 100, 100);
 
-    CGUI_Result(CGUI_Window) result = wndFactory->createWindow(wndFactory);
-    if (cgui_is_err(result)) {
+    CGUI_Result result = wndFactory->createWindow(wndFactory);
+    if (is_err(result)) {
         panic(result.error->message);
     }
     cgui_destroyWindowFactory(wndFactory);
 
-    CGUI_Window* window = cgui_unwrap(result);
+    CGUI_Window* window = unwrap(result);
     window->show(window);
     return 0;
 }

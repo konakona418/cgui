@@ -44,7 +44,7 @@ CGUI_WindowFactory* cgui_createWindowFactory() {
     return factory;
 }
 
-CGUI_Result(CGUI_Window) cgui_windowFactory_createWindow(CGUI_WindowFactory* factory) {
+CGUI_Result cgui_windowFactory_createWindow(CGUI_WindowFactory* factory) {
     HWND hwnd = CreateWindowEx(
             factory->dwExStyle,
             factory->lpClassName,
@@ -63,9 +63,9 @@ CGUI_Result(CGUI_Window) cgui_windowFactory_createWindow(CGUI_WindowFactory* fac
     CGUI_Window* window = cgui_createWindow(hwnd);
     if (hwnd == NULL) {
         free(window);
-        return CGUI_Err(CGUI_Window, CGUI_Error_WindowCreateFailed());
+        return create_err(CGUI_Error_WindowCreateFailed());
     } else {
-        return CGUI_Ok(CGUI_Window, window);
+        return create_ok(window);
     }
 }
 
@@ -146,39 +146,39 @@ CGUI_Window* cgui_createWindow(HWND hwnd) {
     return window;
 }
 
-CGUI_Result(void) cgui_destroyWindow(CGUI_Window* self) {
+CGUI_Result cgui_destroyWindow(CGUI_Window* self) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     DestroyWindow(self->hwnd);
     free(self);
-    return CGUI_Ok(void, NULL);
+    return create_ok(NULL);
 }
 
-CGUI_Result(void) cgui_window_show(CGUI_Window* self) {
+CGUI_Result cgui_window_show(CGUI_Window* self) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     self->swState = SW_SHOW;
     ShowWindow(self->hwnd, SW_SHOW);
-    return CGUI_Ok(void, NULL);
+    return create_ok(NULL);
 }
 
-CGUI_Result(void) cgui_window_hide(CGUI_Window* self) {
+CGUI_Result cgui_window_hide(CGUI_Window* self) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     self->swState = SW_HIDE;
     ShowWindow(self->hwnd, SW_HIDE);
-    return CGUI_Ok(void, NULL);
+    return create_ok(NULL);
 }
 
-CGUI_Result(void) cgui_window_setState(CGUI_Window* self, int swState) {
+CGUI_Result cgui_window_setState(CGUI_Window* self, int swState) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     ShowWindow(self->hwnd, swState);
-    return CGUI_Ok(void, NULL);
+    return create_ok(NULL);
 }
 
 CGUI_WindowClassFactory* cgui_createWindowClassFactory() {
@@ -251,23 +251,23 @@ CGUI_WindowClass* cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFact
     return wc;
 }
 
-CGUI_Result(void) cgui_registerWindowClass(CGUI_WindowClass* self) {
+CGUI_Result cgui_registerWindowClass(CGUI_WindowClass* self) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     ATOM atom = RegisterClass(&self->wc);
     if (atom == 0) {
-        return CGUI_Err(void, CGUI_Error_WindowClassRegistrationFailed());
+        return create_err(CGUI_Error_WindowClassRegistrationFailed());
     } else {
-        return CGUI_Ok(void, NULL);
+        return create_ok(NULL);
     }
 }
 
-CGUI_Result(void) cgui_destroyWindowClass(CGUI_WindowClass* self) {
+CGUI_Result cgui_destroyWindowClass(CGUI_WindowClass* self) {
     if (self == NULL) {
-        return CGUI_Err(void, CGUI_Error_IllegalNullPtr());
+        return create_err(CGUI_Error_IllegalNullPtr());
     }
     UnregisterClass(self->wc.lpszClassName, self->wc.hInstance);
     free(self);
-    return CGUI_Ok(void, NULL);
+    return create_ok(NULL);
 }
