@@ -267,9 +267,13 @@ typedef struct WindowManager {
     HashTable* windows;
 
     CGUI_Result (* addWindow)(CGUI_WindowManager* self, CGUI_Window* window);
+
     CGUI_Option (* getWindow)(CGUI_WindowManager* self, const char* name);
+
     CGUI_Result (* removeWindow)(CGUI_WindowManager* self, CGUI_Window* window);
+
     CGUI_Result (* removeWindowByIdentifier)(CGUI_WindowManager* self, const char* wndIdentifier);
+
     CGUI_Result (* destroyAllWindows)(CGUI_WindowManager* self);
 } CGUI_WindowManager;
 
@@ -307,14 +311,19 @@ typedef struct WindowClassManager {
     HashTable* windowClasses;
 
     CGUI_Result (* addWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
+
     CGUI_Option (* getWindowClass)(CGUI_WindowClassManager* self, const char* name);
+
     CGUI_Result (* removeWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
+
     CGUI_Result (* removeWindowClassByName)(CGUI_WindowClassManager* self, const char* name);
+
     CGUI_Result (* destroyAllWindowClasses)(CGUI_WindowClassManager* self);
 } CGUI_WindowClassManager;
 
 /* Constructors and Destructors of WindowClassManager. */
 CGUI_WindowClassManager* cgui_createWindowClassManager();
+
 void cgui_destroyWindowClassManager(CGUI_WindowClassManager* manager);
 
 /* Methods of WindowClassManager. */

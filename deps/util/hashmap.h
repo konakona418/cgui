@@ -27,13 +27,20 @@ typedef struct HashTable {
     size_t size;
 
     unsigned long (* hash_function)(const char* key, size_t bucket_count);
+
     int (* insert)(HashTable* table, const char* key, void* value);
+
     void* (* find)(HashTable* table, const char* key);
+
     int (* contains)(HashTable* table, const char* key);
+
     void* (* remove)(HashTable* table, const char* key);
-    void (* iter) (HashTable* table, void (*callback)(const char* key, void* value));
-    void (* iter_values) (HashTable* table, void (*callback)(void* value));
-    void (* iter_keys) (HashTable* table, void (*callback)(const char* key));
+
+    void (* iter)(HashTable* table, void (* callback)(const char* key, void* value));
+
+    void (* iter_values)(HashTable* table, void (* callback)(void* value));
+
+    void (* iter_keys)(HashTable* table, void (* callback)(const char* key));
 } HashTable;
 
 /* Implementation of djb2 hash function. */
@@ -59,12 +66,12 @@ void* hash_table_remove(HashTable* table, const char* key);
 void destroy_hash_table(HashTable* table);
 
 /* Iterate over all key-value pairs in the hash table. */
-void iter(HashTable* table, void (*callback)(const char* key, void* value));
+void iter(HashTable* table, void (* callback)(const char* key, void* value));
 
 /* Iterate over all values in the hash table. */
-void iter_values(HashTable* table, void (*callback)(void* value));
+void iter_values(HashTable* table, void (* callback)(void* value));
 
 /* Iterate over all keys in the hash table. */
-void iter_keys(HashTable* table, void (*callback)(const char* key));
+void iter_keys(HashTable* table, void (* callback)(const char* key));
 
 #endif //CGUI_HASHMAP_H

@@ -122,7 +122,7 @@ void destroy_hash_table(HashTable* table) {
     free(table);
 }
 
-void iter_keys(HashTable* table, void (*callback)(const char*)) {
+void iter_keys(HashTable* table, void (* callback)(const char*)) {
     for (size_t i = 0; i < table->bucket_count; i++) {
         HashNode* node = table->buckets[i];
         while (node) {
@@ -132,7 +132,7 @@ void iter_keys(HashTable* table, void (*callback)(const char*)) {
     }
 }
 
-void iter_values(HashTable* table, void (*callback)(void*)) {
+void iter_values(HashTable* table, void (* callback)(void*)) {
     for (size_t i = 0; i < table->bucket_count; i++) {
         HashNode* node = table->buckets[i];
         while (node) {
@@ -142,7 +142,7 @@ void iter_values(HashTable* table, void (*callback)(void*)) {
     }
 }
 
-void iter(HashTable* table, void (*callback)(const char*, void*)) {
+void iter(HashTable* table, void (* callback)(const char*, void*)) {
     for (size_t i = 0; i < table->bucket_count; i++) {
         HashNode* node = table->buckets[i];
         while (node) {

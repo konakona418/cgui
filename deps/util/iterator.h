@@ -11,8 +11,11 @@ typedef struct Iterator Iterator;
 
 typedef struct Iterator {
     void* (* next)(Iterator* self);
+
     void (* destroy)(Iterator* self);
+
     int (* has_next)(Iterator* self);
+
     void (* reset)(Iterator* self);
 } Iterator;
 

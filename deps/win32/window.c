@@ -340,7 +340,7 @@ CGUI_Result cgui_destroyWindowClass(CGUI_WindowClass* self) {
 }
 
 CGUI_WindowManager* cgui_createWindowManager(HINSTANCE hInstance) {
-    CGUI_WindowManager* manager = (CGUI_WindowManager *) malloc(sizeof(CGUI_WindowManager));
+    CGUI_WindowManager* manager = (CGUI_WindowManager*) malloc(sizeof(CGUI_WindowManager));
     manager->hInstance = hInstance;
     manager->windows = create_hash_table(HASH_TABLE_BUCKET_SIZE);
 
@@ -400,8 +400,8 @@ CGUI_Result cgui_windowManager_destroyAllWindows(CGUI_WindowManager* self) {
     return create_ok(NULL);
 }
 
-CGUI_WindowClassManager *cgui_createWindowClassManager() {
-    CGUI_WindowClassManager* manager = (CGUI_WindowClassManager *) malloc(sizeof(CGUI_WindowClassManager));
+CGUI_WindowClassManager* cgui_createWindowClassManager() {
+    CGUI_WindowClassManager* manager = (CGUI_WindowClassManager*) malloc(sizeof(CGUI_WindowClassManager));
     manager->windowClasses = create_hash_table(HASH_TABLE_BUCKET_SIZE);
 
     manager->addWindowClass = cgui_windowClassManager_addWindowClass;
