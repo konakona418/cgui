@@ -17,4 +17,8 @@ add_executable(cgui main.c
         deps/util/error.h
         deps/util/error_msg.h
         deps/util/obsolete.c
-        deps/util/obsolete.h)
+        deps/util/obsolete.h
+        deps/util/hashmap.c
+        deps/util/hashmap.h
+        deps/util/iterator.c
+        deps/util/iterator.h)

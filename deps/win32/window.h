@@ -9,17 +9,32 @@
 
 #include <windows.h>
 #include <assert.h>
+#include <time.h>
 
 #include "../util/common.h"
+#include "../util/hashmap.h"
 
 #include "../geo/rect.h"
 
-/* Prototype of WindowFactory and Window. */
+/* Prototypes of relevant classes. */
 typedef struct WindowFactory CGUI_WindowFactory;
 typedef struct Window CGUI_Window;
 
 typedef struct WindowClassFactory CGUI_WindowClassFactory;
 typedef struct WindowClass CGUI_WindowClass;
+
+typedef struct WindowManager CGUI_WindowManager;
+typedef struct WindowClassManager CGUI_WindowClassManager;
+
+/* Generating a random window identifier.
+ * The identifier takes the form of:
+ * wnd_<randint(10000, 65536)> */
+char* cgui_generateRandomWindowIdentifier();
+
+/* Generates a window identifier.
+ * The identifier takes the form of:
+ * wnd_<windowClassName>_<randint(10000, 65536)> */
+char* cgui_generateWindowIdentifier(LPCSTR windowClassname);
 
 /* Structure of WindowFactory. */
 typedef struct WindowFactory {
@@ -73,6 +88,9 @@ CGUI_WindowFactory* cgui_createWindowFactory();
 /* Destroys a WindowFactory. */
 void cgui_destroyWindowFactory(struct WindowFactory* factory);
 
+/* Resets the WindowFactory parameters to default. */
+CGUI_WindowFactory* cgui_resetWindowFactory(CGUI_WindowFactory* factory);
+
 /* Setters of WindowFactory. */
 
 /* Sets the style of the window. */
@@ -121,25 +139,33 @@ CGUI_Result cgui_windowFactory_createWindow(CGUI_WindowFactory* factory);
 
 /* Structure of Window. */
 typedef struct Window {
+    char* wndIdentifier;
+
     HWND hwnd;
+    LPCSTR wndName;
+    LPCSTR wndClassName;
     int swState;
 
-    CGUI_Result  (* show)(CGUI_Window* self);
-    CGUI_Result  (* hide)(CGUI_Window* self);
-    CGUI_Result  (* setState)(CGUI_Window* self, int swState);
+    // todo: implement other methods.
+
+    CGUI_Result (* show)(CGUI_Window* self);
+
+    CGUI_Result (* hide)(CGUI_Window* self);
+
+    CGUI_Result (* setState)(CGUI_Window* self, int swState);
 } CGUI_Window;
 
 /* Constructors and Destructors of Window. */
 
 /* Creates a Window struct.
  * Note that this function is not intended for Window creation. Use WindowFactory instead. */
-CGUI_Window* cgui_createWindow(HWND hwnd);
+CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName);
 
 /* Destroys a Window struct. */
-CGUI_Result  cgui_destroyWindow(CGUI_Window* self);
+CGUI_Result cgui_destroyWindow(CGUI_Window* self);
 
 /* Methods of Window. */
-CGUI_Result  cgui_window_show(CGUI_Window* self);
+CGUI_Result cgui_window_show(CGUI_Window* self);
 
 /* Hides the window. */
 CGUI_Result cgui_window_hide(CGUI_Window* self);
@@ -154,33 +180,71 @@ typedef struct WindowClassFactory {
     WNDCLASS wc;
 
     void (* setWindowClassStyle)(CGUI_WindowClassFactory* self, UINT style);
+
     void (* setWindowProc)(CGUI_WindowClassFactory* self, WNDPROC lpfnWndProc);
+
     void (* setWindowClassExtraSize)(CGUI_WindowClassFactory* self, int cbClsExtra);
+
     void (* setWindowExtraSize)(CGUI_WindowClassFactory* self, int cbWndExtra);
+
     void (* setWindowInstance)(CGUI_WindowClassFactory* self, HINSTANCE hInstance);
+
     void (* setWindowIcon)(CGUI_WindowClassFactory* self, HICON hIcon);
+
     void (* setWindowCursor)(CGUI_WindowClassFactory* self, HCURSOR hCursor);
+
     void (* setWindowBackgroundBrush)(CGUI_WindowClassFactory* self, HBRUSH hbrBackground);
+
     void (* setWindowMenuName)(CGUI_WindowClassFactory* self, LPCSTR lpszMenuName);
+
     void (* setWindowClassName)(CGUI_WindowClassFactory* self, LPCSTR lpszClassName);
+
     CGUI_WindowClass* (* createWindowClass)(CGUI_WindowClassFactory* self);
 } CGUI_WindowClassFactory;
 
 /* Constructors and Destructors of WindowClassFactory. */
 CGUI_WindowClassFactory* cgui_createWindowClassFactory();
+
 void cgui_destroyWindowClassFactory(CGUI_WindowClassFactory* factory);
 
+CGUI_WindowClassFactory* cgui_resetWindowClassFactory(CGUI_WindowClassFactory* factory);
+
 /* Setters of WindowClassFactory. */
+
+/* Sets the style of the window class.
+ * See https://docs.microsoft.com/en-us/windows/win32/winmsg/window-class-styles */
 void cgui_windowClassFactory_setWindowClassStyle(CGUI_WindowClassFactory* factory, UINT style);
+
+/* Sets the window procedure of the window class. */
 void cgui_windowClassFactory_setWindowProc(CGUI_WindowClassFactory* factory, WNDPROC lpfnWndProc);
+
+/* Sets the extra size of the window class. */
 void cgui_windowClassFactory_setWindowClassExtraSize(CGUI_WindowClassFactory* factory, int cbClsExtra);
+
+/* Sets the extra size of the window. */
 void cgui_windowClassFactory_setWindowExtraSize(CGUI_WindowClassFactory* factory, int cbWndExtra);
+
+/* Sets the instance of the window class.
+ * Usually, this instance is passed into the program entry point function.*/
 void cgui_windowClassFactory_setWindowInstance(CGUI_WindowClassFactory* factory, HINSTANCE hInstance);
+
+/* Sets the icon of the window class. */
 void cgui_windowClassFactory_setWindowIcon(CGUI_WindowClassFactory* factory, HICON hIcon);
+
+/* Sets the cursor of the window class. */
 void cgui_windowClassFactory_setWindowCursor(CGUI_WindowClassFactory* factory, HCURSOR hCursor);
+
+/* Sets the background brush of the window class. */
 void cgui_windowClassFactory_setWindowBackgroundBrush(CGUI_WindowClassFactory* factory, HBRUSH hbrBackground);
+
+/* Sets the menu name of the window class. */
 void cgui_windowClassFactory_setWindowMenuName(CGUI_WindowClassFactory* factory, LPCSTR lpszMenuName);
+
+/* Sets the class name of the window class. */
 void cgui_windowClassFactory_setWindowClassName(CGUI_WindowClassFactory* factory, LPCSTR lpszClassName);
+
+/* Creates a WindowClass with the given WindowClassFactory.
+ * Note that this function is not intended for WindowClass registration.*/
 CGUI_WindowClass* cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFactory* factory);
 
 /* Structure of WindowClass. */
@@ -188,10 +252,86 @@ typedef struct WindowClass {
     WNDCLASS wc;
 } CGUI_WindowClass;
 
-/* Registers a window class. */
+/* Registers a window class.
+ * This should be called before creating a window. */
 CGUI_Result cgui_registerWindowClass(CGUI_WindowClass* wc);
 
-/* Destroys a window class. */
+/* Destroys a window class.
+ * Note that this function will unregister the window class as well. */
 CGUI_Result cgui_destroyWindowClass(CGUI_WindowClass* self);
+
+
+/* Structure of WindowManager. */
+typedef struct WindowManager {
+    HINSTANCE hInstance;
+    HashTable* windows;
+
+    CGUI_Result (* addWindow)(CGUI_WindowManager* self, CGUI_Window* window);
+    CGUI_Option (* getWindow)(CGUI_WindowManager* self, const char* name);
+    CGUI_Result (* removeWindow)(CGUI_WindowManager* self, CGUI_Window* window);
+    CGUI_Result (* removeWindowByIdentifier)(CGUI_WindowManager* self, const char* wndIdentifier);
+    CGUI_Result (* destroyAllWindows)(CGUI_WindowManager* self);
+} CGUI_WindowManager;
+
+/* Constructors and Destructors of WindowManager. */
+CGUI_WindowManager* cgui_createWindowManager(HINSTANCE hInstance);
+
+/* Destroys a WindowManager.
+ * Note that this should dispose all existing windows. */
+void cgui_destroyWindowManager(CGUI_WindowManager* manager);
+
+/* Methods of WindowManager. */
+
+/* Adds a window to the manager.
+ * DO NOT free the window passed in! It will be freed when the manager is disposed. */
+CGUI_Result cgui_windowManager_addWindow(CGUI_WindowManager* manager, CGUI_Window* window);
+
+/* Gets a window from the manager.
+ * Note that the `wndIdentifier` parameter is **NOT** the name of the window.
+ * Instead, it is the wndIdentifier property of CGUI_Window.
+ * This property is randomly generated. */
+CGUI_Option cgui_windowManager_getWindow(CGUI_WindowManager* self, const char* wndIdentifier);
+
+/* Removes a window from the manager. */
+CGUI_Result cgui_windowManager_removeWindow(CGUI_WindowManager* manager, CGUI_Window* window);
+
+/* Removes a window from the manager by its CGUI_Window.wndIdentifier. */
+CGUI_Result cgui_windowManager_removeWindowByIdentifier(CGUI_WindowManager* manager, const char* wndIdentifier);
+
+/* Destroys all windows in the manager. */
+CGUI_Result cgui_windowManager_destroyAllWindows(CGUI_WindowManager* manager);
+
+
+/* Structure of WindowClassManager. */
+typedef struct WindowClassManager {
+    HashTable* windowClasses;
+
+    CGUI_Result (* addWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
+    CGUI_Option (* getWindowClass)(CGUI_WindowClassManager* self, const char* name);
+    CGUI_Result (* removeWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
+    CGUI_Result (* removeWindowClassByName)(CGUI_WindowClassManager* self, const char* name);
+    CGUI_Result (* destroyAllWindowClasses)(CGUI_WindowClassManager* self);
+} CGUI_WindowClassManager;
+
+/* Constructors and Destructors of WindowClassManager. */
+CGUI_WindowClassManager* cgui_createWindowClassManager();
+void cgui_destroyWindowClassManager(CGUI_WindowClassManager* manager);
+
+/* Methods of WindowClassManager. */
+
+/* Adds a window class to the manager. */
+CGUI_Result cgui_windowClassManager_addWindowClass(CGUI_WindowClassManager* manager, CGUI_WindowClass* wc);
+
+/* Gets a window class from the manager. */
+CGUI_Option cgui_windowClassManager_getWindowClass(CGUI_WindowClassManager* manager, const char* name);
+
+/* Removes a window class from the manager. */
+CGUI_Result cgui_windowClassManager_removeWindowClass(CGUI_WindowClassManager* manager, CGUI_WindowClass* wc);
+
+/* Removes a window class from the manager by its name. */
+CGUI_Result cgui_windowClassManager_removeWindowClassByName(CGUI_WindowClassManager* manager, const char* name);
+
+/* Destroys all window classes in the manager. */
+CGUI_Result cgui_windowClassManager_destroyAllWindowClasses(CGUI_WindowClassManager* manager);
 
 #endif //CGUI_WINDOW_H
