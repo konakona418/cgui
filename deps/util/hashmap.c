@@ -36,6 +36,10 @@ HashTable* create_hash_table(size_t bucket_count) {
     table->iter_values = iter_values;
     table->iter = iter;
 
+    table->iter_result = iter_result;
+    table->iter_key_result = iter_key_result;
+    table->iter_value_result = iter_value_result;
+
     return table;
 }
 
@@ -136,7 +140,8 @@ void iter_values(HashTable* table, void (* callback)(void*)) {
     for (size_t i = 0; i < table->bucket_count; i++) {
         HashNode* node = table->buckets[i];
         while (node) {
-            callback(node->value);
+            void* value = node->value;
+            callback(value);
             node = node->next;
         }
     }
@@ -150,4 +155,40 @@ void iter(HashTable* table, void (* callback)(const char*, void*)) {
             node = node->next;
         }
     }
+}
+
+CGUI_Result iter_result(HashTable* table, CGUI_Result (* callback)(const char*, void*)) {
+    for (size_t i = 0; i < table->bucket_count; i++) {
+        HashNode* node = table->buckets[i];
+        while (node) {
+            CGUI_Result result = callback(node->key, node->value);
+            node = node->next;
+            if (is_err(&result)) return result;
+        }
+    }
+    return create_ok(NULL);
+}
+
+CGUI_Result iter_key_result(HashTable* table, CGUI_Result (* callback)(const char*)) {
+    for (size_t i = 0; i < table->bucket_count; i++) {
+        HashNode* node = table->buckets[i];
+        while (node) {
+            CGUI_Result result = callback(node->key);
+            node = node->next;
+            if (is_err(&result)) return result;
+        }
+    }
+    return create_ok(NULL);
+}
+
+CGUI_Result iter_value_result(HashTable* table, CGUI_Result (* callback)(void*)) {
+    for (size_t i = 0; i < table->bucket_count; i++) {
+        HashNode* node = table->buckets[i];
+        while (node) {
+            CGUI_Result result = callback(node->value);
+            node = node->next;
+            if (is_err(&result)) return result;
+        }
+    }
+    return create_ok(NULL);
 }

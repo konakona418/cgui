@@ -21,4 +21,6 @@ add_executable(cgui main.c
         deps/util/hashmap.c
         deps/util/hashmap.h
         deps/util/iterator.c
-        deps/util/iterator.h)
+        deps/util/iterator.h
+        deps/core.c
+        deps/core.h)

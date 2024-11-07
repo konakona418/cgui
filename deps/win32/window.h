@@ -78,6 +78,8 @@ typedef struct WindowFactory {
     void (* setWindowParam)(CGUI_WindowFactory* self, LPVOID lpParam);
 
     CGUI_Result (* createWindow)(CGUI_WindowFactory* self);
+
+    void (* resetWindowFactory)(CGUI_WindowFactory* self);
 } CGUI_WindowFactory;
 
 /* Constructors and Destructors of WindowFactory. */
@@ -89,7 +91,7 @@ CGUI_WindowFactory* cgui_createWindowFactory();
 void cgui_destroyWindowFactory(struct WindowFactory* factory);
 
 /* Resets the WindowFactory parameters to default. */
-CGUI_WindowFactory* cgui_resetWindowFactory(CGUI_WindowFactory* factory);
+void cgui_resetWindowFactory(CGUI_WindowFactory* self);
 
 /* Setters of WindowFactory. */
 
@@ -133,11 +135,14 @@ void cgui_windowFactory_setWindowInstance(CGUI_WindowFactory* factory, HINSTANCE
 /* [Optional] Sets the param of the window. */
 void cgui_windowFactory_setWindowParam(CGUI_WindowFactory* factory, LPVOID lpParam);
 
-/* Creates a window with the given WindowFactory. */
+/* Creates a window with the given WindowFactory.
+ * This will automatically reset the parameters of the WindowFactory. */
 CGUI_Result cgui_windowFactory_createWindow(CGUI_WindowFactory* factory);
 
 
-/* Structure of Window. */
+/* Structure of Window.
+ * This type, if registered to the `CGUI_WindowManager`,
+ * shall not be deallocated manually. */
 typedef struct Window {
     char* wndIdentifier;
 
@@ -199,7 +204,9 @@ typedef struct WindowClassFactory {
 
     void (* setWindowClassName)(CGUI_WindowClassFactory* self, LPCSTR lpszClassName);
 
-    CGUI_WindowClass* (* createWindowClass)(CGUI_WindowClassFactory* self);
+    CGUI_Result (* createWindowClass)(CGUI_WindowClassFactory* self);
+
+    void (* resetWindowClassFactory)(CGUI_WindowClassFactory* self);
 } CGUI_WindowClassFactory;
 
 /* Constructors and Destructors of WindowClassFactory. */
@@ -207,7 +214,7 @@ CGUI_WindowClassFactory* cgui_createWindowClassFactory();
 
 void cgui_destroyWindowClassFactory(CGUI_WindowClassFactory* factory);
 
-CGUI_WindowClassFactory* cgui_resetWindowClassFactory(CGUI_WindowClassFactory* factory);
+void cgui_resetWindowClassFactory(CGUI_WindowClassFactory* self);
 
 /* Setters of WindowClassFactory. */
 
@@ -244,10 +251,13 @@ void cgui_windowClassFactory_setWindowMenuName(CGUI_WindowClassFactory* factory,
 void cgui_windowClassFactory_setWindowClassName(CGUI_WindowClassFactory* factory, LPCSTR lpszClassName);
 
 /* Creates a WindowClass with the given WindowClassFactory.
- * Note that this function is not intended for WindowClass registration.*/
-CGUI_WindowClass* cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFactory* factory);
+ * Note that this function is not intended for WindowClass registration.
+ * Also, the after calling this function, all the parameters of the WindowClassFactory will be reset. */
+CGUI_Result cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFactory* factory);
 
-/* Structure of WindowClass. */
+/* Structure of WindowClass.
+ * This type, when registered to a `CGUI_WindowClassManager`,
+ * shall not be released manually. */
 typedef struct WindowClass {
     WNDCLASS wc;
 } CGUI_WindowClass;
@@ -312,6 +322,8 @@ typedef struct WindowClassManager {
 
     CGUI_Result (* addWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
 
+    CGUI_Result (* addWindowClassAndRegister)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
+
     CGUI_Option (* getWindowClass)(CGUI_WindowClassManager* self, const char* name);
 
     CGUI_Result (* removeWindowClass)(CGUI_WindowClassManager* self, CGUI_WindowClass* wc);
@@ -330,6 +342,9 @@ void cgui_destroyWindowClassManager(CGUI_WindowClassManager* manager);
 
 /* Adds a window class to the manager. */
 CGUI_Result cgui_windowClassManager_addWindowClass(CGUI_WindowClassManager* manager, CGUI_WindowClass* wc);
+
+/* Adds a window class to the manager and registers it. */
+CGUI_Result cgui_windowClassManager_addWindowClassAndRegister(CGUI_WindowClassManager* manager, CGUI_WindowClass* wc);
 
 /* Gets a window class from the manager. */
 CGUI_Option cgui_windowClassManager_getWindowClass(CGUI_WindowClassManager* manager, const char* name);

@@ -55,6 +55,8 @@ CGUI_WindowFactory* cgui_createWindowFactory() {
     factory->setWindowPosition = cgui_windowFactory_setWindowPosition;
     factory->setWindowSize = cgui_windowFactory_setWindowSize;
     factory->setWindowName = cgui_windowFactory_setWindowName;
+
+    factory->resetWindowFactory = cgui_resetWindowFactory;
     return factory;
 }
 
@@ -77,8 +79,10 @@ CGUI_Result cgui_windowFactory_createWindow(CGUI_WindowFactory* factory) {
     CGUI_Window* window = cgui_createWindow(hwnd, factory->lpWindowName, factory->lpClassName);
     if (hwnd == NULL) {
         free(window);
+        factory->resetWindowFactory(factory);
         return create_err(CGUI_Error_WindowCreateFailed());
     } else {
+        factory->resetWindowFactory(factory);
         return create_ok(window);
     }
 }
@@ -145,24 +149,22 @@ void cgui_destroyWindowFactory(struct WindowFactory* factory) {
     free(factory);
 }
 
-CGUI_WindowFactory* cgui_resetWindowFactory(CGUI_WindowFactory* factory) {
-    factory->dwExStyle = 0;
-    factory->dwStyle = WS_OVERLAPPEDWINDOW;
+void cgui_resetWindowFactory(CGUI_WindowFactory* self) {
+    self->dwExStyle = 0;
+    self->dwStyle = WS_OVERLAPPEDWINDOW;
 
-    factory->hInstance = NULL;
-    factory->lpParam = NULL;
-    factory->menu = NULL;
-    factory->parent = NULL;
+    self->hInstance = NULL;
+    self->lpParam = NULL;
+    self->menu = NULL;
+    self->parent = NULL;
 
-    factory->lpClassName = NULL;
-    factory->lpWindowName = NULL;
+    self->lpClassName = NULL;
+    self->lpWindowName = NULL;
 
-    factory->x = CW_USEDEFAULT;
-    factory->y = CW_USEDEFAULT;
-    factory->width = CW_USEDEFAULT;
-    factory->height = CW_USEDEFAULT;
-
-    return factory;
+    self->x = CW_USEDEFAULT;
+    self->y = CW_USEDEFAULT;
+    self->width = CW_USEDEFAULT;
+    self->height = CW_USEDEFAULT;
 }
 
 CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
@@ -246,6 +248,7 @@ CGUI_WindowClassFactory* cgui_createWindowClassFactory() {
     factory->setWindowMenuName = cgui_windowClassFactory_setWindowMenuName;
     factory->setWindowClassName = cgui_windowClassFactory_setWindowClassName;
     factory->createWindowClass = cgui_windowClassFactory_createWindowClass;
+    factory->resetWindowClassFactory = cgui_resetWindowClassFactory;
 
     return factory;
 }
@@ -254,22 +257,20 @@ void cgui_destroyWindowClassFactory(CGUI_WindowClassFactory* factory) {
     free(factory);
 }
 
-CGUI_WindowClassFactory* cgui_resetWindowClassFactory(CGUI_WindowClassFactory* factory) {
+void cgui_resetWindowClassFactory(CGUI_WindowClassFactory* self) {
     WNDCLASS w = {};
-    factory->wc = w;
+    self->wc = w;
 
-    factory->wc.style = 0;
-    factory->wc.lpfnWndProc = NULL;
-    factory->wc.cbClsExtra = 0;
-    factory->wc.cbWndExtra = 0;
-    factory->wc.hInstance = NULL;
-    factory->wc.hIcon = NULL;
-    factory->wc.hCursor = NULL;
-    factory->wc.hbrBackground = NULL;
-    factory->wc.lpszMenuName = NULL;
-    factory->wc.lpszClassName = NULL;
-
-    return factory;
+    self->wc.style = 0;
+    self->wc.lpfnWndProc = NULL;
+    self->wc.cbClsExtra = 0;
+    self->wc.cbWndExtra = 0;
+    self->wc.hInstance = NULL;
+    self->wc.hIcon = NULL;
+    self->wc.hCursor = NULL;
+    self->wc.hbrBackground = NULL;
+    self->wc.lpszMenuName = NULL;
+    self->wc.lpszClassName = NULL;
 }
 
 void cgui_windowClassFactory_setWindowClassStyle(CGUI_WindowClassFactory* factory, UINT style) {
@@ -312,10 +313,11 @@ void cgui_windowClassFactory_setWindowClassName(CGUI_WindowClassFactory* factory
     factory->wc.lpszClassName = lpszClassName;
 }
 
-CGUI_WindowClass* cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFactory* factory) {
+CGUI_Result cgui_windowClassFactory_createWindowClass(CGUI_WindowClassFactory* factory) {
     CGUI_WindowClass* wc = (CGUI_WindowClass*) malloc(sizeof(CGUI_WindowClass));
     wc->wc = factory->wc;
-    return wc;
+    factory->resetWindowClassFactory(factory);
+    return create_ok(wc);
 }
 
 CGUI_Result cgui_registerWindowClass(CGUI_WindowClass* self) {
@@ -353,7 +355,7 @@ CGUI_WindowManager* cgui_createWindowManager(HINSTANCE hInstance) {
 }
 
 void cgui_destroyWindowManager(CGUI_WindowManager* self) {
-    cgui_windowManager_destroyAllWindows(self);
+    unwrap(cgui_windowManager_destroyAllWindows(self));
     destroy_hash_table(self->windows);
     free(self);
 }
@@ -370,7 +372,11 @@ CGUI_Option cgui_windowManager_getWindow(CGUI_WindowManager* self, const char* w
     if (self == NULL || wndIdentifier == NULL) {
         return create_none();
     }
-    return create_some(self->windows->find(self->windows, wndIdentifier));
+    CGUI_Window* wnd = self->windows->find(self->windows, wndIdentifier);
+    if (wnd == NULL) {
+        return create_none();
+    }
+    return create_some(wnd);
 }
 
 CGUI_Result cgui_windowManager_removeWindow(CGUI_WindowManager* self, CGUI_Window* window) {
@@ -395,9 +401,7 @@ CGUI_Result cgui_windowManager_destroyAllWindows(CGUI_WindowManager* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    self->windows->iter_values(self->windows, (void (*)(void*)) cgui_destroyWindow);
-    destroy_hash_table(self->windows);
-    return create_ok(NULL);
+    return self->windows->iter_value_result(self->windows, (CGUI_Result (*)(void *)) cgui_destroyWindow);
 }
 
 CGUI_WindowClassManager* cgui_createWindowClassManager() {
@@ -405,6 +409,7 @@ CGUI_WindowClassManager* cgui_createWindowClassManager() {
     manager->windowClasses = create_hash_table(HASH_TABLE_BUCKET_SIZE);
 
     manager->addWindowClass = cgui_windowClassManager_addWindowClass;
+    manager->addWindowClassAndRegister = cgui_windowClassManager_addWindowClassAndRegister;
     manager->destroyAllWindowClasses = cgui_windowClassManager_destroyAllWindowClasses;
     manager->getWindowClass = cgui_windowClassManager_getWindowClass;
     manager->removeWindowClass = cgui_windowClassManager_removeWindowClass;
@@ -416,7 +421,7 @@ void cgui_destroyWindowClassManager(CGUI_WindowClassManager* self) {
     if (self == NULL) {
         return;
     }
-    self->destroyAllWindowClasses(self);
+    unwrap(self->destroyAllWindowClasses(self));
     destroy_hash_table(self->windowClasses);
     free(self);
 }
@@ -432,11 +437,27 @@ CGUI_Result cgui_windowClassManager_addWindowClass(CGUI_WindowClassManager* self
     return create_ok(NULL);
 }
 
+CGUI_Result cgui_windowClassManager_addWindowClassAndRegister(CGUI_WindowClassManager* self, CGUI_WindowClass* wc) {
+    if (self == NULL || wc == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    CGUI_Result reg = cgui_registerWindowClass(wc);
+    if (is_err(&reg)) {
+        return reg;
+    }
+    CGUI_Result r = cgui_windowClassManager_addWindowClass(self, wc);
+    return r;
+}
+
 CGUI_Option cgui_windowClassManager_getWindowClass(CGUI_WindowClassManager* self, const char* lpszClassName) {
     if (self == NULL || lpszClassName == NULL) {
         return create_none();
     }
-    return create_some(self->windowClasses->find(self->windowClasses, lpszClassName));
+    CGUI_WindowClass* wc = self->windowClasses->find(self->windowClasses, lpszClassName);
+    if (wc == NULL) {
+        return create_none();
+    }
+    return create_some(wc);
 }
 
 CGUI_Result cgui_windowClassManager_removeWindowClass(CGUI_WindowClassManager* self, CGUI_WindowClass* wc) {
@@ -467,7 +488,5 @@ CGUI_Result cgui_windowClassManager_destroyAllWindowClasses(CGUI_WindowClassMana
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    self->windowClasses->iter_values(self->windowClasses, (void (*)(void*)) cgui_destroyWindowClass);
-    destroy_hash_table(self->windowClasses);
-    return create_ok(NULL);
+    return self->windowClasses->iter_value_result(self->windowClasses, (CGUI_Result (*)(void*)) cgui_destroyWindowClass);
 }

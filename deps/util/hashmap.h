@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "common.h"
 
 /* Prototypes of hash node and hash table. */
 typedef struct HashNode HashNode;
@@ -41,6 +42,12 @@ typedef struct HashTable {
     void (* iter_values)(HashTable* table, void (* callback)(void* value));
 
     void (* iter_keys)(HashTable* table, void (* callback)(const char* key));
+
+    CGUI_Result (* iter_result)(HashTable* table, CGUI_Result (* callback)(const char* key, void* value));
+
+    CGUI_Result (* iter_value_result)(HashTable* table, CGUI_Result (* callback)(void* value));
+
+    CGUI_Result (* iter_key_result)(HashTable* table, CGUI_Result (* callback)(const char* key));
 } HashTable;
 
 /* Implementation of djb2 hash function. */
@@ -73,5 +80,20 @@ void iter_values(HashTable* table, void (* callback)(void* value));
 
 /* Iterate over all keys in the hash table. */
 void iter_keys(HashTable* table, void (* callback)(const char* key));
+
+/* Iterate over all key-value pairs in the hash table and return the result.
+ * If the callback function raises an Err, the iteration will stop and the Err will be returned.
+ * Otherwise, the function will return an Ok(NULL). */
+CGUI_Result iter_result(HashTable* table, CGUI_Result (* callback)(const char* key, void* value));
+
+/* Iterate over all values in the hash table and return the result.
+ * If the callback function raises an Err, the iteration will stop and the Err will be returned.
+ * Otherwise, the function will return an Ok(NULL). */
+CGUI_Result iter_value_result(HashTable* table, CGUI_Result (* callback)(void* value));
+
+/* Iterate over all keys in the hash table and return the result.
+ * If the callback function raises an Err, the iteration will stop and the Err will be returned.
+ * Otherwise, the function will return an Ok(NULL). */
+CGUI_Result iter_key_result(HashTable* table, CGUI_Result (* callback)(const char* key));
 
 #endif //CGUI_HASHMAP_H
