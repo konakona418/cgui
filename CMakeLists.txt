@@ -23,4 +23,6 @@ add_executable(cgui main.c
         deps/util/iterator.c
         deps/util/iterator.h
         deps/core.c
-        deps/core.h)
+        deps/core.h
+        deps/win32/message.c
+        deps/win32/message.h)

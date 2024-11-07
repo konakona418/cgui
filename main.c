@@ -24,6 +24,8 @@ int main(void) {
     core->wndManager->addWindow(core->wndManager, wnd);
     wnd->show(wnd);
 
+    DestroyWindow(wnd->hwnd);
+
     cgui_destroyCore(core);
     return 0;
     CGUI_WindowFactory* wndFactory = cgui_createWindowFactory();

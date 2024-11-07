@@ -190,7 +190,12 @@ CGUI_Result cgui_destroyWindow(CGUI_Window* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    DestroyWindow(self->hwnd);
+    if (IsWindow(self->hwnd)) {
+        DestroyWindow(self->hwnd);
+    } else {
+        // todo: this does not raise any error, but that's just a temporary compromise.
+        // in case that the window was already destroyed by user.
+    }
     free(self);
     return create_ok(NULL);
 }
