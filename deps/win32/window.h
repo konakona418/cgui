@@ -158,6 +158,22 @@ typedef struct Window {
     CGUI_Result (* hide)(CGUI_Window* self);
 
     CGUI_Result (* setState)(CGUI_Window* self, int swState);
+
+    CGUI_Result (* setWindowName)(CGUI_Window* self, LPCSTR wndName);
+
+    CGUI_Result (* setWindowStyle)(CGUI_Window* self, LONG_PTR dwStyle);
+
+    CGUI_Result (* setWindowGeometry) (CGUI_Window* self, int x, int y, int width, int height);
+
+    CGUI_Result (* setWindowGeometryRect) (CGUI_Window* self, CGUI_Rectangle* rect);
+
+    CGUI_Result (* setWindowPosition) (CGUI_Window* self, int x, int y);
+
+    CGUI_Result (* setWindowSize) (CGUI_Window* self, int width, int height);
+
+    CGUI_Result (* setWindowProperty) (CGUI_Window* self, int gwlIndex, LONG_PTR gwlValue);
+
+    HWND (* getWindowHandle) (CGUI_Window* self);
 } CGUI_Window;
 
 /* Constructors and Destructors of Window. */
@@ -177,6 +193,31 @@ CGUI_Result cgui_window_hide(CGUI_Window* self);
 
 /* Sets the state of the window. e.g. SW_SHOW to show the window. */
 CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);
+
+/* Sets the name of the window. */
+CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName);
+
+/* Sets the style of the window. */
+CGUI_Result cgui_window_setWindowStyle(CGUI_Window* self, LONG_PTR dwStyle);
+
+/* Sets the geometry of the window. */
+CGUI_Result cgui_window_setWindowGeometry(CGUI_Window* self, int x, int y, int width, int height);
+
+/* Sets the geometry of the window with a `Rectangle`. */
+CGUI_Result cgui_window_setWindowGeometryRect(CGUI_Window* self, CGUI_Rectangle* rect);
+
+/* Sets the position of the window. */
+CGUI_Result cgui_window_setWindowPosition(CGUI_Window* self, int x, int y);
+
+/* Sets the size of the window. */
+CGUI_Result cgui_window_setWindowSize(CGUI_Window* self, int width, int height);
+
+/* Sets the property of the window.
+ * See: https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlongptra.*/
+CGUI_Result cgui_window_setWindowProperty(CGUI_Window* self, int gwlIndex, LONG_PTR gwlValue);
+
+/* Gets the handle of the window. */
+HWND cgui_window_getWindowHandle(CGUI_Window* self);
 
 
 /* Structure of WindowClassFactory.

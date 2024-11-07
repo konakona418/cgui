@@ -177,11 +177,20 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
 
     window->wndIdentifier = cgui_generateWindowIdentifier(wndClassName);
 
-    // todo: load function pointers.
-
     window->show = cgui_window_show;
     window->hide = cgui_window_hide;
+
     window->setState = cgui_window_setState;
+    window->setWindowName = cgui_window_setWindowName;
+    window->setWindowStyle = cgui_window_setWindowStyle;
+    window->setWindowGeometry = cgui_window_setWindowGeometry;
+    window->setWindowGeometryRect = cgui_window_setWindowGeometryRect;
+    window->setWindowPosition = cgui_window_setWindowPosition;
+    window->setWindowSize = cgui_window_setWindowSize;
+
+    window->setWindowProperty = cgui_window_setWindowProperty;
+
+    window->getWindowHandle = cgui_window_getWindowHandle;
 
     return window;
 }
@@ -224,6 +233,65 @@ CGUI_Result cgui_window_setState(CGUI_Window* self, int swState) {
     }
     ShowWindow(self->hwnd, swState);
     return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    SetWindowText(self->hwnd, wndName);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowStyle(CGUI_Window* self, LONG_PTR dwStyle) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    SetWindowLongPtr(self->hwnd, GWL_STYLE, dwStyle);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowGeometry(CGUI_Window* self, int x, int y, int width, int height) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    MoveWindow(self->hwnd, x, y, width, height, TRUE);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowGeometryRect(CGUI_Window* self, CGUI_Rectangle* rect) {
+    return cgui_window_setWindowGeometry(self, rect->x, rect->y, rect->width, rect->height);
+}
+
+CGUI_Result cgui_window_setWindowPosition(CGUI_Window* self, int x, int y) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    MoveWindow(self->hwnd, x, y, 0, 0, TRUE);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowSize(CGUI_Window* self, int width, int height) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    MoveWindow(self->hwnd, 0, 0, width, height, TRUE);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setWindowProperty(CGUI_Window* self, int gwlIndex, LONG_PTR gwlValue) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    SetWindowLongPtr(self->hwnd, gwlIndex, gwlValue);
+    return create_ok(NULL);
+}
+
+HWND cgui_window_getWindowHandle(CGUI_Window* self) {
+    if (self == NULL) {
+        return NULL;
+    }
+    return self->hwnd;
 }
 
 CGUI_WindowClassFactory* cgui_createWindowClassFactory() {
