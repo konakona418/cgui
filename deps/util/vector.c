@@ -71,14 +71,17 @@ void vector_set(Vector* vector, size_t index, const void* element)
     }
 }
 
-void vector_remove(Vector* vector, size_t index)
+void* vector_remove(Vector* vector, size_t index)
 {
     if (index < vector->size)
     {
+        void* element = vector->data + index * vector->element_size;
         memmove(vector->data + index * vector->element_size, vector->data + (index + 1) * vector->element_size,
                 (vector->size - index - 1) * vector->element_size);
         vector->size--;
+        return element;
     }
+    return NULL;
 }
 
 void vector_resize(Vector* vector, size_t new_size)

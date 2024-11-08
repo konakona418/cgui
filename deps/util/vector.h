@@ -26,7 +26,7 @@ typedef struct Vector {
 
     void (* push_back)(Vector* vector, const void* element);
     void* (* pop_back)(Vector* vector);
-    void (* remove)(Vector* vector, size_t index);
+    void* (* remove)(Vector* vector, size_t index);
     void (* clear)(Vector* vector);
     void (* resize)(Vector* vector, size_t new_size);
     void (* set)(Vector* vector, size_t index, const void* element);
@@ -64,7 +64,7 @@ void vector_push_back(Vector* vector, const void* element);
 
 void* vector_pop_back(Vector* vector);
 
-void vector_remove(Vector* vector, size_t index);
+void* vector_remove(Vector* vector, size_t index);
 
 /* Clear all elements in the vector
  * This is not safe, only use it when you are sure that the memory is deallocated. */
