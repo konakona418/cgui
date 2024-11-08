@@ -6,7 +6,7 @@
 
 #include "core.h"
 
-#include "util/error.h"
+#include "../util/error.h"
 
 CGUI_Result cgui_createCore(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow) {
     CGUI_Result result = cgui_createRuntimeContext(hInstance, lpCmdLine, nCmdShow);
@@ -38,6 +38,10 @@ void cgui_destroyCore(CGUI_Core* core) {
     cgui_destroyWindowClassManager(core->wndClassManager);
     cgui_destroyWindowFactory(core->wndFactory);
     cgui_destroyWindowClassFactory(core->wndClassFactory);
+
+    // todo: use some other struct to store the context.
+    // for instance, Application.
+    // make sure the context can survive the whole application.
     cgui_destroyRuntimeContext(core->ctx);
     free(core);
 }

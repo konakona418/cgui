@@ -474,7 +474,7 @@ CGUI_Result cgui_windowManager_destroyAllWindows(CGUI_WindowManager* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    return self->windows->iter_value_result(self->windows, (CGUI_Result (*)(void *)) cgui_destroyWindow);
+    return self->windows->iter_value_result(self->windows, (CGUI_Result (*)(void*)) cgui_destroyWindow);
 }
 
 CGUI_WindowClassManager* cgui_createWindowClassManager() {
@@ -561,5 +561,6 @@ CGUI_Result cgui_windowClassManager_destroyAllWindowClasses(CGUI_WindowClassMana
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    return self->windowClasses->iter_value_result(self->windowClasses, (CGUI_Result (*)(void*)) cgui_destroyWindowClass);
+    return self->windowClasses->iter_value_result(self->windowClasses,
+                                                  (CGUI_Result (*)(void*)) cgui_destroyWindowClass);
 }

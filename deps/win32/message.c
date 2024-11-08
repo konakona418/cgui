@@ -24,7 +24,7 @@ void cgui_destroyMessageDispatcher(CGUI_MessageDispatcher* dispatcher) {
 }
 
 void cgui_messageDispatcher_dispatch(CGUI_MessageDispatcher* self, HWND hwnd, UINT filterMin, UINT filterMax) {
-    MSG msg = { };
+    MSG msg = {};
     while (GetMessage(&msg, hwnd, filterMin, filterMax) > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -54,7 +54,8 @@ void cgui_destroyMessageHandler(CGUI_MessageHandler* handler) {
     free(handler);
 }
 
-LRESULT CALLBACK cgui_messageHandler_winProc(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK
+cgui_messageHandler_winProc(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     switch (msg) {
         case WM_CREATE:
             if (self->onCreate) {

@@ -22,7 +22,18 @@ add_executable(cgui main.c
         deps/util/hashmap.h
         deps/util/iterator.c
         deps/util/iterator.h
-        deps/core.c
-        deps/core.h
+        deps/app/core.c
+        deps/app/core.h
         deps/win32/message.c
-        deps/win32/message.h)
+        deps/win32/message.h
+        deps/app/application.c
+        deps/app/application.h
+        deps/component/ui.c
+        deps/component/ui.h
+        deps/util/vector.c
+        deps/util/vector.h
+        deps/event/handler.c
+        deps/event/handler.h
+        deps/geo/layout.c
+        deps/geo/layout.h
+)

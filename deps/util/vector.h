@@ -25,13 +25,21 @@ typedef struct Vector {
     size_t capacity;
 
     void (* push_back)(Vector* vector, const void* element);
+
     void* (* pop_back)(Vector* vector);
+
     void* (* remove)(Vector* vector, size_t index);
+
     void (* clear)(Vector* vector);
+
     void (* resize)(Vector* vector, size_t new_size);
+
     void (* set)(Vector* vector, size_t index, const void* element);
+
     void* (* get)(Vector* vector, size_t index);
+
     void (* iter)(Vector* vector, void (* callback)(void* element));
+
     CGUI_Result (* iter_result)(Vector* vector, CGUI_Result (* callback)(void* element));
 } Vector;
 

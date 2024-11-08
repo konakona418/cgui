@@ -58,6 +58,10 @@ int random(int min, int max);
 /* This type is intended for representing a boolean value. */
 typedef int bool;
 
+#define true 1
+
+#define false 0
+
 /* Prototypes of functions and types. */
 typedef enum ResultType CGUI_ResultType;
 

@@ -163,17 +163,17 @@ typedef struct Window {
 
     CGUI_Result (* setWindowStyle)(CGUI_Window* self, LONG_PTR dwStyle);
 
-    CGUI_Result (* setWindowGeometry) (CGUI_Window* self, int x, int y, int width, int height);
+    CGUI_Result (* setWindowGeometry)(CGUI_Window* self, int x, int y, int width, int height);
 
-    CGUI_Result (* setWindowGeometryRect) (CGUI_Window* self, CGUI_Rectangle* rect);
+    CGUI_Result (* setWindowGeometryRect)(CGUI_Window* self, CGUI_Rectangle* rect);
 
-    CGUI_Result (* setWindowPosition) (CGUI_Window* self, int x, int y);
+    CGUI_Result (* setWindowPosition)(CGUI_Window* self, int x, int y);
 
-    CGUI_Result (* setWindowSize) (CGUI_Window* self, int width, int height);
+    CGUI_Result (* setWindowSize)(CGUI_Window* self, int width, int height);
 
-    CGUI_Result (* setWindowProperty) (CGUI_Window* self, int gwlIndex, LONG_PTR gwlValue);
+    CGUI_Result (* setWindowProperty)(CGUI_Window* self, int gwlIndex, LONG_PTR gwlValue);
 
-    HWND (* getWindowHandle) (CGUI_Window* self);
+    HWND (* getWindowHandle)(CGUI_Window* self);
 } CGUI_Window;
 
 /* Constructors and Destructors of Window. */

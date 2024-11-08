@@ -7,9 +7,9 @@
 #ifndef CGUI_CORE_H
 #define CGUI_CORE_H
 
-#include "./util/common.h"
+#include "../util/common.h"
 
-#include "./win32/window.h"
+#include "../win32/window.h"
 
 /* Prototypes */
 typedef struct Core CGUI_Core;
