@@ -5,7 +5,6 @@
 //
 
 #include "ui.h"
-#include "../util/common.h"
 #include "../util/error.h"
 
 CGUI_UIComponent* cgui_createUIComponentDefault(LPCSTR name, LONG_PTR id, CGUI_UIComponent* parent) {
@@ -29,11 +28,11 @@ CGUI_UIComponent* cgui_createUIComponent(LPCSTR name, LONG_PTR id, CGUI_UICompon
     component->eventHandler = NULL;
 
     // set the traits to null.
-    component->disposable = NULL;
-    component->drawable = NULL;
-    component->layout = NULL;
-    component->state = NULL;
-    component->style = NULL;
+    component->disposableImpl = NULL;
+    component->drawableImpl = NULL;
+    component->layoutImpl = NULL;
+    component->stateImpl = NULL;
+    component->styleImpl = NULL;
 
     // register the methods of the base class.
     component->addChild = cgui_uiComponent_addChild;
@@ -69,9 +68,9 @@ void cgui_destroyUIComponent(CGUI_UIComponent* component) {
     component->children->iter(component->children, (void (*)(void*)) cgui_destroyUIComponent);
 
     // call the custom destructor to free the custom type specific properties.
-    if (component->disposable->destructor != NULL &&
+    if (component->disposableImpl->destructor != NULL &&
         impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDisposable)) {
-        component->disposable->destructor(component);
+        component->disposableImpl->destructor(component);
     } else {
         printf("No destructor found for the component %s.\n", component->name);
     }
@@ -127,4 +126,145 @@ void cgui_uiComponent_setEventHandler(CGUI_UIComponent* component, CGUI_EventHan
         cgui_destroyEventHandler(component->eventHandler);
     }
     component->eventHandler = handler;
+}
+
+CGUI_UIDrawable* cgui_createUIDrawable(void (* drawCallback)(CGUI_UIComponent* component), void (* refreshCallback)(CGUI_UIComponent* component)) {
+    CGUI_UIDrawable* drawable = (CGUI_UIDrawable*) malloc(sizeof(CGUI_UIDrawable));
+    drawable->drawCallback = drawCallback;
+    drawable->refreshCallback = refreshCallback;
+
+    drawable->draw = cgui_uiDrawable_draw;
+    drawable->refresh = cgui_uiDrawable_refresh;
+    return drawable;
+}
+
+void cgui_destroyUIDrawable(CGUI_UIDrawable* drawable) {
+    free(drawable);
+}
+
+void cgui_uiDrawable_draw(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
+        if (component->drawableImpl->drawCallback != NULL) {
+            component->drawableImpl->drawCallback(component);
+        }
+    }
+    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_draw);
+}
+
+void cgui_uiDrawable_refresh(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
+        if (component->drawableImpl->refreshCallback != NULL) {
+            component->drawableImpl->refreshCallback(component);
+        }
+    }
+    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_refresh);
+}
+
+CGUI_UIState* cgui_createUIState() {
+    CGUI_UIState* state = (CGUI_UIState*) malloc(sizeof(CGUI_UIState));
+    state->enabled = true;
+    state->visible = true;
+
+    state->isEnabled = cgui_uiState_isEnabled;
+    state->isVisible = cgui_uiState_isVisible;
+    state->setEnabled = cgui_uiState_setEnabled;
+    state->setVisible = cgui_uiState_setVisible;
+
+    return state;
+}
+
+void cgui_destroyUIState(CGUI_UIState* state) {
+    free(state);
+}
+
+bool cgui_uiState_isEnabled(CGUI_UIComponent* state) {
+    if (impl(state->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIState)) {
+        return state->stateImpl->enabled;
+    }
+    return false;
+}
+
+bool cgui_uiState_isVisible(CGUI_UIComponent* state) {
+    if (impl(state->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIState)) {
+        return state->stateImpl->visible;
+    }
+    return false;
+}
+
+CGUI_Result cgui_uiState_setEnabled(CGUI_UIComponent* state, bool enabled) {
+    if (impl(state->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIState)) {
+        state->stateImpl->enabled = enabled;
+    }
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_uiState_setVisible(CGUI_UIComponent* state, bool visible) {
+    if (impl(state->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIState)) {
+        state->stateImpl->visible = visible;
+    }
+    return create_ok(NULL);
+}
+
+CGUI_UILayout* cgui_createUILayout() {
+    CGUI_Layout layout;
+    layout.padding = CGUI_PADDING_DEFAULT;
+    layout.margin = CGUI_MARGIN_DEFAULT;
+    layout.direction = CGUI_Direction_Horizontal;
+    layout.alignment = CGUI_Alignment_Left;
+    layout.anchor = CGUI_Anchor_TopLeft;
+
+    CGUI_Rectangle rect = cgui_createRectangle(0, 0, 0, 0);
+
+    CGUI_UILayout* impl = (CGUI_UILayout*) malloc(sizeof(CGUI_UILayout));
+    impl->layout = layout;
+    impl->geometry = rect;
+
+    impl->getGeometry = cgui_uiLayout_getGeometry;
+    impl->setGeometry = cgui_uiLayout_setGeometry;
+    impl->getLayout = cgui_uiLayout_getLayout;
+    impl->setLayout = cgui_uiLayout_setLayout;
+
+    return impl;
+}
+
+void cgui_destroyUILayout(CGUI_UILayout* layout) {
+    free(layout);
+}
+
+CGUI_Rectangle* cgui_uiLayout_getGeometry(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UILayout)) {
+        return &component->layoutImpl->geometry;
+    }
+    return NULL;
+}
+
+CGUI_Result cgui_uiLayout_setGeometry(CGUI_UIComponent* component, CGUI_Rectangle rect) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UILayout)) {
+        component->layoutImpl->geometry = rect;
+    }
+    return create_ok(NULL);
+}
+
+CGUI_Layout* cgui_uiLayout_getLayout(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UILayout)) {
+        return &component->layoutImpl->layout;
+    }
+    return NULL;
+}
+
+CGUI_Result cgui_uiLayout_setLayout(CGUI_UIComponent* component, CGUI_Layout layout) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UILayout)) {
+        component->layoutImpl->layout = layout;
+    }
+    return create_ok(NULL);
+}
+
+CGUI_UIStyle* cgui_createUIStyle() {
+    CGUI_UIStyle* style = (CGUI_UIStyle*) malloc(sizeof(CGUI_UIStyle));
+    // todo: to be implemented.
+    return style;
+}
+
+void cgui_destroyUIStyle(CGUI_UIStyle* style) {
+    free(style);
 }

@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include "deps/util/common.h"
 #include "deps/util/hashmap.h"
+#include "deps/util/vector.h"
 #include "deps/win32/window.h"
-#include "deps/core.h"
+#include "deps/app/core.h"
+
+// todo: fix core.c: L42
 
 int main(void) {
     CGUI_RuntimeContext* ctx = unwrap(cgui_createRuntimeContext(GetModuleHandle(NULL), GetCommandLine(), SW_SHOW));
     CGUI_Core* core = unwrap(cgui_createCoreFromContext(ctx));
+    core->wndClassFactory->setWindowClassStyle(core->wndClassFactory, CS_HREDRAW | CS_VREDRAW);
     core->wndClassFactory->setWindowClassName(core->wndClassFactory, "CGUI_Window");
     core->wndClassFactory->setWindowInstance(core->wndClassFactory, GetModuleHandle(NULL));
     core->wndClassFactory->setWindowProc(core->wndClassFactory, DefWindowProc);
+    core->wndClassFactory->setWindowBackgroundBrush(core->wndClassFactory, (HBRUSH)(COLOR_WINDOW + 1));
     CGUI_WindowClass* wndClass = unwrap(core->wndClassFactory->createWindowClass(core->wndClassFactory));
 
     core->wndClassManager->addWindowClassAndRegister(core->wndClassManager, wndClass);
@@ -24,37 +29,14 @@ int main(void) {
     core->wndManager->addWindow(core->wndManager, wnd);
     wnd->show(wnd);
 
-    DestroyWindow(wnd->hwnd);
-
-    cgui_destroyCore(core);
-    return 0;
-    CGUI_WindowFactory* wndFactory = cgui_createWindowFactory();
-    wndFactory->setWindowClass(wndFactory, wndClass);
-    wndFactory->setWindowName(wndFactory, "CGUI Window");
-    wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW);
-    wndFactory->setWindowSize(wndFactory, 640, 480);
-    wndFactory->setWindowPosition(wndFactory, 100, 100);
-
-    CGUI_Result result = wndFactory->createWindow(wndFactory);
-    if (is_err(&result)) {
-        panic(result.error->message);
-    }
-    cgui_destroyWindowFactory(wndFactory);
-
-    CGUI_Window* window = unwrap(result);
-    printf("Window created: %s.\n", window->wndIdentifier);
-    window->show(window);
-
-    CGUI_WindowManager* wndManager = cgui_createWindowManager(GetModuleHandle(NULL));
-    CGUI_WindowClassManager* wndClassManager = cgui_createWindowClassManager();
-    wndManager->addWindow(wndManager, window);
-    wndClassManager->addWindowClass(wndClassManager, wndClass);
-    unwrap_option(wndManager->getWindow(wndManager, window->wndIdentifier));
-
     MSG msg = { };
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    DestroyWindow(wnd->hwnd);
+
+    cgui_destroyCore(core);
     return 0;
 }

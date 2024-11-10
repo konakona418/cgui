@@ -26,12 +26,20 @@ typedef struct Margin {
     int bottom;
 } CGUI_Margin;
 
+CGUI_Margin cgui_margin(int left, int top, int right, int bottom);
+
+#define CGUI_MARGIN_DEFAULT cgui_margin(0, 0, 0, 0)
+
 typedef struct Padding {
     int left;
     int top;
     int right;
     int bottom;
 } CGUI_Padding;
+
+CGUI_Padding cgui_padding(int left, int top, int right, int bottom);
+
+#define CGUI_PADDING_DEFAULT cgui_padding(0, 0, 0, 0)
 
 typedef enum Alignment {
     CGUI_Alignment_Left,

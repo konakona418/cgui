@@ -95,10 +95,10 @@ void cgui_resetWindowFactory(CGUI_WindowFactory* self);
 
 /* Setters of WindowFactory. */
 
-/* Sets the style of the window. */
+/* Sets the styleImpl of the window. */
 void cgui_windowFactory_setWindowStyle(CGUI_WindowFactory* factory, DWORD dwStyle);
 
-/* Sets the extended style of the window.
+/* Sets the extended styleImpl of the window.
  * See https://docs.microsoft.com/en-us/windows/win32/winmsg/extended-window-styles. */
 void cgui_windowFactory_setWindowExStyle(CGUI_WindowFactory* factory, DWORD dwExStyle);
 
@@ -191,13 +191,13 @@ CGUI_Result cgui_window_show(CGUI_Window* self);
 /* Hides the window. */
 CGUI_Result cgui_window_hide(CGUI_Window* self);
 
-/* Sets the state of the window. e.g. SW_SHOW to show the window. */
+/* Sets the stateImpl of the window. e.g. SW_SHOW to show the window. */
 CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);
 
 /* Sets the name of the window. */
 CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName);
 
-/* Sets the style of the window. */
+/* Sets the styleImpl of the window. */
 CGUI_Result cgui_window_setWindowStyle(CGUI_Window* self, LONG_PTR dwStyle);
 
 /* Sets the geometry of the window. */
@@ -259,7 +259,7 @@ void cgui_resetWindowClassFactory(CGUI_WindowClassFactory* self);
 
 /* Setters of WindowClassFactory. */
 
-/* Sets the style of the window class.
+/* Sets the styleImpl of the window class.
  * See https://docs.microsoft.com/en-us/windows/win32/winmsg/window-class-styles */
 void cgui_windowClassFactory_setWindowClassStyle(CGUI_WindowClassFactory* factory, UINT style);
 
