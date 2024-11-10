@@ -8,6 +8,7 @@
 #define CGUI_CORE_H
 
 #include "../util/common.h"
+#include "../util/error.h"
 
 #include "../win32/window.h"
 

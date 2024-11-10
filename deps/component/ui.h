@@ -20,12 +20,12 @@
 
 typedef unsigned int CGUI_Trait;
 
-const CGUI_Trait CGUI_Trait_UIComponent     = 0x00000001;
-const CGUI_Trait CGUI_Trait_UIDisposable    = 0x00000002;
-const CGUI_Trait CGUI_Trait_UIState         = 0x00000004;
-const CGUI_Trait CGUI_Trait_UIDrawable      = 0x00000008;
-const CGUI_Trait CGUI_Trait_UILayout        = 0x00000010;
-const CGUI_Trait CGUI_Trait_UIStyle         = 0x00000020;
+#define CGUI_Trait_UIComponent      0x00000001
+#define CGUI_Trait_UIDisposable     0x00000002
+#define CGUI_Trait_UIState          0x00000004
+#define CGUI_Trait_UIDrawable       0x00000008
+#define CGUI_Trait_UILayout         0x00000010
+#define CGUI_Trait_UIStyle          0x00000020
 
 /**
  * @note This macro can be applied to evaluating whether the given component implements all the required traits.
@@ -80,6 +80,13 @@ typedef struct UIDisposable {
      *   That includes: properties of it (e.g. EventHandlers), @b the @b children of the component, and @b the @b parent of the component.
      *   The destructor of @p CGUI_UIComponent will handle the destruction of these! */
     void (* destructor)(CGUI_UIComponent* component);
+
+    /**
+     * The upper level component.
+     *
+     * @note This is used to store the upper level component of the component (for instance, higher level implementation).
+     * It is used to implement the 'chain' of destruction. */
+    void* upperLevel;
 } CGUI_UIDisposable;
 
 typedef struct UILayout {
@@ -230,6 +237,19 @@ CGUI_UIComponent* cgui_uiComponent_removeChildById(CGUI_UIComponent* component, 
  * @param handler The new event handler. */
 void cgui_uiComponent_setEventHandler(CGUI_UIComponent* component, CGUI_EventHandler* handler);
 
+/**
+ * Create a new disposable component.
+ * @note the disposable will be destroyed when the component is destroyed.
+ * @param upperLevel the upper level implementation.
+ * @param destructor The destructor of the component.
+ * @return The created disposable component. */
+CGUI_UIDisposable* cgui_createUIDisposable(void* upperLevel, void (* destructor)(CGUI_UIComponent* component));
+
+/**
+ * Destroy the disposable component.
+ * @note This method will destroy the callback.
+ * @param component The disposable component to destroy. */
+void cgui_destroyUIDisposable(CGUI_UIDisposable* disposable);
 
 /**
  * Create a new drawable component.

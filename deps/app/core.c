@@ -6,8 +6,6 @@
 
 #include "core.h"
 
-#include "../util/error.h"
-
 CGUI_Result cgui_createCore(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow) {
     CGUI_Result result = cgui_createRuntimeContext(hInstance, lpCmdLine, nCmdShow);
     if (is_err(&result)) {

@@ -36,4 +36,6 @@ add_executable(cgui main.c
         deps/event/handler.h
         deps/geo/layout.c
         deps/geo/layout.h
+        deps/component/ui_window.c
+        deps/component/ui_window.h
 )

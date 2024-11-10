@@ -44,18 +44,6 @@ CGUI_UIComponent* cgui_createUIComponent(LPCSTR name, LONG_PTR id, CGUI_UICompon
 
     component->setEventHandler = cgui_uiComponent_setEventHandler;
 
-    /*
-    component->setVisible = cgui_uiComponent_setVisible;
-    component->setEnabled = cgui_uiComponent_setEnabled;
-    component->isVisible = cgui_uiComponent_isVisible;
-    component->isEnabled = cgui_uiComponent_isEnabled;
-
-    component->setGeometry = cgui_uiComponent_setGeometry;
-    component->getGeometry = cgui_uiComponent_getGeometry;
-    component->setLayout = cgui_uiComponent_setLayout;
-    component->getLayout = cgui_uiComponent_getLayout;
-    */
-
     return component;
 }
 
@@ -71,6 +59,9 @@ void cgui_destroyUIComponent(CGUI_UIComponent* component) {
     if (component->disposableImpl->destructor != NULL &&
         impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDisposable)) {
         component->disposableImpl->destructor(component);
+
+        // free the disposable impl.
+        cgui_destroyUIDisposable(component->disposableImpl);
     } else {
         printf("No destructor found for the component %s.\n", component->name);
     }
@@ -126,6 +117,17 @@ void cgui_uiComponent_setEventHandler(CGUI_UIComponent* component, CGUI_EventHan
         cgui_destroyEventHandler(component->eventHandler);
     }
     component->eventHandler = handler;
+}
+
+CGUI_UIDisposable* cgui_createUIDisposable(void* upperLevel, void (* destructor)(CGUI_UIComponent* component)) {
+    CGUI_UIDisposable* disposable = (CGUI_UIDisposable*) malloc(sizeof(CGUI_UIDisposable));
+    disposable->destructor = destructor;
+
+    return disposable;
+}
+
+void cgui_destroyUIDisposable(CGUI_UIDisposable* disposable) {
+    free(disposable);
 }
 
 CGUI_UIDrawable* cgui_createUIDrawable(void (* drawCallback)(CGUI_UIComponent* component), void (* refreshCallback)(CGUI_UIComponent* component)) {

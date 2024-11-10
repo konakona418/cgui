@@ -29,11 +29,11 @@ int main(void) {
     core->wndManager->addWindow(core->wndManager, wnd);
     wnd->show(wnd);
 
-    MSG msg = { };
+    /*MSG msg = { };
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-    }
+    }*/
 
     DestroyWindow(wnd->hwnd);
 
