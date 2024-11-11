@@ -35,7 +35,7 @@ int main(void) {
         DispatchMessage(&msg);
     }*/
 
-    DestroyWindow(wnd->hwnd);
+    cgui_destroyWindowInstance(wnd);
 
     cgui_destroyCore(core);
     return 0;

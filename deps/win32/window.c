@@ -214,6 +214,16 @@ CGUI_Result cgui_destroyWindow(CGUI_Window* self) {
     return create_ok(NULL);
 }
 
+CGUI_Result cgui_destroyWindowInstance(CGUI_Window* self) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    if (IsWindow(self->hwnd)) {
+        DestroyWindow(self->hwnd);
+    }
+    return create_ok(NULL);
+}
+
 CGUI_Result cgui_window_show(CGUI_Window* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());

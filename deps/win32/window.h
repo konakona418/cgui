@@ -188,8 +188,17 @@ typedef struct Window {
  * Note that this function is not intended for Window creation. Use WindowFactory instead. */
 CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName);
 
-/* Destroys a Window struct. */
+/** Destroys a Window struct.
+ * @warning this will destroy the window instance (win32) and the CGUI_Window struct.
+ * @warning do not call this function if the window is registered a manager.
+ */
 CGUI_Result cgui_destroyWindow(CGUI_Window* self);
+
+/**
+ * Destroys the window instance.
+ * @warning this only destroys the window instance (win32), but CGUI_Window is not destroyed.
+ */
+CGUI_Result cgui_destroyWindowInstance(CGUI_Window* self);
 
 /* Methods of Window. */
 CGUI_Result cgui_window_show(CGUI_Window* self);

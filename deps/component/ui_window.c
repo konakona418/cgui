@@ -75,7 +75,7 @@ CGUI_Result cgui_uiNativeWindow_bindWindowInstance(CGUI_UINativeWindow* self, CG
 
 void cgui_destroyUINativeWindow(CGUI_UINativeWindow* window) {
     // note: the native window is freed HERE.
-    cgui_destroyWindow(window->window);
+    cgui_destroyWindowInstance(window->window);
     free(window);
 }
 
