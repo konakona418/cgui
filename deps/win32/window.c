@@ -179,8 +179,13 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
 
     window->show = cgui_window_show;
     window->hide = cgui_window_hide;
+    window->close = cgui_window_close;
+
+    window->setEnabled = cgui_window_setEnabled;
 
     window->setState = cgui_window_setState;
+    window->postMessage = cgui_window_postMessage;
+
     window->setWindowName = cgui_window_setWindowName;
     window->setWindowStyle = cgui_window_setWindowStyle;
     window->setWindowGeometry = cgui_window_setWindowGeometry;
@@ -227,11 +232,35 @@ CGUI_Result cgui_window_hide(CGUI_Window* self) {
     return create_ok(NULL);
 }
 
+CGUI_Result cgui_window_close(CGUI_Window* self) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    PostMessage(self->hwnd, WM_CLOSE, 0, 0);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_setEnabled(CGUI_Window* self, bool enabled) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    EnableWindow(self->hwnd, enabled);
+    return create_ok(NULL);
+}
+
 CGUI_Result cgui_window_setState(CGUI_Window* self, int swState) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
     ShowWindow(self->hwnd, swState);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_postMessage(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    PostMessage(self->hwnd, msg, wParam, lParam);
     return create_ok(NULL);
 }
 

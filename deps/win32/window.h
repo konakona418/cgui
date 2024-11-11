@@ -157,7 +157,13 @@ typedef struct Window {
 
     CGUI_Result (* hide)(CGUI_Window* self);
 
+    CGUI_Result (* close)(CGUI_Window* self);
+
     CGUI_Result (* setState)(CGUI_Window* self, int swState);
+
+    CGUI_Result (* setEnabled)(CGUI_Window* self, bool enabled);
+
+    CGUI_Result (* postMessage)(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
 
     CGUI_Result (* setWindowName)(CGUI_Window* self, LPCSTR wndName);
 
@@ -191,8 +197,17 @@ CGUI_Result cgui_window_show(CGUI_Window* self);
 /* Hides the window. */
 CGUI_Result cgui_window_hide(CGUI_Window* self);
 
+/* Closes the window. */
+CGUI_Result cgui_window_close(CGUI_Window* self);
+
 /* Sets the stateImpl of the window. e.g. SW_SHOW to show the window. */
 CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);
+
+/* Enables or disables the window. */
+CGUI_Result cgui_window_setEnabled(CGUI_Window* self, bool enabled);
+
+/* Posts a message to the window. */
+CGUI_Result cgui_window_postMessage(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Sets the name of the window. */
 CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName);
