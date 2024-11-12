@@ -19,8 +19,6 @@ typedef struct RuntimeContext CGUI_RuntimeContext;
 
 /* Structures of Core */
 typedef struct Core {
-    CGUI_RuntimeContext* ctx;
-
     CGUI_WindowManager* wndManager;
     CGUI_WindowFactory* wndFactory;
 

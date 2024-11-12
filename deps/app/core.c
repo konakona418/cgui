@@ -20,8 +20,6 @@ CGUI_Result cgui_createCoreFromContext(CGUI_RuntimeContext* ctx) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
 
-    core->ctx = ctx;
-
     core->wndFactory = cgui_createWindowFactory();
     core->wndClassFactory = cgui_createWindowClassFactory();
 
@@ -37,10 +35,6 @@ void cgui_destroyCore(CGUI_Core* core) {
     cgui_destroyWindowFactory(core->wndFactory);
     cgui_destroyWindowClassFactory(core->wndClassFactory);
 
-    // todo: use some other struct to store the context.
-    // for instance, Application.
-    // make sure the context can survive the whole application.
-    cgui_destroyRuntimeContext(core->ctx);
     free(core);
 }
 
