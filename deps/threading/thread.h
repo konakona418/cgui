@@ -26,6 +26,8 @@ void cgui_thread_joinThread(CGUI_Thread* thread);
 
 void cgui_thread_joinThreadTimeout(CGUI_Thread* thread, DWORD milliseconds);
 
+void cgui_thread_forceKill(CGUI_Thread* thread);
+
 void cgui_destroyThread(CGUI_Thread* thread);
 
 #endif //CGUI_THREAD_H

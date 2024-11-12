@@ -28,6 +28,10 @@ void cgui_thread_joinThreadTimeout(CGUI_Thread* thread, DWORD milliseconds) {
     WaitForSingleObject(thread->thread_handle, milliseconds);
 }
 
+void cgui_thread_forceKill(CGUI_Thread* thread) {
+    TerminateThread(thread->thread_handle, 0);
+}
+
 void cgui_destroyThread(CGUI_Thread* thread) {
     CloseHandle(thread->thread_handle);
     free(thread);
