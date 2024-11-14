@@ -59,6 +59,8 @@ typedef struct UINativeWindow {
     CGUI_Result (* setEnabled)  (CGUI_UINativeWindow* self, bool enabled);
     bool        (* isVisible)   (CGUI_UINativeWindow* self);
     bool        (* isEnabled)   (CGUI_UINativeWindow* self);
+
+    /* implementation for CGUI_Win32 */
 } CGUI_UINativeWindow;
 
 /**
@@ -139,5 +141,7 @@ bool cgui_uiNativeWindow_isEnabled(CGUI_UINativeWindow* self);
 CGUI_Result cgui_uiNativeWindow_setVisible(CGUI_UINativeWindow* self, bool visible);
 
 CGUI_Result cgui_uiNativeWindow_setEnabled(CGUI_UINativeWindow* self, bool enabled);
+
+HWND cgui_uiNativeWindow_getWindowHandle(CGUI_UIComponent* component);
 
 #endif //CGUI_UI_WINDOW_H

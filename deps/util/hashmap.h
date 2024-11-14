@@ -11,6 +11,8 @@
 #include <string.h>
 #include "common.h"
 
+#define DEFAULT_BUCKET_COUNT 16
+
 /* Prototypes of hash node and hash table. */
 typedef struct HashNode HashNode;
 typedef struct HashTable HashTable;
@@ -32,6 +34,8 @@ typedef struct HashTable {
     int (* insert)(HashTable* table, const char* key, void* value);
 
     void* (* find)(HashTable* table, const char* key);
+
+    void* (* find_if)(HashTable* table, void* target, IterPredicateResult (* predicate)(const char* key, void* value, void* target));
 
     int (* contains)(HashTable* table, const char* key);
 
@@ -61,6 +65,9 @@ int hash_table_insert(HashTable* table, const char* key, void* value);
 
 /* Find the value associated with the given key. */
 void* hash_table_find(HashTable* table, const char* key);
+
+/* Find the value associated with the given key if the predicate is true. */
+void* hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target));
 
 /* Check whether the hash table contains the given key. */
 int hash_table_contains(HashTable* table, const char* key);

@@ -14,6 +14,7 @@
 #include "../util/vector.h"
 #include "../event/handler.h"
 #include "../geo/layout.h"
+#include "../util/hashmap.h"
 
 #ifndef CGUI_UI_TRAITS
 #define CGUI_UI_TRAITS
@@ -26,6 +27,8 @@ typedef unsigned int CGUI_Trait;
 #define CGUI_Trait_UIDrawable       0x00000008
 #define CGUI_Trait_UILayout         0x00000010
 #define CGUI_Trait_UIStyle          0x00000020
+
+#define CGUI_Trait_UIWin32            0x00000100
 
 /**
  * @note This macro can be applied to evaluating whether the given component implements all the required traits.
@@ -49,6 +52,8 @@ typedef struct UIDrawable CGUI_UIDrawable;
 typedef struct UIState CGUI_UIState;
 
 typedef struct UIStyle CGUI_UIStyle;
+
+typedef struct UIWin32 CGUI_UIWin32;
 
 typedef enum FontStyle CGUI_FontStyle;
 
@@ -139,6 +144,10 @@ typedef struct UIStyle {
     int shadowOffsetY;
 } CGUI_UIStyle;
 
+typedef struct UIWin32 {
+    HWND (* getWindowHandle)(CGUI_UIComponent* component);
+} CGUI_UIWin32;
+
 /**
  * @note The base 'class' for all high-level abstractions of UI components.
  * It is used to provide a common 'interface' (if you name it).
@@ -162,6 +171,7 @@ typedef struct UIComponent {
     CGUI_UIState*       stateImpl;
     CGUI_UILayout*      layoutImpl;
     CGUI_UIStyle*       styleImpl;
+    CGUI_UIWin32*       win32Impl;
 
     /* Methods */
     void                (* addChild)            (CGUI_UIComponent* component, CGUI_UIComponent* child);
@@ -360,5 +370,68 @@ CGUI_UIStyle* cgui_createUIStyle();
  * Destroy the style component.
  * @param style The style component to destroy. */
 void cgui_destroyUIStyle(CGUI_UIStyle* style);
+
+/**
+ * Create a new win32 component.
+ * @note this trait does @b NOT provide a default implementation for @p getWindowHandle.
+ * @note which means that certain component must provide a custom implementation.
+ * @return The created win32 component. */
+CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component));
+
+/**
+ * Destroy the win32 component.
+ * @param win32 The win32 component to destroy. */
+void cgui_destroyUIWin32(CGUI_UIWin32* win32);
+
+
+typedef IterPredicateResult (* ComponentPredicate)(const char* key, void* value, void* target);
+
+typedef struct ComponentManager CGUI_ComponentManager;
+
+typedef struct ComponentManager {
+    HashTable* components;
+
+    CGUI_Result (* addComponent)(CGUI_ComponentManager* self, CGUI_UIComponent* component);
+
+    CGUI_Result (* getComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
+    CGUI_Result (* getComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
+    CGUI_Result (* getComponentPredicate)(CGUI_ComponentManager* self, void* target, ComponentPredicate predicate);
+
+    CGUI_Result (* removeComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
+    CGUI_Result (* removeComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
+    CGUI_Result (* removeComponent)(CGUI_ComponentManager* self, CGUI_UIComponent* component);
+    CGUI_Result (* removeAllComponents)(CGUI_ComponentManager* self);
+
+    void (* iter)(CGUI_ComponentManager* self, void (* callback)(const char* key, void* value));
+
+} CGUI_ComponentManager;
+
+/**
+ * Create a new component manager.
+ * @return The created component manager. */
+CGUI_ComponentManager* cgui_createComponentManager();
+
+/**
+ * Destroy the component manager.
+ * @param manager The component manager to destroy. */
+void cgui_destroyComponentManager(CGUI_ComponentManager* manager);
+
+CGUI_Result cgui_componentManager_addComponent(CGUI_ComponentManager* manager, CGUI_UIComponent* component);
+
+CGUI_Result cgui_componentManager_getComponentById(CGUI_ComponentManager* manager, LONG_PTR id);
+
+CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* manager, LPCSTR name);
+
+CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate);
+
+CGUI_Result cgui_componentManager_removeComponentById(CGUI_ComponentManager* manager, LONG_PTR id);
+
+CGUI_Result cgui_componentManager_removeComponentByName(CGUI_ComponentManager* manager, LPCSTR name);
+
+CGUI_Result cgui_componentManager_removeComponent(CGUI_ComponentManager* manager, CGUI_UIComponent* component);
+
+CGUI_Result cgui_componentManager_removeAllComponents(CGUI_ComponentManager* manager);
+
+void cgui_componentManager_iter(CGUI_ComponentManager* manager, void (* callback)(const char* key, void* value));
 
 #endif //CGUI_UI_H

@@ -27,13 +27,15 @@ int main(void) {
     CGUI_Window* wnd = unwrap(core->wndFactory->createWindow(core->wndFactory));
 
     core->wndManager->addWindow(core->wndManager, wnd);
+    HWND hwnd = wnd->hwnd;
+    wnd = unwrap_option(core->wndManager->getWindowByHwnd(core->wndManager, hwnd));
     wnd->show(wnd);
 
-    /*MSG msg = { };
+    MSG msg = { };
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-    }*/
+    }
 
     cgui_destroyWindowInstance(wnd);
 

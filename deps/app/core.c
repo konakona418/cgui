@@ -26,14 +26,19 @@ CGUI_Result cgui_createCoreFromContext(CGUI_RuntimeContext* ctx) {
     core->wndManager = cgui_createWindowManager(ctx->hInstance);
     core->wndClassManager = cgui_createWindowClassManager();
 
+    core->compManager = cgui_createComponentManager();
+
     return create_ok(core);
 }
 
 void cgui_destroyCore(CGUI_Core* core) {
     cgui_destroyWindowManager(core->wndManager);
     cgui_destroyWindowClassManager(core->wndClassManager);
+
     cgui_destroyWindowFactory(core->wndFactory);
     cgui_destroyWindowClassFactory(core->wndClassFactory);
+
+    cgui_destroyComponentManager(core->compManager);
 
     free(core);
 }

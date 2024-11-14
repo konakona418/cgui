@@ -29,6 +29,7 @@ HashTable* create_hash_table(size_t bucket_count) {
     table->hash_function = hash_function;
     table->insert = hash_table_insert;
     table->find = hash_table_find;
+    table->find_if = hash_table_find_if;
     table->contains = hash_table_contains;
     table->remove = hash_table_remove;
 
@@ -77,6 +78,19 @@ void* hash_table_find(HashTable* table, const char* key) {
             return node->value;
         }
         node = node->next;
+    }
+    return NULL;
+}
+
+void* hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target)) {
+    for (size_t i = 0; i < table->bucket_count; i++) {
+        HashNode* node = table->buckets[i];
+        while (node) {
+            if (predicate(node->key, node->value, target)) {
+                return node->value;
+            }
+            node = node->next;
+        }
     }
     return NULL;
 }

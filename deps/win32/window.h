@@ -345,6 +345,8 @@ typedef struct WindowManager {
 
     CGUI_Option (* getWindow)(CGUI_WindowManager* self, const char* name);
 
+    CGUI_Option (* getWindowByHwnd)(CGUI_WindowManager* self, HWND hwnd);
+
     CGUI_Result (* removeWindow)(CGUI_WindowManager* self, CGUI_Window* window);
 
     CGUI_Result (* removeWindowByIdentifier)(CGUI_WindowManager* self, const char* wndIdentifier);
@@ -370,6 +372,9 @@ CGUI_Result cgui_windowManager_addWindow(CGUI_WindowManager* manager, CGUI_Windo
  * Instead, it is the wndIdentifier property of CGUI_Window.
  * This property is randomly generated. */
 CGUI_Option cgui_windowManager_getWindow(CGUI_WindowManager* self, const char* wndIdentifier);
+
+/* Gets a window from the manager by its HWND. */
+CGUI_Option cgui_windowManager_getWindowByHwnd(CGUI_WindowManager* manager, HWND hwnd);
 
 /* Removes a window from the manager. */
 CGUI_Result cgui_windowManager_removeWindow(CGUI_WindowManager* manager, CGUI_Window* window);

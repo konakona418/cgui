@@ -53,3 +53,9 @@ void CGUI_threadPool_joinTimeout(CGUI_ThreadPool* pool, DWORD timeout) {
     }
     WaitForMultipleObjects(pool->currentNumThreads, handles, TRUE, timeout);
 }
+
+void CGUI_threadPool_wait(CGUI_ThreadPool* pool) {
+    for (int i = 0; i < pool->currentNumThreads; ++i) {
+        cgui_thread_joinThread(pool->threads[i]);
+    }
+}

@@ -6,10 +6,6 @@ set(CMAKE_C_STANDARD 11)
 add_executable(cgui main.c
         deps/win32/window.c
         deps/win32/window.h
-        deps/win32/window.c
-        deps/win32/window.h
-        deps/win32/window.c
-        deps/win32/window.h
         deps/geo/rect.c
         deps/geo/rect.h
         deps/util/common.c
@@ -38,4 +34,12 @@ add_executable(cgui main.c
         deps/geo/layout.h
         deps/component/ui_window.c
         deps/component/ui_window.h
+        deps/component/ui_window_proto.c
+        deps/component/ui_window_proto.h
+        deps/event/args.c
+        deps/event/args.h
+        deps/threading/thread.c
+        deps/threading/thread.h
+        deps/threading/threadpool.c
+        deps/threading/threadpool.h
 )

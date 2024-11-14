@@ -460,6 +460,7 @@ CGUI_WindowManager* cgui_createWindowManager(HINSTANCE hInstance) {
 
     manager->addWindow = cgui_windowManager_addWindow;
     manager->getWindow = cgui_windowManager_getWindow;
+    manager->getWindowByHwnd = cgui_windowManager_getWindowByHwnd;
     manager->removeWindow = cgui_windowManager_removeWindow;
     manager->removeWindowByIdentifier = cgui_windowManager_removeWindowByIdentifier;
     manager->destroyAllWindows = cgui_windowManager_destroyAllWindows;
@@ -489,6 +490,22 @@ CGUI_Option cgui_windowManager_getWindow(CGUI_WindowManager* self, const char* w
         return create_none();
     }
     return create_some(wnd);
+}
+
+IterPredicateResult cgui_windowManager_predicateHwnd(const char* key, void* value, void* target) {
+    CGUI_Window* window = (CGUI_Window*) value;
+    return window->hwnd == deref(HWND, target);
+}
+
+CGUI_Option cgui_windowManager_getWindowByHwnd(CGUI_WindowManager* self, HWND hwnd) {
+    if (self == NULL || hwnd == NULL) {
+        return create_none();
+    }
+    CGUI_Window* wc = self->windows->find_if(self->windows, &hwnd, cgui_windowManager_predicateHwnd);
+    if (wc == NULL) {
+        return create_none();
+    }
+    return create_some(wc);
 }
 
 CGUI_Result cgui_windowManager_removeWindow(CGUI_WindowManager* self, CGUI_Window* window) {

@@ -14,7 +14,8 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
             "window",
             (LONG_PTR)nativeWindow->getWindowHandle(nativeWindow),
             parent,
-            CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable | CGUI_Trait_UIState | CGUI_Trait_UIDisposable);
+            CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
+            | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
 
     window->component->layoutImpl = cgui_createUILayout();
     window->component->drawableImpl = cgui_createUIDrawable(
@@ -22,6 +23,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
             cgui_uiNativeWindow_refreshCallback);
     window->component->stateImpl = cgui_createUIState();
     window->component->disposableImpl = cgui_createUIDisposable(window, cgui_uiNativeWindow_destroyCallback);
+    window->component->win32Impl = cgui_createUIWin32(cgui_uiNativeWindow_getWindowHandle);
 
     window->window = nativeWindow;
 
@@ -229,6 +231,15 @@ CGUI_Result cgui_uiNativeWindow_setEnabled(CGUI_UINativeWindow* self, bool enabl
         return self->window->setEnabled(self->window, enabled);
     } else {
         return create_err(CGUI_Error_NotImplemented());
+    }
+}
+
+HWND cgui_uiNativeWindow_getWindowHandle(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        CGUI_UINativeWindow* nativeWindow = (CGUI_UINativeWindow*)component->disposableImpl->upperLevel;
+        return nativeWindow->window->getWindowHandle(nativeWindow->window);
+    } else {
+        return NULL;
     }
 }
 

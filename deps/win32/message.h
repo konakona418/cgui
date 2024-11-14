@@ -10,10 +10,25 @@
 #include <windows.h>
 
 #include "../util/common.h"
+#include "../threading/thread.h"
 
 typedef struct MessageDispatcher CGUI_MessageDispatcher;
 
 typedef struct MessageHandler CGUI_MessageHandler;
+
+typedef struct DispatcherThreadStart CGUI_DispatcherThreadStart;
+
+typedef void (* CGUI_ApplicationMessageCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+typedef struct DispatcherThreadStart {
+    CGUI_MessageDispatcher* dispatcher;
+    HWND hwnd;
+    UINT filterMin;
+    UINT filterMax;
+} CGUI_DispatcherThreadStart;
+
+CGUI_DispatcherThreadStart* cgui_createDispatcherThreadStart(CGUI_MessageDispatcher* dispatcher);
+void cgui_destroyDispatcherThreadStart(CGUI_DispatcherThreadStart* threadStart);
 
 /* Structure of MessageDispatcher */
 typedef struct MessageDispatcher {
@@ -21,9 +36,16 @@ typedef struct MessageDispatcher {
     UINT filterMin;
     UINT filterMax;
 
-    void (* _dispatch)(CGUI_MessageDispatcher* self, HWND hwnd, UINT filterMin, UINT filterMax);
+    bool isDispatching;
+    CGUI_Thread* thread;
+
+    void* (* _dispatch)(void* ts);
 
     void (* beginDispatch)(CGUI_MessageDispatcher* self);
+
+    void (* beginDispatchAsync)(CGUI_MessageDispatcher* self);
+
+    void (* stop)(CGUI_MessageDispatcher* self, bool force);
 } CGUI_MessageDispatcher;
 
 #define CGUI_DEFAULT_MESSAGE_DISPATCHER_FILTER_MIN 0
@@ -35,34 +57,39 @@ CGUI_MessageDispatcher* cgui_createMessageDispatcher(HWND hwnd, UINT filterMin, 
 void cgui_destroyMessageDispatcher(CGUI_MessageDispatcher* dispatcher);
 
 /* The default message dispatcher */
-void cgui_messageDispatcher_dispatch(CGUI_MessageDispatcher* self, HWND hwnd, UINT filterMin, UINT filterMax);
+void* cgui_messageDispatcher_dispatch(void* ts);
 
 void cgui_messageDispatcher_beginDispatch(CGUI_MessageDispatcher* self);
 
+void cgui_messageDispatcher_beginDispatchAsync(CGUI_MessageDispatcher* self);
+
+void cgui_messageDispatcher_stop(CGUI_MessageDispatcher* self, bool force);
+
+typedef LRESULT CALLBACK (* WindowProc)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Structure of MessageHandler */
 typedef struct MessageHandler {
     LRESULT CALLBACK (* _winProc)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    void (* onCreate)(CGUI_MessageHandler* self, HWND hwnd, WPARAM wParam, LPARAM lParam);
+    CGUI_ApplicationMessageCallback applicationCallback;
 
-    void (* onClose)(CGUI_MessageHandler* self, HWND hwnd, WPARAM wParam, LPARAM lParam);
+    void (* routeToApplication)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    void (* onDestroy)(CGUI_MessageHandler* self, HWND hwnd, WPARAM wParam, LPARAM lParam);
-
-    void (* onPaint)(CGUI_MessageHandler* self, HWND hwnd, WPARAM wParam, LPARAM lParam);
-
-    void (* onSize)(CGUI_MessageHandler* self, HWND hwnd, WPARAM wParam, LPARAM lParam);
-    // todo: fill more callbacks.
+    WindowProc (* getWindowProc)(CGUI_MessageHandler* handler);
 } CGUI_MessageHandler;
 
 /* Constructor and Destructor */
-CGUI_MessageHandler* cgui_createMessageHandler();
+CGUI_MessageHandler* cgui_createMessageHandler(CGUI_ApplicationMessageCallback callback);
 
 void cgui_destroyMessageHandler(CGUI_MessageHandler* handler);
 
 /* The default message handler & router. */
 LRESULT CALLBACK
 cgui_messageHandler_winProc(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/* Route the message to the application. */
+void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler);
 
 #endif //CGUI_MESSAGE_H

@@ -82,10 +82,6 @@
 
 #define decapsulate(_Capsule) (*_Capsule).value
 
-#define ref(_T, _V) ((_T*) _V)
-
-#define deref(_T, _V) (*((_T*) _V))
-
 /* This macro is applied to create the definition for a Result type.
  * The type created will have an internal name of CGUI_Result_##T. \
  * Note that the data stored in this structure is a pointer. */

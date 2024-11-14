@@ -24,7 +24,7 @@ assert(0);                                                      \
 #define ref(_T, _V) (_T*) _V
 
 /* This macro is intended for dereferencing a pointer type into any type. */
-#define deref(_T, _V) (*(_T*) _V)
+#define deref(_T, _V) (*((_T*) _V))
 
 /* This macro is intended for creating a pointer type from a primitive type. */
 #define as_ptr(_T, _V) ({ \
@@ -57,6 +57,15 @@ int random(int min, int max);
 
 /* This type is intended for representing a boolean value. */
 typedef int bool;
+
+/* This type is intended for representing an exit flag of an iterator.
+ * When set to true, the iterator will stop iterating. */
+typedef bool IterExitFlag;
+
+/* This type is intended for representing the result of a predicate function.
+ * When set to false, will continue to the next item.
+ * When set to true, will stop iterating. */
+typedef bool IterPredicateResult;
 
 #define true 1
 

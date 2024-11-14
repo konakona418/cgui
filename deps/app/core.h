@@ -12,6 +12,8 @@
 
 #include "../win32/window.h"
 
+#include "../component/ui.h"
+
 /* Prototypes */
 typedef struct Core CGUI_Core;
 
@@ -24,6 +26,8 @@ typedef struct Core {
 
     CGUI_WindowClassManager* wndClassManager;
     CGUI_WindowClassFactory* wndClassFactory;
+
+    CGUI_ComponentManager* compManager;
 } CGUI_Core;
 
 /* Constructors and Destructors */

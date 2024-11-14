@@ -33,6 +33,7 @@ CGUI_UIComponent* cgui_createUIComponent(LPCSTR name, LONG_PTR id, CGUI_UICompon
     component->layoutImpl = NULL;
     component->stateImpl = NULL;
     component->styleImpl = NULL;
+    component->win32Impl = NULL;
 
     // register the methods of the base class.
     component->addChild = cgui_uiComponent_addChild;
@@ -270,3 +271,117 @@ CGUI_UIStyle* cgui_createUIStyle() {
 void cgui_destroyUIStyle(CGUI_UIStyle* style) {
     free(style);
 }
+
+CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component)) {
+    CGUI_UIWin32* win = (CGUI_UIWin32*) malloc(sizeof(CGUI_UIWin32));
+    win->getWindowHandle = getWindowHandle;
+    return win;
+}
+
+void cgui_destroyUIWin32(CGUI_UIWin32* win) {
+    free(win);
+}
+
+const char* id_to_string(LONG_PTR id) {
+    char buffer[24];
+    sprintf(buffer, "%lld", id);
+    return strdup(buffer);
+}
+
+CGUI_ComponentManager* cgui_createComponentManager() {
+    CGUI_ComponentManager* manager = (CGUI_ComponentManager*) malloc(sizeof(CGUI_ComponentManager));
+    manager->components = create_hash_table(DEFAULT_BUCKET_COUNT);
+
+    manager->addComponent = cgui_componentManager_addComponent;
+
+    manager->getComponentById = cgui_componentManager_getComponentById;
+    manager->getComponentByName = cgui_componentManager_getComponentByName;
+    manager->getComponentPredicate = cgui_componentManager_getComponentPredicate;
+
+    manager->removeComponent = cgui_componentManager_removeComponent;
+    manager->removeComponentById = cgui_componentManager_removeComponentById;
+    manager->removeComponentByName = cgui_componentManager_removeComponentByName;
+    manager->removeAllComponents = cgui_componentManager_removeAllComponents;
+
+    manager->iter = cgui_componentManager_iter;
+
+    return manager;
+}
+
+void cgui_destroyUIComponentIfParent(CGUI_UIComponent* component) {
+    if (component->parent == NULL) {
+        cgui_destroyUIComponent(component);
+    }
+}
+
+void cgui_destroyComponentManager(CGUI_ComponentManager* manager) {
+    manager->components->iter_values(manager->components, (void (*)(void*)) cgui_destroyUIComponentIfParent);
+    // todo: this may lead to double free as the parent component will free its children.
+    destroy_hash_table(manager->components);
+    free(manager);
+}
+
+CGUI_Result cgui_componentManager_addComponent(CGUI_ComponentManager* manager, CGUI_UIComponent* component) {
+    if (manager->components->contains(manager->components, id_to_string(component->id))) {
+        return create_err(CGUI_Error_ComponentIdAlreadyExists());
+    }
+    manager->components->insert(manager->components, id_to_string(component->id), component);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_componentManager_removeComponent(CGUI_ComponentManager* manager, CGUI_UIComponent* component) {
+    return cgui_componentManager_removeComponentById(manager, component->id);
+}
+
+CGUI_Result cgui_componentManager_removeComponentById(CGUI_ComponentManager* manager, LONG_PTR id) {
+    if (manager->components->contains(manager->components, id_to_string(id))) {
+        manager->components->remove(manager->components, id_to_string(id));
+    }
+    return create_ok(NULL);
+}
+
+IterPredicateResult cgui_componentManager_predicateName(const char* key, void* value, void* target) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) value;
+    return strcmp(component->name, (char*) target) == 0;
+}
+
+CGUI_Result cgui_componentManager_removeComponentByName(CGUI_ComponentManager* manager, LPCSTR name) {
+    char* name_copy = strdup(name);
+    CGUI_UIComponent* component = manager->components->find_if(manager->components, name_copy, cgui_componentManager_predicateName);
+    cgui_componentManager_removeComponentById(manager, component->id);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_componentManager_removeAllComponents(CGUI_ComponentManager* manager) {
+    manager->components->iter_values(manager->components, (void (*)(void*)) cgui_destroyUIComponent);
+    destroy_hash_table(manager->components);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_componentManager_getComponentById(CGUI_ComponentManager* manager, LONG_PTR id) {
+    CGUI_UIComponent* result = manager->components->find(manager->components, id_to_string(id));
+    if (result == NULL) {
+        return create_err(CGUI_Error_ComponentNotFound());
+    } else {
+        return create_ok(result);
+    }
+}
+
+CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* manager, const char* name) {
+    CGUI_UIComponent* result = manager->components->find_if(manager->components, (void*) name, cgui_componentManager_predicateName);
+    if (result == NULL) {
+        return create_err(CGUI_Error_ComponentNotFound());
+    } else {
+        return create_ok(result);
+    }
+}
+
+CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate) {
+    CGUI_UIComponent* result = manager->components->find_if(manager->components, target, predicate);
+    if (result == NULL) {
+        return create_err(CGUI_Error_ComponentNotFound());
+    } else {
+        return create_ok(result);
+    }
+}
+
