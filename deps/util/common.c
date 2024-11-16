@@ -89,6 +89,7 @@ void* unwrap(CGUI_Result result) {
         return result.value;
     }
     if (result.error != NULL) {
+        printf("Fatal error occurred, details: %s\n", result.error->message);
         destroyError(result.error);
     }
     panic("Called `unwrap()` on an `Err` value.");
@@ -151,4 +152,28 @@ void* take_option(CGUI_Option* option) {
         return value;
     }
     return NULL;
+}
+
+CGUI_Singleton* cgui_createSingleton() {
+    CGUI_Singleton* ptr = malloc(sizeof(CGUI_Singleton));
+    ptr->isInitialized = false;
+    ptr->value = NULL;
+    return ptr;
+}
+
+void cgui_initSingleton(CGUI_Singleton* singleton, void* value) {
+    singleton->isInitialized = true;
+    singleton->value = value;
+}
+
+void* cgui_getSingletonValue(CGUI_Singleton* singleton) {
+    return singleton->value;
+}
+
+bool cgui_isSingletonInitialized(CGUI_Singleton* singleton) {
+    return singleton->isInitialized;
+}
+
+void cgui_destroySingleton(CGUI_Singleton* singleton) {
+    free(singleton);
 }

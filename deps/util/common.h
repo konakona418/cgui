@@ -33,6 +33,9 @@ _T* _primitive_ptr = malloc(sizeof(_T));               \
 _primitive_ptr;                                        \
 })
 
+/* This macro is intended for casting any pointer type into another type. */
+#define into(_T, _V) ((_T*)_V)
+
 /* This macro is intended for returning a result from a function.
  * When the result is an error, the function will return immediately.
  * Otherwise, the macro will continue to the next line.
@@ -183,6 +186,42 @@ bool is_some(CGUI_Option* option);
 
 /* Checks if the option is none. */
 bool is_none(CGUI_Option* option);
+
+typedef struct Singleton CGUI_Singleton;
+
+typedef struct Singleton {
+    void* value;
+    bool isInitialized;
+} CGUI_Singleton;
+
+/**
+ * Creates a singleton.
+ * @return singleton.
+ */
+CGUI_Singleton* cgui_createSingleton();
+
+/**
+ * Initializes a singleton.
+ * @param singleton singleton.
+ * @param value designated value, dynamically allocated.
+ */
+void cgui_initSingleton(CGUI_Singleton* singleton, void* value);
+
+/**
+ * Gets the value of a singleton.
+ * @param singleton singleton.
+ * @return value.
+ */
+void* cgui_getSingletonValue(CGUI_Singleton* singleton);
+
+bool cgui_isSingletonInitialized(CGUI_Singleton* singleton);
+
+/**
+ * Destroys a singleton.
+ * @note this will not deallocate the value.
+ * @param singleton singleton.
+ */
+void cgui_destroySingleton(CGUI_Singleton* singleton);
 
 
 #endif //CGUI_COMMON_H

@@ -81,7 +81,7 @@ void cgui_messageDispatcher_stop(CGUI_MessageDispatcher* self, bool force) {
     }
 }
 
-CGUI_MessageHandler* cgui_createMessageHandler(CGUI_ApplicationMessageCallback callback) {
+void cgui_messageHandler_initSingleton(CGUI_ApplicationMessageCallback callback) {
     CGUI_MessageHandler* handler = (CGUI_MessageHandler*) malloc(sizeof(CGUI_MessageHandler));
 
     handler->_winProc = cgui_messageHandler_winProc;
@@ -90,7 +90,34 @@ CGUI_MessageHandler* cgui_createMessageHandler(CGUI_ApplicationMessageCallback c
     handler->routeToApplication = cgui_messageHandler_routeToApplication;
     handler->getWindowProc = cgui_messageHandler_getWindowProc;
 
-    return handler;
+    if (cgui_messageHandlerSingleton == NULL) {
+        panic("Fatal! Message handler singleton is not initialized.");
+    }
+
+    cgui_initSingleton(cgui_messageHandlerSingleton, handler);
+}
+
+CGUI_MessageHandler* cgui_getMessageHandlerInstance() {
+    if (cgui_messageHandlerSingleton == NULL) {
+        return NULL;
+    } else {
+        if (!cgui_isSingletonInitialized(cgui_messageHandlerSingleton)) {
+            return NULL;
+        }
+    }
+    return into(CGUI_MessageHandler, cgui_getSingletonValue(cgui_messageHandlerSingleton));
+}
+
+CGUI_MessageHandler* cgui_createMessageHandler(CGUI_ApplicationMessageCallback callback) {
+    if (cgui_messageHandlerSingleton == NULL) {
+        cgui_messageHandlerSingleton = cgui_createSingleton();
+        cgui_messageHandler_initSingleton(callback);
+    } else {
+        if (!cgui_isSingletonInitialized(cgui_messageHandlerSingleton)) {
+            cgui_messageHandler_initSingleton(callback);
+        }
+    }
+    return cgui_getMessageHandlerInstance();
 }
 
 void cgui_destroyMessageHandler(CGUI_MessageHandler* handler) {
@@ -98,8 +125,13 @@ void cgui_destroyMessageHandler(CGUI_MessageHandler* handler) {
 }
 
 LRESULT CALLBACK
-cgui_messageHandler_winProc(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    self->routeToApplication(self, hwnd, msg, wParam, lParam);
+cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    CGUI_MessageHandler* instance = cgui_getMessageHandlerInstance();
+    if (instance == NULL) {
+        printf("Message handler instance is not initialized. Use DefWindowProc instead.");
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    instance->routeToApplication(instance, hwnd, msg, wParam, lParam);
     return 0;
 }
 
@@ -110,6 +142,6 @@ void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, HWND hwnd
     self->applicationCallback(hwnd, msg, wParam, lParam);
 }
 
-WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler) {
+CGUI_WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler) {
     return handler->_winProc;
 }

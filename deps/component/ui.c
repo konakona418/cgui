@@ -385,3 +385,7 @@ CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* m
     }
 }
 
+void cgui_componentManager_iter(CGUI_ComponentManager* manager, void (* callback)(const char* key, void* value)) {
+    manager->components->iter(manager->components, callback);
+}
+

@@ -65,17 +65,20 @@ void cgui_messageDispatcher_beginDispatchAsync(CGUI_MessageDispatcher* self);
 
 void cgui_messageDispatcher_stop(CGUI_MessageDispatcher* self, bool force);
 
-typedef LRESULT CALLBACK (* WindowProc)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef LRESULT CALLBACK (* CGUI_WindowProc)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/* Singleton of MessageHandler */
+static CGUI_Singleton* cgui_messageHandlerSingleton = NULL;
 
 /* Structure of MessageHandler */
 typedef struct MessageHandler {
-    LRESULT CALLBACK (* _winProc)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT CALLBACK (* _winProc)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     CGUI_ApplicationMessageCallback applicationCallback;
 
     void (* routeToApplication)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    WindowProc (* getWindowProc)(CGUI_MessageHandler* handler);
+    CGUI_WindowProc (* getWindowProc)(CGUI_MessageHandler* handler);
 } CGUI_MessageHandler;
 
 /* Constructor and Destructor */
@@ -85,11 +88,11 @@ void cgui_destroyMessageHandler(CGUI_MessageHandler* handler);
 
 /* The default message handler & router. */
 LRESULT CALLBACK
-cgui_messageHandler_winProc(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Route the message to the application. */
 void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler);
+CGUI_WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler);
 
 #endif //CGUI_MESSAGE_H

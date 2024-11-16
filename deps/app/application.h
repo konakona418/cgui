@@ -29,7 +29,7 @@ void cgui_destroyApplication(CGUI_Application* app);
 void cgui_application_run(CGUI_Application* app, bool isAsync);
 void cgui_application_stop(CGUI_Application* app);
 
-WindowProc cgui_application_getWindowProc(CGUI_Application* app);
+CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app);
 void cgui_application_messageCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_Application* CGUI_APP_INSTANCE = NULL;

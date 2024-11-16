@@ -57,7 +57,7 @@ void cgui_application_stop(CGUI_Application* app) {
     app->dispatcher->stop(app->dispatcher, true);
 }
 
-WindowProc cgui_application_getWindowProc(CGUI_Application* app) {
+CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app) {
     return app->handler->getWindowProc(app->handler);
 }
 
