@@ -117,6 +117,7 @@ void cgui_uiComponent_setEventHandler(CGUI_UIComponent* component, CGUI_EventHan
     if (component->eventHandler != NULL) {
         cgui_destroyEventHandler(component->eventHandler);
     }
+    handler->setComponent(handler, component);
     component->eventHandler = handler;
 }
 

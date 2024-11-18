@@ -13,6 +13,8 @@
 typedef struct EventHandler CGUI_EventHandler;
 
 typedef struct EventHandler {
+    void* component;
+
     void (*onClick)         (CGUI_MouseEventArgs args);
     void (*onDoubleClick)   (CGUI_MouseEventArgs args);
 
@@ -33,15 +35,21 @@ typedef struct EventHandler {
     void (*onCreate)        (CGUI_EventArgs args);
     void (*onClose)         (CGUI_EventArgs args);
     void (*onDestroy)       (CGUI_EventArgs args);
-    void (*onPaint)         (CGUI_EventArgs args);
+    void (*onPaint)         (CGUI_EventArgs args); // todo: note that this event should call the paint function of the component (gdi WM_PAINT).
 
     void (*handleEvent)     (CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void (*setComponent)    (CGUI_EventHandler* self, void* component);
 } CGUI_EventHandler;
 
 CGUI_EventHandler* cgui_createEventHandler();
 
+void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component);
+
 void cgui_destroyEventHandler(CGUI_EventHandler* handler);
 
 void cgui_eventHandler_handleEvent(CGUI_EventHandler* handler, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args);
 
 #endif //CGUI_HANDLER_H

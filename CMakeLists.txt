@@ -42,4 +42,8 @@ add_executable(cgui main.c
         deps/threading/thread.h
         deps/threading/threadpool.c
         deps/threading/threadpool.h
+        deps/win32/gdi.c
+        deps/win32/gdi.h
+        deps/component/trait.c
+        deps/component/trait.h
 )

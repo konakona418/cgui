@@ -24,14 +24,18 @@ typedef enum MouseButton {
     MiddleButton
 } CGUI_MouseButton;
 
+CGUI_MouseButton cgui_asMouseButton(WPARAM wParam);
+
 typedef enum KeyState {
     KeyDown,
     KeyUp
 } CGUI_KeyState;
 
 typedef struct EventArgs {
+    void* component;
+
     HWND hwnd;
-    INT msg;
+    UINT msg;
 
     WPARAM wParam;
     LPARAM lParam;
@@ -40,7 +44,7 @@ typedef struct EventArgs {
     UINT argc;
 } CGUI_EventArgs;
 
-CGUI_EventArgs cgui_createEventArgs(HWND hwnd, INT msg, WPARAM wParam, LPARAM lParam);
+CGUI_EventArgs cgui_createEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef struct MouseEventArgs {
     CGUI_EventArgs base;
@@ -49,7 +53,7 @@ typedef struct MouseEventArgs {
     CGUI_MouseButton button;
 } CGUI_MouseEventArgs;
 
-CGUI_MouseEventArgs cgui_createMouseEventArgs(HWND hwnd, INT msg, WPARAM wParam, LPARAM lParam);
+CGUI_MouseEventArgs cgui_createMouseEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef struct KeyEventArgs CGUI_KeyEventArgs;
 
@@ -60,6 +64,6 @@ typedef struct KeyEventArgs {
     CGUI_KeyState keyState;
 } CGUI_KeyEventArgs;
 
-CGUI_KeyEventArgs cgui_createKeyEventArgs(HWND hwnd, INT msg, WPARAM wParam, LPARAM lParam);
+CGUI_KeyEventArgs cgui_createKeyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif //CGUI_ARGS_H
