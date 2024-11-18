@@ -7,4 +7,56 @@
 #ifndef CGUI_GDI_H
 #define CGUI_GDI_H
 
+#include <windows.h>
+
+#include "../util/common.h"
+#include "../geo/layout.h"
+#include "../geo/rect.h"
+
+typedef enum TextAlignment {
+    CGUI_TextAlignment_Left,
+    CGUI_TextAlignment_Center,
+    CGUI_TextAlignment_Right
+} CGUI_TextAlignment;
+
+typedef enum TextOrientation {
+    CGUI_TextOrientation_Horizontal,
+    CGUI_TextOrientation_Vertical
+} CGUI_TextOrientation;
+
+typedef struct TextStyle {
+    bool bold;
+    bool italic;
+    bool underline;
+    bool strikeout;
+} CGUI_TextStyle;
+
+typedef struct Color {
+    COLORREF rgb;
+    bool transparent;
+} CGUI_Color;
+
+typedef struct FontStyle {
+    int fontSize;
+    char fontName[32];
+    CGUI_Color foregroundColor;
+    CGUI_Color backgroundColor;
+} CGUI_FontStyle;
+
+typedef struct GDITextContext {
+    CGUI_FontStyle fontStyle;
+    CGUI_TextStyle textStyle;
+
+    CGUI_TextAlignment alignment;
+    CGUI_TextOrientation orientation;
+
+    bool multiLine;
+} CGUI_GDITextContext;
+
+CGUI_Color cgui_rgbaToColor(int r, int g, int b);
+
+CGUI_Color cgui_transparentColor();
+
+void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry);
+
 #endif //CGUI_GDI_H

@@ -31,6 +31,7 @@ typedef struct UINativeWindow {
     CGUI_Result (* postMessage)(CGUI_UINativeWindow* self, UINT msg, WPARAM wParam, LPARAM lParam);
     CGUI_Result (* hide)(CGUI_UINativeWindow* self);
     CGUI_Result (* show)(CGUI_UINativeWindow* self);
+    CGUI_Result (* update)(CGUI_UINativeWindow* self);
     CGUI_Result (* close)(CGUI_UINativeWindow* self);
     CGUI_Result (* setWindowName)(CGUI_UINativeWindow* self, LPCSTR wndName);
 
@@ -103,6 +104,8 @@ CGUI_Result cgui_uiNativeWindow_postMessage(CGUI_UINativeWindow* self, UINT msg,
 CGUI_Result cgui_uiNativeWindow_hide(CGUI_UINativeWindow* self);
 
 CGUI_Result cgui_uiNativeWindow_show(CGUI_UINativeWindow* self);
+
+CGUI_Result cgui_uiNativeWindow_update(CGUI_UINativeWindow* self);
 
 CGUI_Result cgui_uiNativeWindow_close(CGUI_UINativeWindow* self);
 

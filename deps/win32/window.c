@@ -179,6 +179,7 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
 
     window->show = cgui_window_show;
     window->hide = cgui_window_hide;
+    window->update = cgui_window_update;
     window->close = cgui_window_close;
 
     window->setEnabled = cgui_window_setEnabled;
@@ -239,6 +240,14 @@ CGUI_Result cgui_window_hide(CGUI_Window* self) {
     }
     self->swState = SW_HIDE;
     ShowWindow(self->hwnd, SW_HIDE);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_update(CGUI_Window* self) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    UpdateWindow(self->hwnd);
     return create_ok(NULL);
 }
 

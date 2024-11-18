@@ -157,6 +157,8 @@ typedef struct Window {
 
     CGUI_Result (* hide)(CGUI_Window* self);
 
+    CGUI_Result (* update)(CGUI_Window* self);
+
     CGUI_Result (* close)(CGUI_Window* self);
 
     CGUI_Result (* setState)(CGUI_Window* self, int swState);
@@ -205,6 +207,9 @@ CGUI_Result cgui_window_show(CGUI_Window* self);
 
 /* Hides the window. */
 CGUI_Result cgui_window_hide(CGUI_Window* self);
+
+/* Updates the window. */
+CGUI_Result cgui_window_update(CGUI_Window* self);
 
 /* Closes the window. */
 CGUI_Result cgui_window_close(CGUI_Window* self);

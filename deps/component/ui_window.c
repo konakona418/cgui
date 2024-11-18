@@ -31,6 +31,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
     window->bindWindowInstance = cgui_uiNativeWindow_bindWindowInstance;
     window->show = cgui_uiNativeWindow_show;
     window->hide = cgui_uiNativeWindow_hide;
+    window->update = cgui_uiNativeWindow_update;
     window->close = cgui_uiNativeWindow_close;
     window->setWindowName = cgui_uiNativeWindow_setWindowName;
     window->setState = cgui_uiNativeWindow_setState;
@@ -94,6 +95,7 @@ void cgui_uiNativeWindow_refreshCallback(CGUI_UIComponent* component) {
     // todo: refresh the native window.
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         if (component->disposableImpl != NULL) {
+            cgui_uiNativeWindow_update(component->disposableImpl->upperLevel);
             cgui_uiNativeWindow_show(component->disposableImpl->upperLevel);
         }
     }
@@ -124,6 +126,10 @@ CGUI_Result cgui_uiNativeWindow_hide(CGUI_UINativeWindow* self) {
     return self->window->hide(self->window);
 }
 
+CGUI_Result cgui_uiNativeWindow_update(CGUI_UINativeWindow* self) {
+    return self->window->update(self->window);
+}
+
 CGUI_Result cgui_uiNativeWindow_close(CGUI_UINativeWindow* self) {
     return self->window->close(self->window);
 }
@@ -134,6 +140,7 @@ CGUI_Result cgui_uiNativeWindow_setWindowName(CGUI_UINativeWindow* self, LPCSTR 
 
 void cgui_uiNativeWindow_addChild(CGUI_UINativeWindow* self, CGUI_UIComponent* child) {
     self->component->addChild(self->component, child);
+    self->refresh(self); // refresh the window.
 }
 
 CGUI_UIComponent* cgui_uiNativeWindow_removeChild(CGUI_UINativeWindow* self, CGUI_UIComponent* child) {
