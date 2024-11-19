@@ -18,8 +18,6 @@ typedef struct MessageHandler CGUI_MessageHandler;
 
 typedef struct DispatcherThreadStart CGUI_DispatcherThreadStart;
 
-typedef void (* CGUI_ApplicationMessageCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 typedef struct DispatcherThreadStart {
     CGUI_MessageDispatcher* dispatcher;
     HWND hwnd;

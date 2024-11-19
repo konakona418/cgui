@@ -8,12 +8,72 @@
 #include "handler.h"
 #include "../component/trait.h"
 
-CGUI_EventHandler* cgui_createEventHandler() {
+#include "../component/ui.h"
+void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) args.component;
+    if (impl(component->implFlag, CGUI_Trait_UIDrawable)) {
+        if (component->drawableImpl->refresh) {
+            component->drawableImpl->refresh(component);
+        }
+    }
+}
+
+CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag) {
     CGUI_EventHandler* handler = (CGUI_EventHandler*) malloc(sizeof(CGUI_EventHandler));
     handler->component = NULL;
 
+    handler->localHandler = localHandler;
+    handler->handlerFlag = handlerFlag;
+
     handler->handleEvent = cgui_eventHandler_handleEvent;
     handler->setComponent = cgui_eventHandler_setComponent;
+
+    return handler;
+}
+
+void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component) {
+    handler->component = component;
+}
+
+void cgui_destroyEventHandler(CGUI_EventHandler* handler) {
+    free(handler);
+}
+
+void cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (handle(handler->handlerFlag, CGUI_LocalHandler_WindowRoot)) {
+        into(CGUI_WindowHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    }
+    else {
+        panic("Invalid handler type.");
+    }
+}
+
+void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
+    if (msg == WM_COMMAND) {
+        HWND hComponent = (HWND) lParam;
+        if (unlikely(hwnd != hComponent)) {
+            if (likely(IsWindow(hComponent))) {
+                callback(hComponent, msg, wParam, lParam);
+                return;
+            } else {
+                printf("WM_COMMAND: Child component not a window. Ignoring.\n");
+            }
+        } else {
+            printf("WM_COMMAND: child component hwnd eq hwnd.\n");
+        }
+    }
+    cgui_routeToLocalHandler(self, self->localHandler, hwnd, msg, wParam, lParam);
+}
+
+
+typedef struct ButtonEventHandler CGUI_ButtonEventHandler;
+
+typedef struct ButtonEventHandler {
+
+} CGUI_ButtonEventHandler;
+
+CGUI_WindowHandler* cgui_createWindowHandler() {
+    CGUI_WindowHandler* handler = malloc(sizeof(CGUI_WindowHandler));
 
     handler->onCreate = NULL;
     handler->onDestroy = NULL;
@@ -36,29 +96,18 @@ CGUI_EventHandler* cgui_createEventHandler() {
     handler->onKeyDown = NULL;
     handler->onKeyUp = NULL;
 
+    handler->handleEventLocal = cgui_windowHandler_handleEventLocal;
+
     return handler;
 }
 
-void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component) {
-    handler->component = component;
-}
-
-#include "../component/ui.h"
-void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
-    CGUI_UIComponent* component = (CGUI_UIComponent*) args.component;
-    if (impl(component->implFlag, CGUI_Trait_UIDrawable)) {
-        if (component->drawableImpl->refresh) {
-            component->drawableImpl->refresh(component);
-        }
-    }
-}
-
-void cgui_destroyEventHandler(CGUI_EventHandler* handler) {
+void cgui_destroyWindowHandler(CGUI_WindowHandler* handler) {
     free(handler);
 }
 
-void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    CGUI_EventArgs args = cgui_createEventArgs(self->component, hwnd, msg, wParam, lParam);
+void cgui_windowHandler_handleEventLocal(CGUI_WindowHandler* self, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                         WPARAM wParam, LPARAM lParam) {
+    CGUI_EventArgs args = cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam);
     switch (msg) {
         case WM_CREATE:
             if (self->onCreate) {
@@ -92,13 +141,13 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
             break;
         case WM_MOUSEMOVE:
             if (self->onMouseMove) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 self->onMouseMove(mouseArgs);
             }
             break;
         case WM_LBUTTONDOWN:
             if (self->onMouseDown) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 if (mouseArgs.button != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
                 mouseArgs.button = LeftButton;
                 self->onMouseDown(mouseArgs);
@@ -106,7 +155,7 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
             break;
         case WM_LBUTTONUP:
             if (self->onMouseUp) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 if (mouseArgs.button != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
                 mouseArgs.button = LeftButton;
                 self->onMouseUp(mouseArgs);
@@ -114,7 +163,7 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
             break;
         case WM_RBUTTONDOWN:
             if (self->onMouseDown) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 if (mouseArgs.button != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
                 mouseArgs.button = RightButton;
                 self->onMouseDown(mouseArgs);
@@ -122,7 +171,7 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
             break;
         case WM_RBUTTONUP:
             if (self->onMouseUp) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 if (mouseArgs.button != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
                 mouseArgs.button = RightButton;
                 self->onMouseUp(mouseArgs);
@@ -130,22 +179,24 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
             break;
         case WM_MOUSEWHEEL:
             if (self->onMouseWheel) {
-                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 self->onMouseWheel(mouseArgs);
             }
             break;
         case WM_KEYDOWN:
             if (self->onKeyDown) {
-                CGUI_KeyEventArgs keyArgs = cgui_createKeyEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_KeyEventArgs keyArgs = cgui_createKeyEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 self->onKeyDown(keyArgs);
             }
             break;
         case WM_KEYUP:
             if (self->onKeyUp) {
-                CGUI_KeyEventArgs keyArgs = cgui_createKeyEventArgs(self->component, hwnd, msg, wParam, lParam);
+                CGUI_KeyEventArgs keyArgs = cgui_createKeyEventArgs(parent->component, hwnd, msg, wParam, lParam);
                 self->onKeyUp(keyArgs);
             }
             break;
+        case WM_COMMAND:
+            panic("WM_COMMAND: Unhandled command message!");
         default:
             break;
     }

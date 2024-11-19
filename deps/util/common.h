@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <windows.h>
 
 /* This macro is intended for panicking. */
 #define panic(msg) (panic_impl(msg, __FILE_NAME__, __LINE__))
@@ -55,6 +56,19 @@ _primitive_ptr;                                        \
 } else {                                                            \
     unwrap_option(_O);                                              \
 }
+
+/* This macro is intended for better branch prediction.
+ * As this macro utilizes the GNU extension __builtin_expect,
+ * it may not work on other compilers.
+ * Well the optimization is little, but it's pretty cool anyway lol. */
+#ifdef __GNUC__
+#define unlikely(_Condition) (__builtin_expect(!!(_Condition), 0))
+#define likely(_Condition) (__builtin_expect(!!(_Condition), 1))
+
+#else
+#define unlikely(_Condition) (_Condition)
+#define likely(_Condition) (_Condition)
+#endif
 
 int random(int min, int max);
 
@@ -222,6 +236,8 @@ bool cgui_isSingletonInitialized(CGUI_Singleton* singleton);
  * @param singleton singleton.
  */
 void cgui_destroySingleton(CGUI_Singleton* singleton);
+
+typedef void (* CGUI_ApplicationMessageCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
 #endif //CGUI_COMMON_H

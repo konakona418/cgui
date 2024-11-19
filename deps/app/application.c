@@ -72,11 +72,11 @@ IterPredicateResult cgui_application_predicateHwnd(const char* key, void* value,
 
 void cgui_application_messageCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (CGUI_APP_INSTANCE == NULL) return;
-    // todo: route
     CGUI_Application* app = CGUI_APP_INSTANCE;
     CGUI_Result result = app->core->compManager->getComponentPredicate(app->core->compManager, &hwnd, cgui_application_predicateHwnd);
     if (is_ok(&result)) {
         CGUI_UIComponent* component = take(&result);
-        component->eventHandler->handleEvent(component->eventHandler, hwnd, msg, wParam, lParam);
+        // todo: this may lead to infinite recursive calls. proceed with caution.
+        component->eventHandler->handleEvent(component->eventHandler, hwnd, msg, wParam, lParam, cgui_application_messageCallback);
     }
 }
