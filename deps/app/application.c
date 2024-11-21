@@ -80,3 +80,11 @@ void cgui_application_messageCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM
         component->eventHandler->handleEvent(component->eventHandler, hwnd, msg, wParam, lParam, cgui_application_messageCallback);
     }
 }
+
+CGUI_Option cgui_getApplicationInstance() {
+    if (CGUI_APP_INSTANCE != NULL) {
+        return create_some(CGUI_APP_INSTANCE);
+    } else {
+        return create_none();
+    }
+}
