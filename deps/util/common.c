@@ -31,6 +31,36 @@ LPCSTR cgui_concatString(LPCSTR str1, LPCSTR str2) {
     return result;
 }
 
+LPCSTR cgui_toLowercase(LPCSTR str) {
+    unsigned long long len = strlen(str);
+    char* result = strdup(str);
+    for (int i = 0; i < len; ++i) {
+        if (str[i] == '\0') {
+            break;
+        }
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            result[i] += 32;
+        }
+    }
+    result[len] = '\0';
+    return result;
+}
+
+LPCSTR cgui_toUppercase(LPCSTR str) {
+    unsigned long long len = strlen(str);
+    char* result = strdup(str);
+    for (int i = 0; i < len; ++i) {
+        if (str[i] == '\0') {
+            break;
+        }
+        if (str[i] >= 'a' && str[i] <= 'z') {
+            result[i] -= 32;
+        }
+    }
+    result[len] = '\0';
+    return result;
+}
+
 CGUI_Error* createError(int code, const char* msg) {
     CGUI_Error* ptr = malloc(sizeof(CGUI_Error));
     ptr->code = code;

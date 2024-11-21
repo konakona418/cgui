@@ -89,6 +89,8 @@ typedef bool IterPredicateResult;
 #define false 0
 
 LPCSTR cgui_concatString(LPCSTR str1, LPCSTR str2);
+LPCSTR cgui_toLowercase(LPCSTR str);
+LPCSTR cgui_toUppercase(LPCSTR str);
 
 /* Prototypes of functions and types. */
 typedef enum ResultType CGUI_ResultType;
