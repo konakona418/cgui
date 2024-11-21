@@ -51,7 +51,7 @@ void cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HW
 void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
     if (msg == WM_COMMAND) {
         HWND hComponent = (HWND) lParam;
-        if (unlikely(hwnd != hComponent)) {
+        if (likely(hwnd != hComponent)) {
             if (unlikely(hComponent == NULL)) {
                 // todo: [IMPORTANT] when this value is NULL, it usually means that this message originates from a menu option.
                 // add something to handle this.
