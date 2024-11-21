@@ -10,9 +10,11 @@
 CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent) {
     CGUI_UINativeWindow* window = (CGUI_UINativeWindow*) malloc(sizeof(CGUI_UINativeWindow));
 
+    LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
+    LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     window->component = cgui_createUIComponent(
-            "window",
-            (LONG_PTR)nativeWindow->getWindowHandle(nativeWindow),
+            cgui_concatString("window", wndIdentifier),
+            (LONG_PTR) wndId,
             parent,
             CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
             | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
@@ -73,6 +75,11 @@ CGUI_Result cgui_uiNativeWindow_bindWindowInstance(CGUI_UINativeWindow* self, CG
         return create_err(CGUI_Error_IllegalNullPtr());
     }
     self->window = nativeWindow;
+
+    LPCSTR wndIdentifier = nativeWindow->wndIdentifier;
+    self->component->name = cgui_concatString("window", wndIdentifier);
+    self->component->id = (LONG_PTR) nativeWindow->getWindowHandle(nativeWindow);
+
     return create_ok(NULL);
 }
 

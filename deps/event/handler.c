@@ -52,6 +52,11 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
     if (msg == WM_COMMAND) {
         HWND hComponent = (HWND) lParam;
         if (unlikely(hwnd != hComponent)) {
+            if (unlikely(hComponent == NULL)) {
+                // todo: [IMPORTANT] when this value is NULL, it usually means that this message originates from a menu option.
+                // add something to handle this.
+            }
+
             if (likely(IsWindow(hComponent))) {
                 callback(hComponent, msg, wParam, lParam);
                 return;
