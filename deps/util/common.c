@@ -22,6 +22,15 @@ int random(int min, int max) {
     return min + rand() % (max - min + 1);
 }
 
+LPCSTR cgui_concatString(LPCSTR str1, LPCSTR str2) {
+    unsigned long long len1 = strlen(str1);
+    unsigned long long len2 = strlen(str2);
+    char* result = malloc(len1 + len2 + 1);
+    strcpy(result, str1);
+    strcpy(result + len1, str2);
+    return result;
+}
+
 CGUI_Error* createError(int code, const char* msg) {
     CGUI_Error* ptr = malloc(sizeof(CGUI_Error));
     ptr->code = code;

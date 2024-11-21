@@ -32,4 +32,6 @@
 
 #define CGUI_Error_ComponentNotFound() (CGUI_Error_Prototype(CGUI_COMPONENT_NOT_FOUND_CODE, CGUI_COMPONENT_NOT_FOUND_MESSAGE))
 
+#define CGUI_Error_FactoryNotFound() (CGUI_Error_Prototype(CGUI_FACTORY_NOT_FOUND_CODE, CGUI_FACTORY_NOT_FOUND_MESSAGE))
+
 #endif //CGUI_ERROR_H
