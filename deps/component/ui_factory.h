@@ -25,14 +25,15 @@ typedef struct UIFactoryCluster {
     CGUI_Result (* createComponent)(CGUI_UIFactoryCluster* cluster, const char* name, int argc, void* argv);
 } CGUI_UIFactoryCluster;
 
-CGUI_UIFactoryCluster* CGUI_createUIFactoryCluster();
-void CGUI_destroyUIFactoryCluster(CGUI_UIFactoryCluster* cluster);
+CGUI_UIFactoryCluster* cgui_createUIFactoryCluster();
+void cgui_destroyUIFactoryCluster(CGUI_UIFactoryCluster* cluster);
+CGUI_UIFactoryCluster* cgui_getUIFactoryClusterInstance();
 
 CGUI_Result cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
 CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster, const char* name);
 CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, void* argv);
 
-CGUI_Result cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster);
+void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster);
 
 typedef struct WindowClassOptions {
     LPCSTR className;
