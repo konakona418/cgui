@@ -92,6 +92,47 @@ LPCSTR cgui_concatString(LPCSTR str1, LPCSTR str2);
 LPCSTR cgui_toLowercase(LPCSTR str);
 LPCSTR cgui_toUppercase(LPCSTR str);
 
+/**
+ * This type is intended for representing a boxed pointer.
+ * It is used to store a pointer to a value.
+ * Intended for providing a type with a fixed size to be passed as array parameter. */
+typedef struct Box CGUI_Box;
+
+typedef struct Box {
+    void* _inner;
+} CGUI_Box;
+
+/**
+ * Creates a boxed pointer.
+ * This function is intended for providing a type with a fixed size to be passed as array parameter.
+ * @param ptr The pointer to be boxed.
+ * @return A boxed pointer.
+ */
+CGUI_Box* into_box(void* ptr);
+
+/**
+ * Clones a boxed pointer.
+ * @param box The boxed pointer.
+ * @return A cloned boxed pointer.
+ */
+CGUI_Box* clone_box(CGUI_Box* box);
+
+/**
+ * Unboxes a boxed pointer.
+ * @warning This function will deallocate the box.
+ * @param box The boxed pointer.
+ * @return The unboxed pointer.
+ */
+void* unbox(CGUI_Box* box);
+
+/**
+ * Dereferences a boxed pointer.
+ * @param _InnerType The type of the inner value.
+ * @param _Box The boxed pointer.
+ * @return The dereferenced pointer.
+ */
+#define deref_box(_InnerType, _Box) (deref(_InnerType, unbox(_Box)))
+
 /* Prototypes of functions and types. */
 typedef enum ResultType CGUI_ResultType;
 

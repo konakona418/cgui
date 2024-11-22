@@ -61,6 +61,22 @@ LPCSTR cgui_toUppercase(LPCSTR str) {
     return result;
 }
 
+CGUI_Box* into_box(void* ptr) {
+    CGUI_Box* box = malloc(sizeof(CGUI_Box));
+    box->_inner = ptr;
+    return box;
+}
+
+CGUI_Box* clone_box(CGUI_Box* box) {
+    return into_box(box->_inner);
+}
+
+void* unbox(CGUI_Box* box) {
+    void* ptr = box->_inner;
+    free(box);
+    return ptr;
+}
+
 CGUI_Error* createError(int code, const char* msg) {
     CGUI_Error* ptr = malloc(sizeof(CGUI_Error));
     ptr->code = code;
