@@ -49,6 +49,10 @@ void* cgui_messageDispatcher_dispatch(void* ts) {
     while (GetMessage(&msg, threadStart->hwnd, threadStart->filterMin, threadStart->filterMax) > 0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+
+        if (!threadStart->dispatcher->isDispatching) {
+            break;
+        }
     }
     threadStart->dispatcher->isDispatching = false;
 
@@ -79,6 +83,7 @@ void cgui_messageDispatcher_stop(CGUI_MessageDispatcher* self, bool force) {
             cgui_destroyThread(self->thread);
         }
     }
+    self->isDispatching = false;
 }
 
 void cgui_messageHandler_initSingleton(CGUI_ApplicationMessageCallback callback) {
