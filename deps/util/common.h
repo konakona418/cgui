@@ -70,6 +70,9 @@ _primitive_ptr;                                        \
 #define likely(_Condition) (_Condition)
 #endif
 
+/* This macro is intended for indicating that the return value of a function should be used. */
+#define nodiscard __attribute__((warn_unused_result))
+
 int random(int min, int max);
 
 /* This type is intended for representing a boolean value. */

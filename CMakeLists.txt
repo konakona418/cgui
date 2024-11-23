@@ -34,8 +34,6 @@ add_executable(cgui main.c
         deps/geo/layout.h
         deps/component/ui_window.c
         deps/component/ui_window.h
-        deps/component/ui_window_proto.c
-        deps/component/ui_window_proto.h
         deps/event/args.c
         deps/event/args.h
         deps/threading/thread.c

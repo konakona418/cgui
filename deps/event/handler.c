@@ -70,13 +70,6 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg,
     cgui_routeToLocalHandler(self, self->localHandler, hwnd, msg, wParam, lParam);
 }
 
-
-typedef struct ButtonEventHandler CGUI_ButtonEventHandler;
-
-typedef struct ButtonEventHandler {
-
-} CGUI_ButtonEventHandler;
-
 CGUI_WindowHandler* cgui_createWindowHandler() {
     CGUI_WindowHandler* handler = malloc(sizeof(CGUI_WindowHandler));
 
@@ -110,8 +103,9 @@ void cgui_destroyWindowHandler(CGUI_WindowHandler* handler) {
     free(handler);
 }
 
-void cgui_windowHandler_handleEventLocal(CGUI_WindowHandler* self, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+void cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                          WPARAM wParam, LPARAM lParam) {
+    CGUI_WindowHandler* self = (CGUI_WindowHandler*) pSelf;
     CGUI_EventArgs args = cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam);
     switch (msg) {
         case WM_CREATE:
@@ -153,32 +147,32 @@ void cgui_windowHandler_handleEventLocal(CGUI_WindowHandler* self, CGUI_EventHan
         case WM_LBUTTONDOWN:
             if (self->onMouseDown) {
                 CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
-                if (mouseArgs.button != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
-                mouseArgs.button = LeftButton;
+                if (mouseArgs.button.state != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
+                mouseArgs.button.state = LeftButton;
                 self->onMouseDown(mouseArgs);
             }
             break;
         case WM_LBUTTONUP:
             if (self->onMouseUp) {
                 CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
-                if (mouseArgs.button != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
-                mouseArgs.button = LeftButton;
+                if (mouseArgs.button.state != LeftButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
+                mouseArgs.button.state = LeftButton;
                 self->onMouseUp(mouseArgs);
             }
             break;
         case WM_RBUTTONDOWN:
             if (self->onMouseDown) {
                 CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
-                if (mouseArgs.button != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
-                mouseArgs.button = RightButton;
+                if (mouseArgs.button.state != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
+                mouseArgs.button.state = RightButton;
                 self->onMouseDown(mouseArgs);
             }
             break;
         case WM_RBUTTONUP:
             if (self->onMouseUp) {
                 CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
-                if (mouseArgs.button != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
-                mouseArgs.button = RightButton;
+                if (mouseArgs.button.state != RightButton) printf("WM_MOUSEMOVE: button code mismatch.\n");
+                mouseArgs.button.state = RightButton;
                 self->onMouseUp(mouseArgs);
             }
             break;
@@ -202,6 +196,100 @@ void cgui_windowHandler_handleEventLocal(CGUI_WindowHandler* self, CGUI_EventHan
             break;
         case WM_COMMAND:
             panic("WM_COMMAND: Unhandled command message!");
+        default:
+            break;
+    }
+}
+
+CGUI_ButtonHandler* cgui_createButtonHandler() {
+    CGUI_ButtonHandler* handler = (CGUI_ButtonHandler*) malloc(sizeof(CGUI_ButtonHandler));
+
+    handler->onClick = NULL;
+    handler->onDoubleClick = NULL;
+    handler->onMouseDown = NULL;
+    handler->onMouseUp = NULL;
+    handler->onFocus = NULL;
+    handler->onDefocus = NULL;
+
+    handler->handleEventLocal = cgui_buttonHandler_handleEventLocal;
+    return handler;
+}
+
+void cgui_destroyButtonHandler(CGUI_ButtonHandler* handler) {
+    free(handler);
+}
+
+void cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                         WPARAM wParam, LPARAM lParam) {
+    CGUI_ButtonHandler* self = (CGUI_ButtonHandler*) pSelf;
+    CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
+
+    int bnMessage = HIWORD(wParam);
+    switch (bnMessage) {
+        case BN_CLICKED:
+            if (self->onClick) {
+                self->onClick(mouseArgs);
+            }
+            break;
+        case BN_DBLCLK:
+            if (self->onDoubleClick) {
+                self->onDoubleClick(mouseArgs);
+            }
+            break;
+        case BN_SETFOCUS:
+            if (self->onFocus) {
+                self->onFocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        case BN_KILLFOCUS:
+            if (self->onDefocus) {
+                self->onDefocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+CGUI_TextBoxHandler* cgui_createTextBoxHandler() {
+    CGUI_TextBoxHandler* handler = (CGUI_TextBoxHandler*) malloc(sizeof(CGUI_TextBoxHandler));
+
+    handler->onTextChanged = NULL;
+    handler->onKeyDown = NULL;
+    handler->onKeyUp = NULL;
+    handler->onMouseDown = NULL;
+    handler->onMouseUp = NULL;
+    handler->onDefocus = NULL;
+    handler->onFocus = NULL;
+
+    handler->handleEventLocal = cgui_textBoxHandler_handleEventLocal;
+    return handler;
+}
+
+void cgui_destroyTextBoxHandler(CGUI_TextBoxHandler* handler) {
+    free(handler);
+}
+
+void cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                          WPARAM wParam, LPARAM lParam) {
+    CGUI_TextBoxHandler* self = (CGUI_TextBoxHandler*) pSelf;
+    int notificationCode = HIWORD(wParam);
+    switch (notificationCode) {
+        case EN_CHANGE:
+            if (self->onTextChanged) {
+                self->onTextChanged(cgui_createTextBoxEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        case EN_SETFOCUS:
+            if (self->onFocus) {
+                self->onFocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        case EN_KILLFOCUS:
+            if (self->onDefocus) {
+                self->onDefocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
         default:
             break;
     }

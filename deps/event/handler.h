@@ -10,7 +10,19 @@
 #include <windows.h>
 #include "args.h"
 
+typedef struct EventHandler CGUI_EventHandler;
+
+typedef struct WindowHandler CGUI_WindowHandler;
+
+typedef struct ButtonHandler CGUI_ButtonHandler;
+
+typedef struct TextBoxHandler CGUI_TextBoxHandler;
+
+typedef struct ListBoxHandler CGUI_ListBoxHandler;
+
 typedef unsigned int LocalHandlerFlag;
+
+typedef void (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #define CGUI_LocalHandler_Default       0x0000
 #define CGUI_LocalHandler_WindowRoot    0x0001
@@ -20,11 +32,7 @@ typedef unsigned int LocalHandlerFlag;
 
 #define handle(_HandlerFlag, _Required) (((_HandlerFlag) & (_Required)) == (_Required))
 
-typedef struct EventHandler CGUI_EventHandler;
 
-typedef struct WindowHandler CGUI_WindowHandler;
-
-typedef struct ButtonHandler CGUI_ButtonHandler;
 
 typedef struct WindowHandler {
     void (*onClick)             (CGUI_MouseEventArgs args);
@@ -49,19 +57,71 @@ typedef struct WindowHandler {
     void (*onDestroy)           (CGUI_EventArgs args);
     void (*onPaint)             (CGUI_EventArgs args); // todo: note that this event should call the paint function of the component (gdi WM_PAINT).
 
-    void (*handleEventLocal)    (CGUI_WindowHandler* self, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LocalEventHandler           handleEventLocal;
 } CGUI_WindowHandler;
 
 CGUI_WindowHandler* cgui_createWindowHandler();
 
 void cgui_destroyWindowHandler(CGUI_WindowHandler* handler);
 
-void cgui_windowHandler_handleEventLocal(CGUI_WindowHandler* self, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+void cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                          WPARAM wParam, LPARAM lParam);
 
 typedef struct ButtonHandler {
+    void (*onClick)        (CGUI_MouseEventArgs args);
+    void (*onDoubleClick)  (CGUI_MouseEventArgs args);
+    void (*onMouseDown)    (CGUI_MouseEventArgs args);
+    void (*onMouseUp)      (CGUI_MouseEventArgs args);
+    void (*onFocus)        (CGUI_EventArgs args);
+    void (*onDefocus)      (CGUI_EventArgs args);
 
+    LocalEventHandler      handleEventLocal;
 } CGUI_ButtonHandler;
+
+CGUI_ButtonHandler* cgui_createButtonHandler();
+
+void cgui_destroyButtonHandler(CGUI_ButtonHandler* handler);
+
+void cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                         WPARAM wParam, LPARAM lParam);
+
+typedef struct TextBoxHandler {
+    void (*onTextChanged)   (CGUI_TextBoxEventArgs args);
+    void (*onKeyDown)       (CGUI_KeyEventArgs args);
+    void (*onKeyUp)         (CGUI_KeyEventArgs args);
+    void (*onMouseDown)     (CGUI_MouseEventArgs args);
+    void (*onMouseUp)       (CGUI_MouseEventArgs args);
+    void (*onFocus)         (CGUI_EventArgs args);
+    void (*onDefocus)       (CGUI_EventArgs args);
+
+    LocalEventHandler    handleEventLocal;
+} CGUI_TextBoxHandler;
+
+CGUI_TextBoxHandler* cgui_createTextBoxHandler();
+
+void cgui_destroyTextBoxHandler(CGUI_TextBoxHandler* handler);
+
+void cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                          WPARAM wParam, LPARAM lParam);
+
+typedef struct ListBoxHandler {
+    void (*onItemSelected) (CGUI_EventArgs args);
+    void (*onItemDoubleClicked) (CGUI_EventArgs args);
+    void (*onMouseDown)   (CGUI_MouseEventArgs args);
+    void (*onMouseUp)     (CGUI_MouseEventArgs args);
+    void (*onMouseWheel) (CGUI_MouseEventArgs args);
+    void (*onFocus) (CGUI_EventArgs args);
+    void (*onDefocus) (CGUI_EventArgs args);
+
+    LocalEventHandler handleEventLocal;
+} CGUI_ListBoxHandler;
+
+CGUI_ListBoxHandler* cgui_createListBoxHandler();
+
+void cgui_destroyListBoxHandler(CGUI_ListBoxHandler* handler);
+
+void cgui_listBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                          WPARAM wParam, LPARAM lParam);
 
 typedef struct EventHandler {
     void* component;

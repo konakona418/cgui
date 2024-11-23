@@ -14,14 +14,30 @@ typedef struct EventArgs CGUI_EventArgs;
 
 typedef struct MouseEventArgs CGUI_MouseEventArgs;
 
-typedef enum MouseButton CGUI_MouseButton;
+typedef struct MouseButton CGUI_MouseButton;
+
+typedef enum MouseButtonState CGUI_MouseButtonState;
+
+typedef struct MouseButtonKeyState CGUI_MouseButtonKeyState;
 
 typedef enum KeyState CGUI_KeyState;
 
-typedef enum MouseButton {
+typedef enum MouseButtonState {
     LeftButton,
     RightButton,
-    MiddleButton
+    MiddleButton,
+    XButton1,
+    XButton2,
+} CGUI_MouseButtonState;
+
+typedef struct MouseButtonKeyState {
+    bool isShiftDown;
+    bool isCtrlDown;
+} CGUI_MouseButtonKeyState;
+
+typedef struct MouseButton {
+    CGUI_MouseButtonState state;
+    CGUI_MouseButtonKeyState keyState;
 } CGUI_MouseButton;
 
 CGUI_MouseButton cgui_asMouseButton(WPARAM wParam);
@@ -65,5 +81,16 @@ typedef struct KeyEventArgs {
 } CGUI_KeyEventArgs;
 
 CGUI_KeyEventArgs cgui_createKeyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+typedef struct TextBoxEventArgs CGUI_TextBoxEventArgs;
+
+typedef struct TextBoxEventArgs {
+    CGUI_EventArgs base;
+
+    LPCSTR text;
+    UINT textLength;
+} CGUI_TextBoxEventArgs;
+
+CGUI_TextBoxEventArgs cgui_createTextBoxEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #endif //CGUI_ARGS_H
