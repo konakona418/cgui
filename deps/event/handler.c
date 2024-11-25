@@ -59,9 +59,9 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery 
 
             if (likely(IsWindow(hComponent))) {
                 int id = LOWORD(wParam);
-                CGUI_ComponentQuery query = cgui_createComponentQuery(hComponent, id);
+                CGUI_ComponentQuery queryLocal = cgui_createComponentQuery(hComponent, id);
 
-                callback(query, msg, wParam, lParam);
+                callback(queryLocal, msg, wParam, lParam);
                 return;
             } else {
                 printf("WM_COMMAND: Child component not a window. Ignoring.\n");

@@ -122,7 +122,9 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
     wndManager->addWindow(wndManager, wnd);
 
     CGUI_ComponentManager* compManager = app->core->compManager;
-    CGUI_UIWindow* wndComp = cgui_createUINativeWindowFromWindow(wnd, NULL);
+
+    CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
+    CGUI_UIWindow* wndComp = cgui_createUINativeWindowFromWindow(wnd, NULL, nextId);
     compManager->addComponent(compManager, wndComp->component);
 
     // initialize the event handler.

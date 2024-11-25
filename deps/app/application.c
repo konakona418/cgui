@@ -61,6 +61,17 @@ CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app) {
     return app->handler->getWindowProc(app->handler);
 }
 
+IterPredicateResult cgui_application_predicateInternalId(const char* key, void* value, void* target) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) value;
+    if (impl(component->implFlag, CGUI_Trait_UIWin32)) {
+        CGUI_InternalID internalId = deref(int, target);
+        if (cgui_componentQueryIsIdLegal(internalId)) {
+            return component->win32Impl->internalId == internalId;
+        }
+    }
+    return false;
+}
+
 IterPredicateResult cgui_application_predicateHwnd(const char* key, void* value, void* target) {
     CGUI_UIComponent* component = (CGUI_UIComponent*) value;
     if (impl(component->implFlag, CGUI_Trait_UIWin32)) {

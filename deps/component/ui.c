@@ -292,12 +292,14 @@ const char* id_to_string(LONG_PTR id) {
 CGUI_ComponentManager* cgui_createComponentManager() {
     CGUI_ComponentManager* manager = (CGUI_ComponentManager*) malloc(sizeof(CGUI_ComponentManager));
     manager->components = create_hash_table(DEFAULT_BUCKET_COUNT);
+    manager->internalIdCounter = 0;
 
     manager->addComponent = cgui_componentManager_addComponent;
 
     manager->getComponentById = cgui_componentManager_getComponentById;
     manager->getComponentByName = cgui_componentManager_getComponentByName;
     manager->getComponentPredicate = cgui_componentManager_getComponentPredicate;
+    manager->getNextInternalId = cgui_componentManager_getNextInternalId;
 
     manager->removeComponent = cgui_componentManager_removeComponent;
     manager->removeComponentById = cgui_componentManager_removeComponentById;
@@ -384,6 +386,10 @@ CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* m
     } else {
         return create_ok(result);
     }
+}
+
+CGUI_InternalID cgui_componentManager_getNextInternalId(CGUI_ComponentManager* manager) {
+    return manager->internalIdCounter++;
 }
 
 void cgui_componentManager_iter(CGUI_ComponentManager* manager, void (* callback)(const char* key, void* value)) {

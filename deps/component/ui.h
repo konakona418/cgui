@@ -122,6 +122,7 @@ typedef struct UIStyle {
 } CGUI_UIStyle;
 
 typedef struct UIWin32 {
+    int internalId;
     HWND (* getWindowHandle)(CGUI_UIComponent* component);
 } CGUI_UIWin32;
 
@@ -353,7 +354,7 @@ void cgui_destroyUIStyle(CGUI_UIStyle* style);
  * @note this trait does @b NOT provide a default implementation for @p getWindowHandle.
  * @note which means that certain component must provide a custom implementation.
  * @return The created win32 component. */
-CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component));
+CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component), int internalId);
 
 /**
  * Destroy the win32 component.
@@ -367,12 +368,15 @@ typedef struct ComponentManager CGUI_ComponentManager;
 
 typedef struct ComponentManager {
     HashTable* components;
+    CGUI_InternalID internalIdCounter;
 
     CGUI_Result (* addComponent)(CGUI_ComponentManager* self, CGUI_UIComponent* component);
 
     CGUI_Result (* getComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
     CGUI_Result (* getComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
     CGUI_Result (* getComponentPredicate)(CGUI_ComponentManager* self, void* target, ComponentPredicate predicate);
+
+    CGUI_InternalID (* getNextInternalId)(CGUI_ComponentManager* self);
 
     CGUI_Result (* removeComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
     CGUI_Result (* removeComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
@@ -400,6 +404,8 @@ CGUI_Result cgui_componentManager_getComponentById(CGUI_ComponentManager* manage
 CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* manager, LPCSTR name);
 
 CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate);
+
+CGUI_InternalID cgui_componentManager_getNextInternalId(CGUI_ComponentManager* manager);
 
 CGUI_Result cgui_componentManager_removeComponentById(CGUI_ComponentManager* manager, LONG_PTR id);
 

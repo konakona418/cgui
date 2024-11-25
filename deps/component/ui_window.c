@@ -7,7 +7,7 @@
 #include <windows.h>
 #include "ui_window.h"
 
-CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent) {
+CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeWindow* window = (CGUI_UINativeWindow*) malloc(sizeof(CGUI_UINativeWindow));
 
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
@@ -25,7 +25,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
             cgui_uiNativeWindow_refreshCallback);
     window->component->stateImpl = cgui_createUIState();
     window->component->disposableImpl = cgui_createUIDisposable(window, cgui_uiNativeWindow_destroyCallback);
-    window->component->win32Impl = cgui_createUIWin32(cgui_uiNativeWindow_getWindowHandle);
+    window->component->win32Impl = cgui_createUIWin32(cgui_uiNativeWindow_getWindowHandle, internalId);
 
     window->window = nativeWindow;
 
@@ -66,8 +66,8 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
     return window;
 }
 
-CGUI_UINativeWindow* cgui_createUINativeWindow(CGUI_UIComponent* parent) {
-    return cgui_createUINativeWindowFromWindow(NULL, parent);
+CGUI_UINativeWindow* cgui_createUINativeWindow(CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+    return cgui_createUINativeWindowFromWindow(NULL, parent, internalId);
 }
 
 CGUI_Result cgui_uiNativeWindow_bindWindowInstance(CGUI_UINativeWindow* self, CGUI_Window* nativeWindow) {

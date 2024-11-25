@@ -70,14 +70,14 @@ typedef struct UINativeWindow {
  * @warning set the window instance using @p cgui_uiNativeWindow_bindWindowInstance
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeWindow* cgui_createUINativeWindow(CGUI_UIComponent* parent);
+CGUI_UINativeWindow* cgui_createUINativeWindow(CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 /**
  * Create a native window component from a native win32 window instance.
  * @param nativeWindow the REAL implementation of native window.
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent);
+CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeWindow_bindWindowInstance(CGUI_UINativeWindow* self, CGUI_Window* nativeWindow);
 
