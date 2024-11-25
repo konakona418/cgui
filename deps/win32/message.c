@@ -136,15 +136,16 @@ cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         printf("Message handler instance is not initialized. Use DefWindowProc instead.");
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
-    instance->routeToApplication(instance, hwnd, msg, wParam, lParam);
+    CGUI_ComponentQuery query = cgui_createComponentQuery(hwnd, CGUI_COMPONENT_QUERY_NO_ID);
+    instance->routeToApplication(instance, query, msg, wParam, lParam);
     return 0;
 }
 
-void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (self->applicationCallback == NULL) {
         panic("Fatal! Application message callback is not set.");
     }
-    self->applicationCallback(hwnd, msg, wParam, lParam);
+    self->applicationCallback(query, msg, wParam, lParam);
 }
 
 CGUI_WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler) {

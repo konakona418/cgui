@@ -10,6 +10,7 @@
 #include <windows.h>
 
 #include "../util/common.h"
+#include "../util/misc.h"
 #include "../threading/thread.h"
 
 typedef struct MessageDispatcher CGUI_MessageDispatcher;
@@ -74,7 +75,7 @@ typedef struct MessageHandler {
 
     CGUI_ApplicationMessageCallback applicationCallback;
 
-    void (* routeToApplication)(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    void (* routeToApplication)(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
     CGUI_WindowProc (* getWindowProc)(CGUI_MessageHandler* handler);
 } CGUI_MessageHandler;
@@ -89,7 +90,7 @@ LRESULT CALLBACK
 cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Route the message to the application. */
-void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+void cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler);
 

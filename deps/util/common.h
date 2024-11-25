@@ -285,7 +285,5 @@ bool cgui_isSingletonInitialized(CGUI_Singleton* singleton);
  */
 void cgui_destroySingleton(CGUI_Singleton* singleton);
 
-typedef void (* CGUI_ApplicationMessageCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 
 #endif //CGUI_COMMON_H

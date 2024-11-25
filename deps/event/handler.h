@@ -9,6 +9,7 @@
 
 #include <windows.h>
 #include "args.h"
+#include "../util/misc.h"
 
 typedef struct EventHandler CGUI_EventHandler;
 
@@ -129,7 +130,7 @@ typedef struct EventHandler {
     LocalHandlerFlag handlerFlag;
     void* localHandler;
 
-    void (*handleEvent)     (CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+    void (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
     void (*setComponent)    (CGUI_EventHandler* self, void* component);
 } CGUI_EventHandler;
@@ -140,7 +141,7 @@ void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component)
 
 void cgui_destroyEventHandler(CGUI_EventHandler* handler);
 
-void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args);
 

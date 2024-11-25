@@ -46,4 +46,7 @@ add_executable(cgui main.c
         deps/component/trait.h
         deps/component/ui_factory.c
         deps/component/ui_factory.h
+        deps/util/misc.h
+        deps/util/misc.c
+        deps/util/misc.c
 )

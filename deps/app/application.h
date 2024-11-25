@@ -9,6 +9,7 @@
 
 #include "core.h"
 #include "../win32/message.h"
+#include "../util/misc.h"
 
 typedef struct Application CGUI_Application;
 
@@ -30,7 +31,7 @@ void cgui_application_run(CGUI_Application* app, bool isAsync);
 void cgui_application_stop(CGUI_Application* app);
 
 CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app);
-void cgui_application_messageCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+void cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_Option cgui_getApplicationInstance();
 
