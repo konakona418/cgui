@@ -169,6 +169,8 @@ typedef struct Window {
 
     CGUI_Result (* setWindowName)(CGUI_Window* self, LPCSTR wndName);
 
+    LPCSTR      (* getWindowName)(CGUI_Window* self);
+
     CGUI_Result (* setWindowStyle)(CGUI_Window* self, LONG_PTR dwStyle);
 
     CGUI_Result (* setWindowGeometry)(CGUI_Window* self, int x, int y, int width, int height);
@@ -225,6 +227,9 @@ CGUI_Result cgui_window_postMessage(CGUI_Window* self, UINT msg, WPARAM wParam, 
 
 /* Sets the name of the window. */
 CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName);
+
+/* Gets the name of the window. */
+LPCSTR cgui_window_getWindowName(CGUI_Window* self);
 
 /* Sets the styleImpl of the window. */
 CGUI_Result cgui_window_setWindowStyle(CGUI_Window* self, LONG_PTR dwStyle);

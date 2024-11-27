@@ -273,9 +273,10 @@ void cgui_destroyUIStyle(CGUI_UIStyle* style) {
     free(style);
 }
 
-CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component)) {
+CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component), CGUI_InternalID internalId) {
     CGUI_UIWin32* win = (CGUI_UIWin32*) malloc(sizeof(CGUI_UIWin32));
     win->getWindowHandle = getWindowHandle;
+    win->internalId = internalId;
     return win;
 }
 

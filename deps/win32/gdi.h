@@ -36,15 +36,15 @@ typedef struct Color {
     bool transparent;
 } CGUI_Color;
 
-typedef struct FontStyle {
+typedef struct GDIFontStyle {
     int fontSize;
     char fontName[32];
     CGUI_Color foregroundColor;
     CGUI_Color backgroundColor;
-} CGUI_FontStyle;
+} CGUI_GDIFontStyle;
 
 typedef struct GDITextContext {
-    CGUI_FontStyle fontStyle;
+    CGUI_GDIFontStyle fontStyle;
     CGUI_TextStyle textStyle;
 
     CGUI_TextAlignment alignment;

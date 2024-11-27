@@ -113,6 +113,7 @@ void cgui_uiNativeWindow_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIDrawable(component->drawableImpl);
     cgui_destroyUILayout(component->layoutImpl);
     cgui_destroyUIState(component->stateImpl);
+    cgui_destroyUIWin32(component->win32Impl);
 
     cgui_destroyUINativeWindow((CGUI_UINativeWindow*)component->disposableImpl->upperLevel);
 }

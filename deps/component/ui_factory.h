@@ -48,4 +48,12 @@ typedef struct WindowClassOptions {
 
 CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv);
 
+CGUI_Result cgui_uiFactory_createButton(int argc, void* argv);
+
+CGUI_Result cgui_uiFactory_createLabel(int argc, void* argv);
+
+CGUI_Result cgui_uiFactory_createTextBox(int argc, void* argv);
+
+CGUI_Result cgui_uiFactory_createListBox(int argc, void* argv);
+
 #endif //CGUI_UI_FACTORY_H
