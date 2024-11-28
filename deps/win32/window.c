@@ -249,7 +249,8 @@ CGUI_Result cgui_window_update(CGUI_Window* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    UpdateWindow(self->hwnd);
+    // UpdateWindow(self->hwnd);
+    InvalidateRect(self->hwnd, NULL, TRUE);
     return create_ok(NULL);
 }
 

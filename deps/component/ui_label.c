@@ -241,7 +241,6 @@ void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component) {
 void cgui_uiNativeLabel_refreshCallback(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         if (component->disposableImpl != NULL) {
-            cgui_uiNativeLabel_update(component->disposableImpl->upperLevel);
             cgui_uiNativeLabel_show(component->disposableImpl->upperLevel);
         }
     }
