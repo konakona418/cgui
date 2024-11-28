@@ -32,7 +32,8 @@ CGUI_MouseButton cgui_asMouseButton(WPARAM wParam) {
     } else if (wParam & MK_XBUTTON2) {
         mouseButtonState = XButton2;
     } else {
-        panic("Invalid mouse button state.");
+        printf("Invalid mouse button state.\n");
+        mouseButtonState = LeftButton;
     }
 
     CGUI_MouseButtonKeyState keyState;
@@ -76,5 +77,13 @@ CGUI_TextBoxEventArgs cgui_createTextBoxEventArgs(void* component, HWND hwnd, UI
         .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
         .text = buffer,
         .textLength = len,
+    };
+}
+
+CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    return (CGUI_GdiReadyEventArgs) {
+        .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
+        .hdc = (HDC) wParam,
+        .hwnd = (HWND) lParam,
     };
 }

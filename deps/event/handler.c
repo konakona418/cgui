@@ -9,6 +9,8 @@
 #include "../component/trait.h"
 
 #include "../component/ui.h"
+#include "../component/ui_label.h"
+
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
     CGUI_UIComponent* component = (CGUI_UIComponent*) args.component;
     if (impl(component->implFlag, CGUI_Trait_UIDrawable)) {
@@ -18,9 +20,9 @@ void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
     }
 }
 
-CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag) {
+CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag, void* component) {
     CGUI_EventHandler* handler = (CGUI_EventHandler*) malloc(sizeof(CGUI_EventHandler));
-    handler->component = NULL;
+    handler->component = component;
 
     handler->localHandler = localHandler;
     handler->handlerFlag = handlerFlag;
@@ -39,16 +41,21 @@ void cgui_destroyEventHandler(CGUI_EventHandler* handler) {
     free(handler);
 }
 
-void cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (handle(handler->handlerFlag, CGUI_LocalHandler_WindowRoot)) {
-        into(CGUI_WindowHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
-    }
-    else {
+        return into(CGUI_WindowHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    } else if (handle(handler->handlerFlag, CGUI_LocalHandler_Button)) {
+        return into(CGUI_ButtonHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    } else if (handle(handler->handlerFlag, CGUI_LocalHandler_TextBox)) {
+        return into(CGUI_TextBoxHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    } else if (handle(handler->handlerFlag, CGUI_LocalHandler_Label)) {
+        return into(CGUI_LabelHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    } else {
         panic("Invalid handler type.");
     }
 }
 
-void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
+int cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
     if (msg == WM_COMMAND) {
         HWND hComponent = (HWND) lParam;
         if (likely(query.hwnd != hComponent)) {
@@ -61,16 +68,33 @@ void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery 
                 int id = LOWORD(wParam);
                 CGUI_ComponentQuery queryLocal = cgui_createComponentQuery(hComponent, id);
 
-                callback(queryLocal, msg, wParam, lParam);
-                return;
+                return callback(queryLocal, msg, wParam, lParam);
             } else {
                 printf("WM_COMMAND: Child component not a window. Ignoring.\n");
             }
         } else {
             printf("WM_COMMAND: child component hwnd eq hwnd.\n");
         }
+    } else if (eq_any((int) msg, 7, WM_CTLCOLORBTN, WM_CTLCOLOREDIT, WM_CTLCOLORMSGBOX,
+                      WM_CTLCOLORLISTBOX, WM_CTLCOLORSCROLLBAR, WM_CTLCOLORSTATIC, WM_CTLCOLORDLG)) {
+        HWND hComponent = (HWND) lParam;
+        if (likely(query.hwnd != hComponent)) {
+            if (unlikely(hComponent == NULL)) {
+
+            }
+
+            if (likely(IsWindow(hComponent))) {
+                int id = GetDlgCtrlID(hComponent);
+                CGUI_ComponentQuery queryLocal = cgui_createComponentQuery(hComponent, id);
+
+                return callback(queryLocal, msg, wParam, lParam);
+            }
+        } else {
+            // if the query hwnd is the same as the hwnd of the message, then send the message to the local handler.
+            return cgui_routeToLocalHandler(self, self->localHandler, query.hwnd, msg, wParam, lParam);
+        }
     }
-    cgui_routeToLocalHandler(self, self->localHandler, query.hwnd, msg, wParam, lParam);
+    return cgui_routeToLocalHandler(self, self->localHandler, query.hwnd, msg, wParam, lParam);
 }
 
 CGUI_WindowHandler* cgui_createWindowHandler() {
@@ -106,8 +130,8 @@ void cgui_destroyWindowHandler(CGUI_WindowHandler* handler) {
     free(handler);
 }
 
-void cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam) {
+int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                        WPARAM wParam, LPARAM lParam) {
     CGUI_WindowHandler* self = (CGUI_WindowHandler*) pSelf;
     CGUI_EventArgs args = cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam);
     switch (msg) {
@@ -200,7 +224,61 @@ void cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent,
         case WM_COMMAND:
             panic("WM_COMMAND: Unhandled command message!");
         default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
             break;
+    }
+    return 0;
+}
+
+void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
+    CGUI_UIComponent* component = args.base.component;
+    if (!impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        panic("Fatal! Not a valid NativeLabel component!");
+    }
+    CGUI_UINativeLabel* label = (CGUI_UINativeLabel*) component->disposableImpl->upperLevel;
+
+    if (!label->_gdiRefreshFlag || label->gdiTextContext == NULL) {
+        return;
+    }
+
+    HDC hdc = args.hdc;
+    HWND hwnd = args.hwnd;
+
+    CGUI_GDITextContext* drawCtx = label->gdiTextContext;
+    SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
+    SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
+
+    if (drawCtx->fontStyle.backgroundColor.transparent) {
+        SetBkMode(hdc, TRANSPARENT);
+    } else {
+        SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
+    }
+    label->_gdiRefreshFlag = false;
+}
+
+CGUI_LabelHandler* cgui_createLabelHandler() {
+    CGUI_LabelHandler* handler = (CGUI_LabelHandler*) malloc(sizeof(CGUI_LabelHandler));
+    handler->onGdiReady = cgui_labelHandler_defaultOnGdiReady;
+    handler->handleEventLocal = cgui_labelHandler_handleEventLocal;
+    return handler;
+}
+
+
+void cgui_destroyLabelHandler(CGUI_LabelHandler* handler) {
+    free(handler);
+}
+
+int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                       WPARAM wParam, LPARAM lParam) {
+    CGUI_LabelHandler* self = (CGUI_LabelHandler*) pSelf;
+    if (msg == WM_CTLCOLORSTATIC) {
+        CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
+        if (self->onGdiReady) {
+            self->onGdiReady(args);
+        }
+        return 0; // todo: can return background brush here.
+    } else {
+        return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 }
 
@@ -222,8 +300,8 @@ void cgui_destroyButtonHandler(CGUI_ButtonHandler* handler) {
     free(handler);
 }
 
-void cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam) {
+int cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                        WPARAM wParam, LPARAM lParam) {
     CGUI_ButtonHandler* self = (CGUI_ButtonHandler*) pSelf;
     CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
 
@@ -250,8 +328,10 @@ void cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent,
             }
             break;
         default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
             break;
     }
+    return 0;
 }
 
 CGUI_TextBoxHandler* cgui_createTextBoxHandler() {
@@ -273,8 +353,8 @@ void cgui_destroyTextBoxHandler(CGUI_TextBoxHandler* handler) {
     free(handler);
 }
 
-void cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                          WPARAM wParam, LPARAM lParam) {
+int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                         WPARAM wParam, LPARAM lParam) {
     CGUI_TextBoxHandler* self = (CGUI_TextBoxHandler*) pSelf;
     int notificationCode = HIWORD(wParam);
     switch (notificationCode) {
@@ -294,6 +374,8 @@ void cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent
             }
             break;
         default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
             break;
     }
+    return 0;
 }

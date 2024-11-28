@@ -24,6 +24,9 @@ typedef struct UINativeLabel {
 
     CGUI_Window* window;
 
+    CGUI_GDITextContext* gdiTextContext;
+    bool _gdiRefreshFlag;
+
     void                (* show)                 (CGUI_UINativeLabel* self);
     void                (* hide)                 (CGUI_UINativeLabel* self);
     void                (* update)               (CGUI_UINativeLabel* self);
@@ -31,7 +34,7 @@ typedef struct UINativeLabel {
 
     void                (* setText)              (CGUI_UINativeLabel* self, LPCSTR text);
     LPCSTR              (* getText)              (CGUI_UINativeLabel* self);
-    void                (* setTextDisplay)       (CGUI_UINativeLabel* self, CGUI_GDITextContext gdiTextContext);
+    void                (* setTextDisplay)       (CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext);
     CGUI_GDITextContext (* getTextDisplay)       (CGUI_UINativeLabel* self);
 
     /* implementation for CGUI_UIComponent */
@@ -72,7 +75,7 @@ CGUI_Result cgui_uiNativeLabel_close(CGUI_UINativeLabel* self);
 
 void cgui_uiNativeLabel_setText(CGUI_UINativeLabel* self, LPCSTR text);
 
-void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextContext gdiTextContext);
+void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext);
 
 LPCSTR cgui_uiNativeLabel_getText(CGUI_UINativeLabel* self);
 
@@ -136,6 +139,8 @@ CGUI_Result cgui_uiNativeLabel_setVisible(CGUI_UINativeLabel* self, bool visible
 CGUI_Result cgui_uiNativeLabel_setEnabled(CGUI_UINativeLabel* self, bool enabled);
 
 HWND cgui_uiNativeLabel_getWindowHandle(CGUI_UIComponent* component);
+
+void cgui_uiNativeLabel_readyCallback(CGUI_UIComponent* component);
 
 void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component);
 

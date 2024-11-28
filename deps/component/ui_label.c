@@ -20,6 +20,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     
     label->component->layoutImpl = cgui_createUILayout();
     label->component->drawableImpl = cgui_createUIDrawable(
+            cgui_uiNativeLabel_readyCallback,
             cgui_uiNativeLabel_drawCallback,
             cgui_uiNativeLabel_refreshCallback);
     label->component->stateImpl = cgui_createUIState();
@@ -27,6 +28,9 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->component->win32Impl = cgui_createUIWin32(cgui_uiNativeLabel_getWindowHandle, internalId);
     
     label->window = nativeWindow;
+
+    label->gdiTextContext = NULL;
+    label->_gdiRefreshFlag = false;
 
     label->show = cgui_uiNativeLabel_show;
     label->hide = cgui_uiNativeLabel_hide;
@@ -104,9 +108,13 @@ void cgui_uiNativeLabel_setText(CGUI_UINativeLabel* self, LPCSTR text) {
     self->update(self);
 }
 
-void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextContext gdiTextContext) {
-    // todo: set text display
-    unwrap(create_err(CGUI_Error_NotImplemented()));
+void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext) {
+    self->gdiTextContext = gdiTextContext;
+    self->_gdiRefreshFlag = true;
+
+    HFONT hFont = cgui_createFont(gdiTextContext);
+    self->window->postMessage(self->window, WM_SETFONT, (WPARAM) hFont, TRUE);
+    self->update(self); // this will signal repaint.
 }
 
 LPCSTR cgui_uiNativeLabel_getText(CGUI_UINativeLabel* self) {
@@ -228,6 +236,10 @@ HWND cgui_uiNativeLabel_getWindowHandle(CGUI_UIComponent* component) {
     } else {
         return NULL;
     }
+}
+
+void cgui_uiNativeLabel_readyCallback(CGUI_UIComponent* component) {
+    // todo: ready callback
 }
 
 void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component) {

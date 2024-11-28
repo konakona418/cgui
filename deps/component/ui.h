@@ -82,9 +82,11 @@ typedef struct UILayout {
 } CGUI_UILayout;
 
 typedef struct UIDrawable {
+    void (* readyCallback)(CGUI_UIComponent* component);
     void (* drawCallback)(CGUI_UIComponent* component);
     void (* refreshCallback)(CGUI_UIComponent* component);
 
+    void (* ready)(CGUI_UIComponent* component);
     void (* draw)(CGUI_UIComponent* component);
     void (* refresh)(CGUI_UIComponent* component);
 } CGUI_UIDrawable;
@@ -244,13 +246,24 @@ void cgui_destroyUIDisposable(CGUI_UIDisposable* disposable);
  * @param drawCallback The callback to be called when the component needs to be drawn.
  * @param refreshCallback The callback to be called when the component needs to be refreshed.
  * @return The created drawable component. */
-CGUI_UIDrawable* cgui_createUIDrawable(void (* drawCallback)(CGUI_UIComponent* component), void (* refreshCallback)(CGUI_UIComponent* component));
+CGUI_UIDrawable* cgui_createUIDrawable(
+        void (* readyCallback)(CGUI_UIComponent* component),
+        void (* drawCallback)(CGUI_UIComponent* component),
+        void (* refreshCallback)(CGUI_UIComponent* component));
 
 /**
  * Destroy the drawable component.
  * @note This method will destroy the callback.
  * @param drawable The drawable component to destroy. */
 void cgui_destroyUIDrawable(CGUI_UIDrawable* drawable);
+
+/**
+ * Call the ready callback of the component.
+ * This can be applied to certain messages concerning gdi paint.
+ * @note This method will call the ready callback of the component's traits implementation (implemented by user), but if not provided, nothing will happen.
+ * @note This method will call the ready callback of all its children.
+ * @param component The component to call the ready callback. */
+void cgui_uiDrawable_ready(CGUI_UIComponent* component);
 
 /**
  * Draw the component.

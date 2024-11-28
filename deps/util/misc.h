@@ -12,11 +12,13 @@
 typedef struct ComponentQuery CGUI_ComponentQuery;
 typedef int CGUI_InternalID;
 
-typedef void (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef struct ComponentQuery {
     HWND hwnd;
     CGUI_InternalID internalId;
+
+    void* component;
 } CGUI_ComponentQuery;
 
 #define CGUI_COMPONENT_QUERY_NO_ID (-1)

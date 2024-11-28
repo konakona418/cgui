@@ -31,7 +31,7 @@ void cgui_application_run(CGUI_Application* app, bool isAsync);
 void cgui_application_stop(CGUI_Application* app);
 
 CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app);
-void cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_Option cgui_getApplicationInstance();
 

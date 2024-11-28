@@ -96,6 +96,15 @@ LPCSTR cgui_toLowercase(LPCSTR str);
 LPCSTR cgui_toUppercase(LPCSTR str);
 
 /**
+ * This function is intended for comparing two values.
+ * @param value The value to be compared.
+ * @param count The number of values to be compared.
+ * @param ... The values to be compared.
+ * @return True if the values are equal, false otherwise.
+ */
+bool eq_any(int value, size_t count, ...);
+
+/**
  * This type is intended for representing a boxed pointer.
  * It is used to store a pointer to a value.
  * Intended for providing a type with a fixed size to be passed as array parameter. */

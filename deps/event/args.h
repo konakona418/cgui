@@ -93,4 +93,15 @@ typedef struct TextBoxEventArgs {
 
 CGUI_TextBoxEventArgs cgui_createTextBoxEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+typedef struct GdiReadyEventArgs CGUI_GdiReadyEventArgs;
+
+typedef struct GdiReadyEventArgs {
+    CGUI_EventArgs base;
+
+    HDC hdc;
+    HWND hwnd;
+} CGUI_GdiReadyEventArgs;
+
+CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 #endif //CGUI_ARGS_H

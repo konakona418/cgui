@@ -161,6 +161,8 @@ typedef struct Window {
 
     CGUI_Result (* close)(CGUI_Window* self);
 
+    CGUI_Result (* destroy)(CGUI_Window* self);
+
     CGUI_Result (* setState)(CGUI_Window* self, int swState);
 
     CGUI_Result (* setEnabled)(CGUI_Window* self, bool enabled);
@@ -215,6 +217,9 @@ CGUI_Result cgui_window_update(CGUI_Window* self);
 
 /* Closes the window. */
 CGUI_Result cgui_window_close(CGUI_Window* self);
+
+/* Destroys the window instance only. */
+CGUI_Result cgui_window_destroy(CGUI_Window* self);
 
 /* Sets the stateImpl of the window. e.g. SW_SHOW to show the window. */
 CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);

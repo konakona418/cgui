@@ -21,6 +21,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
 
     window->component->layoutImpl = cgui_createUILayout();
     window->component->drawableImpl = cgui_createUIDrawable(
+            NULL,
             cgui_uiNativeWindow_drawCallback,
             cgui_uiNativeWindow_refreshCallback);
     window->component->stateImpl = cgui_createUIState();
@@ -35,6 +36,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
     window->hide = cgui_uiNativeWindow_hide;
     window->update = cgui_uiNativeWindow_update;
     window->close = cgui_uiNativeWindow_close;
+    window->destroy = cgui_uiNativeWindow_destroy;
     window->setWindowName = cgui_uiNativeWindow_setWindowName;
     window->setState = cgui_uiNativeWindow_setState;
     window->postMessage = cgui_uiNativeWindow_postMessage;
@@ -140,6 +142,10 @@ CGUI_Result cgui_uiNativeWindow_update(CGUI_UINativeWindow* self) {
 
 CGUI_Result cgui_uiNativeWindow_close(CGUI_UINativeWindow* self) {
     return self->window->close(self->window);
+}
+
+CGUI_Result cgui_uiNativeWindow_destroy(CGUI_UINativeWindow* self) {
+    return self->window->destroy(self->window);
 }
 
 CGUI_Result cgui_uiNativeWindow_setWindowName(CGUI_UINativeWindow* self, LPCSTR wndName) {

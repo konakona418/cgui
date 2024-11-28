@@ -124,6 +124,7 @@ void cgui_uiComponent_setEventHandler(CGUI_UIComponent* component, CGUI_EventHan
 CGUI_UIDisposable* cgui_createUIDisposable(void* upperLevel, void (* destructor)(CGUI_UIComponent* component)) {
     CGUI_UIDisposable* disposable = (CGUI_UIDisposable*) malloc(sizeof(CGUI_UIDisposable));
     disposable->destructor = destructor;
+    disposable->upperLevel = upperLevel;
 
     return disposable;
 }
@@ -132,11 +133,16 @@ void cgui_destroyUIDisposable(CGUI_UIDisposable* disposable) {
     free(disposable);
 }
 
-CGUI_UIDrawable* cgui_createUIDrawable(void (* drawCallback)(CGUI_UIComponent* component), void (* refreshCallback)(CGUI_UIComponent* component)) {
+CGUI_UIDrawable* cgui_createUIDrawable(
+        void (* readyCallback)(CGUI_UIComponent* component),
+        void (* drawCallback)(CGUI_UIComponent* component),
+        void (* refreshCallback)(CGUI_UIComponent* component)) {
     CGUI_UIDrawable* drawable = (CGUI_UIDrawable*) malloc(sizeof(CGUI_UIDrawable));
+    drawable->readyCallback = readyCallback;
     drawable->drawCallback = drawCallback;
     drawable->refreshCallback = refreshCallback;
 
+    drawable->ready = cgui_uiDrawable_ready;
     drawable->draw = cgui_uiDrawable_draw;
     drawable->refresh = cgui_uiDrawable_refresh;
     return drawable;
@@ -144,6 +150,15 @@ CGUI_UIDrawable* cgui_createUIDrawable(void (* drawCallback)(CGUI_UIComponent* c
 
 void cgui_destroyUIDrawable(CGUI_UIDrawable* drawable) {
     free(drawable);
+}
+
+void cgui_uiDrawable_ready(CGUI_UIComponent* component) {
+    if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
+        if (component->drawableImpl->readyCallback != NULL) {
+            component->drawableImpl->readyCallback(component);
+        }
+    }
+    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_ready);
 }
 
 void cgui_uiDrawable_draw(CGUI_UIComponent* component) {

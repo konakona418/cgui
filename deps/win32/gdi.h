@@ -57,6 +57,12 @@ CGUI_Color cgui_rgbaToColor(int r, int g, int b);
 
 CGUI_Color cgui_transparentColor();
 
+HFONT cgui_createFont(CGUI_GDITextContext* fontCtx);
+
+UINT cgui_textAlignIntoGdi(CGUI_TextAlignment alignment);
+
+CGUI_GDITextContext* cgui_createGdiTextContext();
+
 void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry);
 
 #endif //CGUI_GDI_H

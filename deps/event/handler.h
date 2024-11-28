@@ -15,6 +15,8 @@ typedef struct EventHandler CGUI_EventHandler;
 
 typedef struct WindowHandler CGUI_WindowHandler;
 
+typedef struct LabelHandler CGUI_LabelHandler;
+
 typedef struct ButtonHandler CGUI_ButtonHandler;
 
 typedef struct TextBoxHandler CGUI_TextBoxHandler;
@@ -23,13 +25,14 @@ typedef struct ListBoxHandler CGUI_ListBoxHandler;
 
 typedef unsigned int LocalHandlerFlag;
 
-typedef void (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef int (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #define CGUI_LocalHandler_Default       0x0000
 #define CGUI_LocalHandler_WindowRoot    0x0001
 
 #define CGUI_LocalHandler_Button        0x0010
 #define CGUI_LocalHandler_TextBox       0x0020
+#define CGUI_LocalHandler_Label         0x0040
 
 #define handle(_HandlerFlag, _Required) (((_HandlerFlag) & (_Required)) == (_Required))
 
@@ -65,8 +68,21 @@ CGUI_WindowHandler* cgui_createWindowHandler();
 
 void cgui_destroyWindowHandler(CGUI_WindowHandler* handler);
 
-void cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam);
+int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                        WPARAM wParam, LPARAM lParam);
+
+typedef struct LabelHandler {
+    void (*onGdiReady)         (CGUI_GdiReadyEventArgs args);
+
+    LocalEventHandler      handleEventLocal;
+} CGUI_LabelHandler;
+
+CGUI_LabelHandler* cgui_createLabelHandler();
+
+void cgui_destroyLabelHandler(CGUI_LabelHandler* handler);
+
+int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                       WPARAM wParam, LPARAM lParam);
 
 typedef struct ButtonHandler {
     void (*onClick)        (CGUI_MouseEventArgs args);
@@ -83,8 +99,8 @@ CGUI_ButtonHandler* cgui_createButtonHandler();
 
 void cgui_destroyButtonHandler(CGUI_ButtonHandler* handler);
 
-void cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam);
+int cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                        WPARAM wParam, LPARAM lParam);
 
 typedef struct TextBoxHandler {
     void (*onTextChanged)   (CGUI_TextBoxEventArgs args);
@@ -102,8 +118,8 @@ CGUI_TextBoxHandler* cgui_createTextBoxHandler();
 
 void cgui_destroyTextBoxHandler(CGUI_TextBoxHandler* handler);
 
-void cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                          WPARAM wParam, LPARAM lParam);
+int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                         WPARAM wParam, LPARAM lParam);
 
 typedef struct ListBoxHandler {
     void (*onItemSelected) (CGUI_EventArgs args);
@@ -130,18 +146,18 @@ typedef struct EventHandler {
     LocalHandlerFlag handlerFlag;
     void* localHandler;
 
-    void (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+    int (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
     void (*setComponent)    (CGUI_EventHandler* self, void* component);
 } CGUI_EventHandler;
 
-CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag);
+CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag, void* component);
 
 void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component);
 
 void cgui_destroyEventHandler(CGUI_EventHandler* handler);
 
-void cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+int cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args);
 

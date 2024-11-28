@@ -83,12 +83,12 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
     CGUI_Option option = wndClassManager->getWindowClass(wndClassManager, options->className);
     CGUI_WindowClass* wndClass;
     if (unlikely(is_none(&option))) {
-        wndClassFactory->setWindowClassStyle(wndClassFactory, CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_DROPSHADOW);
-        wndClassFactory->setWindowInstance(wndClassFactory, GetModuleHandle(NULL));
-        wndClassFactory->setWindowProc(wndClassFactory, app->handler->getWindowProc(app->handler));
+        wndClassFactory->setWindowClassStyle(wndClassFactory, CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS);
+        wndClassFactory->setWindowClassName(wndClassFactory, options->className);
+        wndClassFactory->setWindowInstance(wndClassFactory, app->ctx->hInstance);
+        wndClassFactory->setWindowProc(wndClassFactory, cgui_application_getWindowProc(app));
         wndClassFactory->setWindowBackgroundBrush(wndClassFactory, (HBRUSH)(COLOR_WINDOW + 1));
 
-        wndClassFactory->setWindowClassName(wndClassFactory, options->className);
         if (options->menuName) {
             wndClassFactory->setWindowMenuName(wndClassFactory, options->menuName);
         } else {
@@ -102,7 +102,7 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
         }
 
         wndClass = unwrap(wndClassFactory->createWindowClass(wndClassFactory));
-        wndClassManager->addWindowClassAndRegister(wndClassManager, wndClass);
+        unwrap(wndClassManager->addWindowClassAndRegister(wndClassManager, wndClass));
     } else {
         wndClass = unwrap_option(option);
     }
@@ -114,8 +114,9 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
     wndFactory->setWindowClass(wndFactory, wndClass);
     wndFactory->setWindowName(wndFactory, options->title);
     // todo: further updates should allow the user to specify the style.
-    wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CHILD);
+    wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+    wndFactory->setWindowMenu(wndFactory, NULL); // no menu for now.
     // todo: fill the rest of the options.
 
     wnd = unwrap(wndFactory->createWindow(wndFactory));
@@ -129,7 +130,7 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
 
     // initialize the event handler.
     CGUI_WindowHandler* localHandler = cgui_createWindowHandler();
-    CGUI_EventHandler* handler = cgui_createEventHandler(localHandler, CGUI_LocalHandler_WindowRoot);
+    CGUI_EventHandler* handler = cgui_createEventHandler(localHandler, CGUI_LocalHandler_WindowRoot, wndComp->component);
 
     wndComp->setEventHandler(wndComp, handler);
 

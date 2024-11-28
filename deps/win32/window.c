@@ -181,6 +181,7 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
     window->hide = cgui_window_hide;
     window->update = cgui_window_update;
     window->close = cgui_window_close;
+    window->destroy = cgui_window_destroy;
 
     window->setEnabled = cgui_window_setEnabled;
 
@@ -249,8 +250,8 @@ CGUI_Result cgui_window_update(CGUI_Window* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    // UpdateWindow(self->hwnd);
     InvalidateRect(self->hwnd, NULL, TRUE);
+    UpdateWindow(self->hwnd);
     return create_ok(NULL);
 }
 
@@ -258,7 +259,15 @@ CGUI_Result cgui_window_close(CGUI_Window* self) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
-    PostMessage(self->hwnd, WM_CLOSE, 0, 0);
+    CloseWindow(self->hwnd);
+    return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_destroy(CGUI_Window* self) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    DestroyWindow(self->hwnd);
     return create_ok(NULL);
 }
 

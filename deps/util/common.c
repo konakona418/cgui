@@ -61,6 +61,20 @@ LPCSTR cgui_toUppercase(LPCSTR str) {
     return result;
 }
 
+bool eq_any(int value, size_t count, ...)  {
+    va_list args;
+    va_start(args, count);
+
+    for (int i = 0; i < count; i++) {
+        if (value == va_arg(args, int)) {
+            return true;
+        }
+    }
+
+    va_end(args);
+    return false;
+}
+
 CGUI_Box* into_box(void* ptr) {
     CGUI_Box* box = malloc(sizeof(CGUI_Box));
     box->_inner = ptr;
