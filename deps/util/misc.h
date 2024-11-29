@@ -21,6 +21,11 @@ typedef struct ComponentQuery {
     void* component;
 } CGUI_ComponentQuery;
 
+#define cgui_defaultRuntimeContext() (unwrap(cgui_createRuntimeContext(GetModuleHandle(NULL), GetCommandLine(), SW_SHOW)))
+#define cgui_defaultIcon() (LoadIcon(NULL, IDI_APPLICATION))
+#define cgui_defaultCursor() (LoadCursor(NULL, IDC_ARROW))
+#define cgui_applicationInstance() (into(CGUI_Application, unwrap_option(cgui_tryGetApplicationInstance())))
+
 #define CGUI_COMPONENT_QUERY_NO_ID (-1)
 #define cgui_componentQueryHasId(_query) (_query.internalId != CGUI_COMPONENT_QUERY_NO_ID)
 #define cgui_componentQueryIsIdLegal(_internalId) (_internalId >= 0)

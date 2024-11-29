@@ -43,7 +43,8 @@ void cgui_destroyApplication(CGUI_Application* app) {
     CGUI_APP_INSTANCE = NULL;
 }
 
-void cgui_application_run(CGUI_Application* app, bool isAsync) {
+void cgui_application_run(bool isAsync) {
+    CGUI_Application* app = CGUI_APP_INSTANCE;
     if (app == NULL) return;
     if (isAsync) {
         app->dispatcher->beginDispatchAsync(app->dispatcher);
@@ -52,12 +53,17 @@ void cgui_application_run(CGUI_Application* app, bool isAsync) {
     }
 }
 
-void cgui_application_stop(CGUI_Application* app) {
+void cgui_application_stop() {
+    CGUI_Application *app = CGUI_APP_INSTANCE;
     if (app == NULL) return;
     app->dispatcher->stop(app->dispatcher, true);
 }
 
-CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app) {
+CGUI_WindowProc cgui_application_getWindowProc() {
+    CGUI_Application* app = CGUI_APP_INSTANCE;
+    if (app == NULL) {
+        panic("Fatal! Application is null, unable to get window proc.");
+    }
     return app->handler->getWindowProc(app->handler);
 }
 
@@ -95,7 +101,7 @@ int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM
     }
 }
 
-CGUI_Option cgui_getApplicationInstance() {
+CGUI_Option cgui_tryGetApplicationInstance() {
     if (CGUI_APP_INSTANCE != NULL) {
         return create_some(CGUI_APP_INSTANCE);
     } else {

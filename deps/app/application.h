@@ -20,20 +20,20 @@ typedef struct Application {
     CGUI_MessageDispatcher* dispatcher;
     CGUI_MessageHandler* handler;
 
-    void (* run)(CGUI_Application* app, bool isAsync);
-    void (* stop)(CGUI_Application* app);
+    void (* run)(bool isAsync);
+    void (* stop)(void);
 } CGUI_Application;
 
 CGUI_Application* cgui_createApplication(CGUI_RuntimeContext* ctx);
 void cgui_destroyApplication(CGUI_Application* app);
 
-void cgui_application_run(CGUI_Application* app, bool isAsync);
-void cgui_application_stop(CGUI_Application* app);
+void cgui_application_run(bool isAsync);
+void cgui_application_stop(void);
 
-CGUI_WindowProc cgui_application_getWindowProc(CGUI_Application* app);
+CGUI_WindowProc cgui_application_getWindowProc();
 int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
-CGUI_Option cgui_getApplicationInstance();
+CGUI_Option cgui_tryGetApplicationInstance();
 
 static CGUI_Application* CGUI_APP_INSTANCE = NULL;
 

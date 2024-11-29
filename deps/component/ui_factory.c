@@ -76,7 +76,7 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
         options = (CGUI_WindowClassOptions*) argv;
     }
 
-    CGUI_Application* app = unwrap_option(cgui_getApplicationInstance());
+    CGUI_Application* app = unwrap_option(cgui_tryGetApplicationInstance());
     CGUI_WindowClassFactory* wndClassFactory = app->core->wndClassFactory;
     CGUI_WindowClassManager* wndClassManager = app->core->wndClassManager;
 

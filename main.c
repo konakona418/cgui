@@ -14,7 +14,7 @@ void onClose(CGUI_EventArgs args) {
     CGUI_UINativeWindow* wnd = into(CGUI_UIWindow, ((CGUI_UIComponent*) args.component)->disposableImpl->upperLevel);
     wnd->close(wnd);
     wnd->destroy(wnd);
-    cgui_application_stop(into(CGUI_Application, unwrap_option(cgui_getApplicationInstance())));
+    cgui_applicationInstance()->stop();
 }
 
 void onClick(CGUI_MouseEventArgs args) {
@@ -22,20 +22,20 @@ void onClick(CGUI_MouseEventArgs args) {
 }
 
 int main(void) {
-    CGUI_RuntimeContext* ctx = unwrap(cgui_createRuntimeContext(GetModuleHandle(NULL), GetCommandLine(), SW_SHOW));
+    CGUI_RuntimeContext* ctx = cgui_defaultRuntimeContext();
     CGUI_Application* app = cgui_createApplication(ctx);
     CGUI_UIFactoryCluster* uiFactory = cgui_createUIFactoryCluster();
 
     CGUI_WindowClassOptions options = {
             .className = "CGUI_Window",
-            .cursor = LoadCursor(NULL, IDC_ARROW),
+            .cursor = cgui_defaultCursor(),
             .geometry = {
                     .x = 100,
                     .y = 100,
                     .width = 640,
                     .height = 480
             },
-            .icon = LoadIcon(NULL, IDI_APPLICATION),
+            .icon = cgui_defaultIcon(),
             .menuName = "test",
             .title = "CGUI Window",
     };
@@ -44,7 +44,9 @@ int main(void) {
     CGUI_WindowHandler* wndHandler = into(CGUI_WindowHandler, wnd->component->eventHandler->localHandler);
     wndHandler->onClose = onClose;
     wndHandler->onMouseUp = onClick;
-    app->run(app, false);
+    app->run(false);
+
+    cgui_destroyUIFactoryCluster(uiFactory);
 
 
     /*CGUI_Core* core = unwrap(cgui_createCoreFromContext(ctx));
