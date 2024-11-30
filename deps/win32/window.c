@@ -192,6 +192,7 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
     window->getWindowName = cgui_window_getWindowName;
 
     window->setWindowStyle = cgui_window_setWindowStyle;
+    window->getWindowStyle = cgui_window_getWindowStyle;
     window->setWindowGeometry = cgui_window_setWindowGeometry;
     window->setWindowGeometryRect = cgui_window_setWindowGeometryRect;
     window->setWindowPosition = cgui_window_setWindowPosition;
@@ -319,6 +320,13 @@ CGUI_Result cgui_window_setWindowStyle(CGUI_Window* self, LONG_PTR dwStyle) {
     }
     SetWindowLongPtr(self->hwnd, GWL_STYLE, dwStyle);
     return create_ok(NULL);
+}
+
+LONG_PTR cgui_window_getWindowStyle(CGUI_Window* self) {
+    if (self == NULL) {
+        return 0;
+    }
+    return GetWindowLongPtr(self->hwnd, GWL_STYLE);
 }
 
 CGUI_Result cgui_window_setWindowGeometry(CGUI_Window* self, int x, int y, int width, int height) {

@@ -14,7 +14,7 @@
 
 typedef struct UIFactoryCluster CGUI_UIFactoryCluster;
 typedef void* CGUI_AnyComponent;
-typedef CGUI_Result (* CGUI_UIFactory)(int argc, void* argv);
+typedef CGUI_Result (* CGUI_UIFactory)(int argc, CGUI_Box* argv);
 
 typedef struct UIFactoryCluster {
     HashTable* factories;
@@ -22,7 +22,7 @@ typedef struct UIFactoryCluster {
     CGUI_Result (* registerFactory)(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
     CGUI_Result (* unregisterFactory)(CGUI_UIFactoryCluster* cluster, const char* name);
 
-    CGUI_Result (* createComponent)(CGUI_UIFactoryCluster* cluster, const char* name, int argc, void* argv);
+    CGUI_Result (* createComponent)(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
 } CGUI_UIFactoryCluster;
 
 CGUI_UIFactoryCluster* cgui_createUIFactoryCluster();
@@ -31,7 +31,7 @@ CGUI_UIFactoryCluster* cgui_getUIFactoryClusterInstance();
 
 CGUI_Result cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
 CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster, const char* name);
-CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, void* argv);
+CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
 
 void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster);
 
@@ -44,16 +44,33 @@ typedef struct WindowClassOptions {
 
     LPCSTR title;
     CGUI_Rectangle geometry;
+
+    bool allowDoubleClick;
 } CGUI_WindowClassOptions;
 
-CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv);
+CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv);
 
-CGUI_Result cgui_uiFactory_createButton(int argc, void* argv);
+typedef enum CGUI_ButtonType {
+    CGUI_ButtonType_Default,
+    CGUI_ButtonType_CheckBox,
+    CGUI_ButtonType_RadioButton,
+} CGUI_ButtonType;
 
-CGUI_Result cgui_uiFactory_createLabel(int argc, void* argv);
+typedef struct CGUI_ButtonOptions {
+    CGUI_UIComponent* parent;
 
-CGUI_Result cgui_uiFactory_createTextBox(int argc, void* argv);
+    CGUI_ButtonType buttonType;
 
-CGUI_Result cgui_uiFactory_createListBox(int argc, void* argv);
+    LPCSTR text;
+    CGUI_Rectangle geometry;
+} CGUI_ButtonOptions;
+
+CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv);
+
+CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv);
+
+CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv);
+
+CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv);
 
 #endif //CGUI_UI_FACTORY_H

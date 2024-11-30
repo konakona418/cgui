@@ -10,7 +10,7 @@
 #include <windows.h>
 
 typedef struct ComponentQuery CGUI_ComponentQuery;
-typedef int CGUI_InternalID;
+typedef long long int CGUI_InternalID;
 
 typedef int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 

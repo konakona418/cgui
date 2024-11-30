@@ -11,6 +11,14 @@
 #include <stdio.h>
 #include <windows.h>
 
+#define CGUI_DEBUGGING
+
+#ifdef CGUI_DEBUGGING
+#define dbg_printf(...) printf("[dbg][line %d @ %s::%s] ", __LINE__, __FILE_NAME__, __FUNCTION__); printf(__VA_ARGS__)
+#else
+#define dbg_printf(...)
+#endif
+
 /* This macro is intended for panicking. */
 #define panic(msg) (panic_impl(msg, __FILE_NAME__, __LINE__))
 
@@ -22,7 +30,7 @@ assert(0);                                                      \
 })
 
 /* This macro is intended for casting any type into a pointer type. */
-#define ref(_T, _V) (_T*) _V
+#define ref(_T, _V) ((_T*) _V)
 
 /* This macro is intended for dereferencing a pointer type into any type. */
 #define deref(_T, _V) (*((_T*) _V))
@@ -106,7 +114,7 @@ bool eq_any(int value, size_t count, ...);
 
 /**
  * This type is intended for representing a boxed pointer.
- * It is used to store a pointer to a value.
+ * It is used to store a pointer pointing at any data allocated on the heap.
  * Intended for providing a type with a fixed size to be passed as array parameter. */
 typedef struct Box CGUI_Box;
 
@@ -144,6 +152,8 @@ void* unbox(CGUI_Box* box);
  * @return The dereferenced pointer.
  */
 #define deref_box(_InnerType, _Box) (deref(_InnerType, unbox(_Box)))
+
+#define unbox_as(_InnerType, _Box) (ref(_InnerType, unbox(_Box)))
 
 /* Prototypes of functions and types. */
 typedef enum ResultType CGUI_ResultType;

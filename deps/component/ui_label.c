@@ -13,7 +13,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     label->component = cgui_createUIComponent(cgui_concatString("label", wndIdentifier),
-                                              (LONG_PTR) wndId,
+                                              (LONG_PTR) internalId,
                                               parent, 
                                               CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
                                               | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
@@ -129,6 +129,7 @@ CGUI_GDITextContext cgui_uiNativeLabel_getTextDisplay(CGUI_UINativeLabel* self) 
 
 void cgui_uiNativeLabel_addChild(CGUI_UINativeLabel* self, CGUI_UIComponent* child) {
     self->component->addChild(self->component, child);
+    self->update(self);
 }
 
 CGUI_UIComponent* cgui_uiNativeLabel_removeChild(CGUI_UINativeLabel* self, CGUI_UIComponent* child) {
@@ -245,7 +246,7 @@ void cgui_uiNativeLabel_readyCallback(CGUI_UIComponent* component) {
 void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         if (component->disposableImpl != NULL) {
-            cgui_uiNativeLabel_show(component->disposableImpl->upperLevel);
+            //cgui_uiNativeLabel_show(component->disposableImpl->upperLevel);
         }
     }
 }
@@ -253,7 +254,7 @@ void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component) {
 void cgui_uiNativeLabel_refreshCallback(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         if (component->disposableImpl != NULL) {
-            cgui_uiNativeLabel_show(component->disposableImpl->upperLevel);
+            //cgui_uiNativeLabel_show(component->disposableImpl->upperLevel);
         }
     }
 }

@@ -7,6 +7,7 @@
 #include "deps/app/application.h"
 #include "deps/component/ui_factory.h"
 #include "deps/component/ui_window.h"
+#include "deps/component/ui_button.h"
 
 // todo: fix core.c: L42
 
@@ -19,6 +20,18 @@ void onClose(CGUI_EventArgs args) {
 
 void onClick(CGUI_MouseEventArgs args) {
     printf("Clicked @ (%ld,%ld)!\n", args.point.x, args.point.y);
+}
+
+void btnOnClick(CGUI_MouseEventArgs args) {
+    CGUI_UINativeButton* btn = into(CGUI_UINativeButton, ((CGUI_UIComponent*) args.base.component)->disposableImpl->upperLevel);
+    CGUI_UINativeButtonState state = btn->getButtonState(btn);
+    if (state == CGUI_ButtonState_Unchecked) {
+        btn->setButtonState(btn, CGUI_ButtonState_Checked);
+        printf("Checked!\n");
+    } else {
+        btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
+        printf("Unchecked!\n");
+    }
 }
 
 int main(void) {
@@ -38,12 +51,34 @@ int main(void) {
             .icon = cgui_defaultIcon(),
             .menuName = "test",
             .title = "CGUI Window",
+            .allowDoubleClick = false
     };
-    CGUI_UINativeWindow* wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, &options));
+    CGUI_UINativeWindow* wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, into_box(&options)));
     wnd->show(wnd);
+
     CGUI_WindowHandler* wndHandler = into(CGUI_WindowHandler, wnd->component->eventHandler->localHandler);
     wndHandler->onClose = onClose;
     wndHandler->onMouseUp = onClick;
+
+    CGUI_ButtonOptions buttonOptions = {
+            .geometry = {
+                    .x = 10,
+                    .y = 10,
+                    .width = 100,
+                    .height = 100
+            },
+            .parent = wnd->component,
+            .text = "Click me!",
+            .buttonType = CGUI_ButtonType_CheckBox
+    };
+    CGUI_UINativeButton* button = unwrap(uiFactory->createComponent(uiFactory, "Button", 1, into_box(&buttonOptions)));
+    wnd->addChild(wnd, button->component);
+    button->show(button);
+
+    CGUI_ButtonHandler* btnHandler = into(CGUI_ButtonHandler, button->component->eventHandler->localHandler);
+    btnHandler->onClick = btnOnClick;
+    btnHandler->onDoubleClick = btnOnClick;
+
     app->run(false);
 
     cgui_destroyUIFactoryCluster(uiFactory);

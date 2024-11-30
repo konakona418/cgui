@@ -14,7 +14,7 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     window->component = cgui_createUIComponent(
             cgui_concatString("window", wndIdentifier),
-            (LONG_PTR) wndId,
+            (LONG_PTR) internalId,
             parent,
             CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
             | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
@@ -104,7 +104,6 @@ void cgui_uiNativeWindow_refreshCallback(CGUI_UIComponent* component) {
     // todo: refresh the native window.
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         if (component->disposableImpl != NULL) {
-            cgui_uiNativeWindow_update(component->disposableImpl->upperLevel);
             cgui_uiNativeWindow_show(component->disposableImpl->upperLevel);
         }
     }
@@ -154,7 +153,7 @@ CGUI_Result cgui_uiNativeWindow_setWindowName(CGUI_UINativeWindow* self, LPCSTR 
 
 void cgui_uiNativeWindow_addChild(CGUI_UINativeWindow* self, CGUI_UIComponent* child) {
     self->component->addChild(self->component, child);
-    self->refresh(self); // refresh the window.
+    self->update(self); // refresh the window.
 }
 
 CGUI_UIComponent* cgui_uiNativeWindow_removeChild(CGUI_UINativeWindow* self, CGUI_UIComponent* child) {

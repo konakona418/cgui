@@ -32,7 +32,7 @@ CGUI_MouseButton cgui_asMouseButton(WPARAM wParam) {
     } else if (wParam & MK_XBUTTON2) {
         mouseButtonState = XButton2;
     } else {
-        printf("Invalid mouse button state.\n");
+        //printf("Invalid mouse button state.\n");
         mouseButtonState = LeftButton;
     }
 

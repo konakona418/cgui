@@ -27,6 +27,8 @@ typedef unsigned int LocalHandlerFlag;
 
 typedef int (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+typedef void (*LocalHandlerDestructor) (void* handler);
+
 #define CGUI_LocalHandler_Default       0x0000
 #define CGUI_LocalHandler_WindowRoot    0x0001
 
@@ -66,7 +68,7 @@ typedef struct WindowHandler {
 
 CGUI_WindowHandler* cgui_createWindowHandler();
 
-void cgui_destroyWindowHandler(CGUI_WindowHandler* handler);
+void cgui_destroyWindowHandler(void* handler);
 
 int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                         WPARAM wParam, LPARAM lParam);
@@ -92,12 +94,14 @@ typedef struct ButtonHandler {
     void (*onFocus)        (CGUI_EventArgs args);
     void (*onDefocus)      (CGUI_EventArgs args);
 
+    void (*onGdiReady)     (CGUI_GdiReadyEventArgs args);
+
     LocalEventHandler      handleEventLocal;
 } CGUI_ButtonHandler;
 
 CGUI_ButtonHandler* cgui_createButtonHandler();
 
-void cgui_destroyButtonHandler(CGUI_ButtonHandler* handler);
+void cgui_destroyButtonHandler(void* handler);
 
 int cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                         WPARAM wParam, LPARAM lParam);
@@ -116,7 +120,7 @@ typedef struct TextBoxHandler {
 
 CGUI_TextBoxHandler* cgui_createTextBoxHandler();
 
-void cgui_destroyTextBoxHandler(CGUI_TextBoxHandler* handler);
+void cgui_destroyTextBoxHandler(void* handler);
 
 int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                          WPARAM wParam, LPARAM lParam);
@@ -145,13 +149,22 @@ typedef struct EventHandler {
 
     LocalHandlerFlag handlerFlag;
     void* localHandler;
+    LocalHandlerDestructor localHandlerDestructor;
 
     int (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
     void (*setComponent)    (CGUI_EventHandler* self, void* component);
 } CGUI_EventHandler;
 
-CGUI_EventHandler* cgui_createEventHandler(void* localHandler, LocalHandlerFlag handlerFlag, void* component);
+typedef struct LocalHandlerContext {
+    void* localHandler;
+    LocalHandlerFlag handlerFlag;
+    LocalHandlerDestructor destructor;
+} CGUI_LocalHandlerContext;
+
+CGUI_LocalHandlerContext cgui_createLocalHandlerContext(void* localHandler, LocalHandlerFlag handlerFlag, LocalHandlerDestructor destructor);
+
+CGUI_EventHandler* cgui_createEventHandler(CGUI_LocalHandlerContext localHandlerCtx, void* componentBase);
 
 void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component);
 

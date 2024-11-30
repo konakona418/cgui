@@ -152,31 +152,35 @@ void cgui_destroyUIDrawable(CGUI_UIDrawable* drawable) {
     free(drawable);
 }
 
-void cgui_uiDrawable_ready(CGUI_UIComponent* component) {
+void cgui_uiDrawable_ready(void* pComponent) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) pComponent;
     if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
         if (component->drawableImpl->readyCallback != NULL) {
             component->drawableImpl->readyCallback(component);
         }
     }
-    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_ready);
+    component->children->iter(component->children, cgui_uiDrawable_ready);
 }
 
-void cgui_uiDrawable_draw(CGUI_UIComponent* component) {
+void cgui_uiDrawable_draw(void* pComponent) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) pComponent;
     if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
         if (component->drawableImpl->drawCallback != NULL) {
             component->drawableImpl->drawCallback(component);
         }
     }
-    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_draw);
+    component->children->iter(component->children, cgui_uiDrawable_draw);
 }
 
-void cgui_uiDrawable_refresh(CGUI_UIComponent* component) {
+void cgui_uiDrawable_refresh(void* pComponent) {
+    CGUI_UIComponent* component = (CGUI_UIComponent*) pComponent;
     if (impl(component->implFlag, CGUI_Trait_UIComponent | CGUI_Trait_UIDrawable)) {
         if (component->drawableImpl->refreshCallback != NULL) {
             component->drawableImpl->refreshCallback(component);
         }
     }
-    component->children->iter(component->children, (void (*)(void*)) cgui_uiDrawable_refresh);
+    // todo: segfault
+    component->children->iter(component->children, cgui_uiDrawable_refresh);
 }
 
 CGUI_UIState* cgui_createUIState() {

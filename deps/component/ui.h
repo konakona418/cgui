@@ -86,9 +86,9 @@ typedef struct UIDrawable {
     void (* drawCallback)(CGUI_UIComponent* component);
     void (* refreshCallback)(CGUI_UIComponent* component);
 
-    void (* ready)(CGUI_UIComponent* component);
-    void (* draw)(CGUI_UIComponent* component);
-    void (* refresh)(CGUI_UIComponent* component);
+    void (* ready)(void* component);
+    void (* draw)(void* component);
+    void (* refresh)(void* component);
 } CGUI_UIDrawable;
 
 typedef struct UIState {
@@ -124,7 +124,7 @@ typedef struct UIStyle {
 } CGUI_UIStyle;
 
 typedef struct UIWin32 {
-    int internalId;
+    CGUI_InternalID internalId;
     HWND (* getWindowHandle)(CGUI_UIComponent* component);
 } CGUI_UIWin32;
 
@@ -263,21 +263,21 @@ void cgui_destroyUIDrawable(CGUI_UIDrawable* drawable);
  * @note This method will call the ready callback of the component's traits implementation (implemented by user), but if not provided, nothing will happen.
  * @note This method will call the ready callback of all its children.
  * @param component The component to call the ready callback. */
-void cgui_uiDrawable_ready(CGUI_UIComponent* component);
+void cgui_uiDrawable_ready(void* pComponent);
 
 /**
  * Draw the component.
  * @note This method will call the draw callback of the component's traits implementation (implemented by user), but if not provided, nothing will happen.
  * @note This method will call the draw callback of all its children.
  * @param component The component to draw. */
-void cgui_uiDrawable_draw(CGUI_UIComponent* component);
+void cgui_uiDrawable_draw(void* pComponent);
 
 /**
  * Refresh the component.
  * @note This method will call the refresh callback of the component's traits implementation (implemented by user), but if not provided, nothing will happen.
  * @note This method will call the refresh callback of all its children.
  * @param component The component to refresh. */
-void cgui_uiDrawable_refresh(CGUI_UIComponent* component);
+void cgui_uiDrawable_refresh(void* pComponent);
 
 /**
  * Create a new state component.
@@ -367,7 +367,7 @@ void cgui_destroyUIStyle(CGUI_UIStyle* style);
  * @note this trait does @b NOT provide a default implementation for @p getWindowHandle.
  * @note which means that certain component must provide a custom implementation.
  * @return The created win32 component. */
-CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component), int internalId);
+CGUI_UIWin32* cgui_createUIWin32(HWND (* getWindowHandle)(CGUI_UIComponent* component), CGUI_InternalID internalId);
 
 /**
  * Destroy the win32 component.

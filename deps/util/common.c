@@ -87,7 +87,7 @@ CGUI_Box* clone_box(CGUI_Box* box) {
 
 void* unbox(CGUI_Box* box) {
     void* ptr = box->_inner;
-    free(box);
+    //free(box);
     return ptr;
 }
 

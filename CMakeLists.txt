@@ -51,4 +51,10 @@ add_executable(cgui main.c
         deps/util/misc.c
         deps/component/ui_label.c
         deps/component/ui_label.h
+        deps/component/ui_textbox.c
+        deps/component/ui_textbox.h
+        deps/component/ui_button.c
+        deps/component/ui_button.h
+        deps/component/ui_list.c
+        deps/component/ui_list.h
 )

@@ -7,6 +7,7 @@
 #include "ui_factory.h"
 #include "ui_window.h"
 #include "../event/handler.h"
+#include "ui_button.h"
 
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
 
@@ -54,7 +55,7 @@ CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster
     return create_err(createError(1, "Failed to unregister factory."));
 }
 
-CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, void* argv) {
+CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv) {
     CGUI_UIFactory factory = cluster->factories->find(cluster->factories, cgui_toLowercase(name));
     if (unlikely(factory == NULL)) {
         return create_err(CGUI_Error_FactoryNotFound());
@@ -65,15 +66,18 @@ CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, 
 
 void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster) {
     cluster->registerFactory(cluster, "window", cgui_uiFactory_createWindow);
-    // todo: add more components.
+    cluster->registerFactory(cluster, "button", cgui_uiFactory_createButton);
+    cluster->registerFactory(cluster, "label", cgui_uiFactory_createLabel);
+    cluster->registerFactory(cluster, "listbox", cgui_uiFactory_createListBox);
+    cluster->registerFactory(cluster, "textbox", cgui_uiFactory_createTextBox);
 }
 
-CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
+CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     CGUI_WindowClassOptions* options;
     if (argc < 1) {
         return create_err(CGUI_Error_InvalidArgument());
     } else {
-        options = (CGUI_WindowClassOptions*) argv;
+        options = unbox_as(CGUI_WindowClassOptions, &argv[0]);
     }
 
     CGUI_Application* app = unwrap_option(cgui_tryGetApplicationInstance());
@@ -83,10 +87,12 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
     CGUI_Option option = wndClassManager->getWindowClass(wndClassManager, options->className);
     CGUI_WindowClass* wndClass;
     if (unlikely(is_none(&option))) {
-        wndClassFactory->setWindowClassStyle(wndClassFactory, CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS);
+        if (options->allowDoubleClick) {
+            wndClassFactory->setWindowClassStyle(wndClassFactory, CS_DBLCLKS);
+        }
         wndClassFactory->setWindowClassName(wndClassFactory, options->className);
         wndClassFactory->setWindowInstance(wndClassFactory, app->ctx->hInstance);
-        wndClassFactory->setWindowProc(wndClassFactory, cgui_application_getWindowProc(app));
+        wndClassFactory->setWindowProc(wndClassFactory, cgui_application_getWindowProc());
         wndClassFactory->setWindowBackgroundBrush(wndClassFactory, (HBRUSH)(COLOR_WINDOW + 1));
 
         if (options->menuName) {
@@ -130,10 +136,104 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, void* argv) {
 
     // initialize the event handler.
     CGUI_WindowHandler* localHandler = cgui_createWindowHandler();
-    CGUI_EventHandler* handler = cgui_createEventHandler(localHandler, CGUI_LocalHandler_WindowRoot, wndComp->component);
+
+    CGUI_LocalHandlerContext localHandlerCtx = {
+            .destructor = cgui_destroyWindowHandler,
+            .handlerFlag = CGUI_LocalHandler_WindowRoot,
+            .localHandler = localHandler
+    };
+    CGUI_EventHandler* handler = cgui_createEventHandler(localHandlerCtx, wndComp->component);
 
     wndComp->setEventHandler(wndComp, handler);
 
     return create_ok(wndComp);
 }
 
+void cgui_uiFactory_wrapNormalButton(CGUI_Window* window);
+
+void cgui_uiFactory_wrapCheckBox(CGUI_Window* window);
+
+void cgui_uiFactory_wrapRadioButton(CGUI_Window* window);
+
+CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
+    if (argc < 1) {
+        return create_err(CGUI_Error_InvalidArgument());
+    }
+
+    CGUI_ButtonOptions* options = unbox_as(CGUI_ButtonOptions, &argv[0]);
+    CGUI_ButtonType buttonType = options->buttonType;
+
+    CGUI_Application* app = cgui_applicationInstance();
+
+    CGUI_ComponentManager* compManager = app->core->compManager;
+    CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
+
+    CGUI_WindowFactory* wndFactory = app->core->wndFactory;
+    wndFactory->setWindowClassName(wndFactory, "BUTTON");
+    wndFactory->setWindowName(wndFactory, options->text);
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS);
+
+    if (options->parent) {
+        wndFactory->setWindowParent(wndFactory, options->parent->win32Impl->getWindowHandle(options->parent));
+    }
+    wndFactory->setWindowMenu(wndFactory, (HMENU) nextId);
+    wndFactory->setWindowInstance(wndFactory, app->ctx->hInstance);
+
+    CGUI_Window* wnd = unwrap(wndFactory->createWindow(wndFactory));
+
+    CGUI_UINativeButton* buttonComp = cgui_createUINativeButtonFromWindow(wnd, options->parent, nextId);
+
+    switch (buttonType) {
+        case CGUI_ButtonType_Default:
+            cgui_uiFactory_wrapNormalButton(wnd);
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_Default);
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Normal);
+        case CGUI_ButtonType_CheckBox:
+            cgui_uiFactory_wrapCheckBox(wnd);
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_CheckBox);
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
+        case CGUI_ButtonType_RadioButton:
+            cgui_uiFactory_wrapRadioButton(wnd);
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_RadioButton);
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
+    }
+
+    compManager->addComponent(compManager, buttonComp->component);
+
+    CGUI_ButtonHandler* localHandler = cgui_createButtonHandler();
+    CGUI_LocalHandlerContext localHandlerCtx = {
+            .destructor = cgui_destroyButtonHandler,
+            .handlerFlag = CGUI_LocalHandler_Button,
+            .localHandler = localHandler
+    };
+    CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, buttonComp->component);
+
+    buttonComp->setEventHandler(buttonComp, eventHandler);
+
+    return create_ok(buttonComp);
+}
+
+void cgui_uiFactory_wrapNormalButton(CGUI_Window* window) {
+    window->setWindowStyle(window, window->getWindowStyle(window) | BS_DEFPUSHBUTTON);
+}
+
+void cgui_uiFactory_wrapCheckBox(CGUI_Window* window) {
+    window->setWindowStyle(window, window->getWindowStyle(window) | BS_CHECKBOX);
+}
+
+void cgui_uiFactory_wrapRadioButton(CGUI_Window* window) {
+    window->setWindowStyle(window, window->getWindowStyle(window) | BS_RADIOBUTTON);
+}
+
+CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
+    return create_err(CGUI_Error_NotImplemented());
+}
+
+CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
+    return create_err(CGUI_Error_NotImplemented());
+}
+
+CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv) {
+    return create_err(CGUI_Error_NotImplemented());
+}
