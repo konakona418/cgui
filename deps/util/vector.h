@@ -19,7 +19,7 @@ typedef struct Vector Vector;
  * So when iterating, use iter_result or iter,
  * instead of writing a loop manually. */
 typedef struct Vector {
-    void* data;
+    CGUI_Box* data;
     size_t element_size;
     size_t size;
     size_t capacity;
