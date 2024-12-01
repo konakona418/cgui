@@ -96,7 +96,7 @@ int main(void) {
             .defaultState = true,
     };
     CGUI_UINativeButton* button = unwrap(uiFactory->createComponent(uiFactory, "Button", 1, into_box(&buttonOptions)));
-    wnd->addChild(wnd, button->component);
+    //wnd->addChild(wnd, button->component);
 
     button->setVisible(button, true);
 
@@ -117,7 +117,7 @@ int main(void) {
             .text = "Label",
     };
     label = unwrap(uiFactory->createComponent(uiFactory, "Label", 1, into_box(&labelOptions)));
-    wnd->addChild(wnd, label->component);
+    //wnd->addChild(wnd, label->component);
 
     label->setVisible(label, true);
     label->setTextDisplay(label, ctxTextDisp);
@@ -134,12 +134,12 @@ int main(void) {
     };
 
     label2 = unwrap(uiFactory->createComponent(uiFactory, "Label", 1, into_box(&labelOptions2)));
-    wnd->addChild(wnd, label2->component);
+    //wnd->addChild(wnd, label2->component);
 
     label2->setTextDisplay(label2, ctxTextDisp);
     label2->setVisible(label2, true);
 
-    wnd->ready(wnd);
+    //wnd->ready(wnd);
 
     cgui_destroyUIFactoryCluster(uiFactory);
 

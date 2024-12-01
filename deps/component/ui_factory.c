@@ -138,6 +138,11 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     CGUI_UIWindow* wndComp = cgui_createUINativeWindowFromWindow(wnd, NULL, nextId);
     compManager->addComponent(compManager, wndComp->component);
 
+    if (options->parent) {
+        CGUI_UIComponent* parent = options->parent;
+        parent->addChild(parent, wndComp->component);
+    }
+
     // initialize the event handler.
     CGUI_WindowHandler* localHandler = cgui_createWindowHandler();
 
@@ -188,6 +193,11 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     CGUI_UINativeButton* buttonComp = cgui_createUINativeButtonFromWindow(wnd, options->parent, nextId);
 
     compManager->addComponent(compManager, buttonComp->component);
+
+    if (options->parent) {
+        CGUI_UIComponent* parent = options->parent;
+        parent->addChild(parent, buttonComp->component);
+    }
 
     CGUI_ButtonHandler* localHandler = cgui_createButtonHandler();
     CGUI_LocalHandlerContext localHandlerCtx = {
@@ -259,6 +269,11 @@ CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
 
     CGUI_UINativeLabel* labelComp = cgui_createUINativeLabelFromWindow(wnd, options->parent, nextId);
     compManager->addComponent(compManager, labelComp->component);
+
+    if (options->parent) {
+        CGUI_UIComponent* parent = options->parent;
+        parent->addChild(parent, labelComp->component);
+    }
 
     CGUI_LabelHandler* localHandler = cgui_createLabelHandler();
     CGUI_LocalHandlerContext localHandlerCtx = {
