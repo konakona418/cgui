@@ -100,6 +100,7 @@ CGUI_Result cgui_uiNativeButton_bindWindowInstance(CGUI_UINativeButton* self, CG
 
 void cgui_destroyUINativeButton(CGUI_UINativeButton* window) {
     cgui_destroyWindowInstance(window->window);
+    cgui_destroyGdiTextContext(window->gdiTextContext);
     free(window);
 }
 
@@ -132,8 +133,13 @@ CGUI_Result cgui_uiNativeButton_setState(CGUI_UINativeButton* self, int swState)
     return self->window->setState(self->window, swState);
 }
 
-CGUI_Result cgui_uiNativeButton_postMessage(CGUI_UINativeButton* self, UINT msg, WPARAM wParam, LPARAM lParam) {
-    return self->window->postMessage(self->window, msg, wParam, lParam);
+CGUI_Result
+cgui_uiNativeButton_postMessage(CGUI_UINativeButton* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (isAsync) {
+        return self->window->postMessageAsync(self->window, msg, wParam, lParam);
+    } else {
+        return self->window->postMessageSync(self->window, msg, wParam, lParam);
+    }
 }
 
 CGUI_Result cgui_uiNativeButton_show(CGUI_UINativeButton* self) {
@@ -287,7 +293,7 @@ CGUI_Result cgui_uiNativeButton_setTextDisplay(CGUI_UINativeButton* self, CGUI_G
     }
 
     HFONT font = cgui_createFont(gdiTextContext);
-    self->postMessage(self, WM_SETFONT, (WPARAM)font, 0);
+    self->postMessage(self, false, WM_SETFONT, (WPARAM) font, 0);
 
     self->gdiTextContext = gdiTextContext;
     self->_gdiRefreshFlag = true;
@@ -300,11 +306,11 @@ CGUI_Result cgui_uiNativeButton_setButtonStyle(CGUI_UINativeButton* self, CGUI_U
     CGUI_Window* wnd = self->window;
 
     if (style == CGUI_ButtonStyle_Default) {
-        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_PUSHBUTTON);
+        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | CGUI_DEFAULT_BUTTON_PRESET);
     } else if (style == CGUI_ButtonStyle_CheckBox) {
-        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_CHECKBOX);
+        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | CGUI_CHECKBOX_BUTTON_PRESET);
     } else if (style == CGUI_ButtonStyle_RadioButton) {
-        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_RADIOBUTTON);
+        return wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | CGUI_RADIOBUTTON_BUTTON_PRESET);
     }
 
     return self->update(self);
@@ -321,25 +327,25 @@ CGUI_Result cgui_uiNativeButton_setButtonState(CGUI_UINativeButton* self, CGUI_U
 
     if (state == CGUI_ButtonState_Normal) {
         if (self->buttonStyle == CGUI_ButtonStyle_Default) {
-            result = wnd->postMessage(wnd, BM_SETSTATE, BST_UNCHECKED, 0);
+            result = wnd->postMessageAsync(wnd, BM_SETSTATE, BST_UNCHECKED, 0);
         } else {
             panic("cgui_uiNativeButton_setButtonState: Not a normal button!");
         }
     } else if (state == CGUI_ButtonState_Pushed) {
         if (self->buttonStyle == CGUI_ButtonStyle_Default) {
-            result = wnd->postMessage(wnd, BM_SETSTATE, BST_PUSHED, 0);
+            result = wnd->postMessageAsync(wnd, BM_SETSTATE, BST_PUSHED, 0);
         } else {
             panic("cgui_uiNativeButton_setButtonState: Not a normal button!");
         }
     } else if (state == CGUI_ButtonState_Checked) {
         if (is_radio_or_checkbox(self->buttonStyle)) {
-            result = wnd->postMessage(wnd, BM_SETCHECK, BST_CHECKED, 0);
+            result = wnd->postMessageAsync(wnd, BM_SETCHECK, BST_CHECKED, 0);
         } else {
             panic("cgui_uiNativeButton_setButtonState: Not a checkbox!");
         }
     } else {
         if (is_radio_or_checkbox(self->buttonStyle)) {
-            result = wnd->postMessage(wnd, BM_SETCHECK, BST_UNCHECKED, 0);
+            result = wnd->postMessageAsync(wnd, BM_SETCHECK, BST_UNCHECKED, 0);
         } else {
             panic("cgui_uiNativeButton_setButtonState: Not a checkbox!");
         }

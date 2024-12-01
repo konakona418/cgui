@@ -31,14 +31,19 @@ CGUI_Application* cgui_createApplication(CGUI_RuntimeContext* ctx) {
     return app;
 }
 
-void cgui_destroyApplication(CGUI_Application* app) {
-    if (app == NULL || CGUI_APP_INSTANCE == NULL) {
-        panic("Fatal! Application is null, unable to destroy application.");
-    }
+void cgui_destroyApplication() {
+    CGUI_Application* app = CGUI_APP_INSTANCE;
+    if (app == NULL) return;
+    dbg_printf("Shutting down, initializing cleanup.\n");
+
     cgui_destroyMessageDispatcher(app->dispatcher);
+    dbg_printf("MessageDispatcher destroyed.\n");
     cgui_destroyCore(app->core);
+    dbg_printf("Core destroyed.\n");
     cgui_destroyRuntimeContext(app->ctx);
+    dbg_printf("RuntimeContext destroyed.\n");
     free(app);
+    dbg_printf("Application destroyed.\n");
 
     CGUI_APP_INSTANCE = NULL;
 }
@@ -46,6 +51,7 @@ void cgui_destroyApplication(CGUI_Application* app) {
 void cgui_application_run(bool isAsync) {
     CGUI_Application* app = CGUI_APP_INSTANCE;
     if (app == NULL) return;
+    dbg_printf("Starting application main loop.\n");
     if (isAsync) {
         app->dispatcher->beginDispatchAsync(app->dispatcher);
     } else {
@@ -57,6 +63,8 @@ void cgui_application_stop() {
     CGUI_Application *app = CGUI_APP_INSTANCE;
     if (app == NULL) return;
     app->dispatcher->stop(app->dispatcher, true);
+
+    cgui_destroyApplication();
 }
 
 CGUI_WindowProc cgui_application_getWindowProc() {
@@ -87,7 +95,7 @@ IterPredicateResult cgui_application_predicateHwnd(const char* key, void* value,
     return false;
 }
 
-int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam) {
+long long int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (CGUI_APP_INSTANCE == NULL) return DefWindowProc(query.hwnd, msg, wParam, lParam);
     CGUI_Application* app = CGUI_APP_INSTANCE;
     CGUI_Result result = app->core->compManager->getComponentPredicate(app->core->compManager, &query.hwnd, cgui_application_predicateHwnd);

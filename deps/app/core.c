@@ -33,12 +33,16 @@ CGUI_Result cgui_createCoreFromContext(CGUI_RuntimeContext* ctx) {
 
 void cgui_destroyCore(CGUI_Core* core) {
     cgui_destroyWindowManager(core->wndManager);
+    dbg_printf("WindowManager destroyed.\n");
     cgui_destroyWindowClassManager(core->wndClassManager);
-
+    dbg_printf("WindowClassManager destroyed.\n");
     cgui_destroyWindowFactory(core->wndFactory);
+    dbg_printf("WindowFactory destroyed.\n");
     cgui_destroyWindowClassFactory(core->wndClassFactory);
+    dbg_printf("WindowClassFactory destroyed.\n");
 
     cgui_destroyComponentManager(core->compManager);
+    dbg_printf("ComponentManager destroyed, components released.\n");
 
     free(core);
 }

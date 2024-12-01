@@ -25,13 +25,13 @@ typedef struct Application {
 } CGUI_Application;
 
 CGUI_Application* cgui_createApplication(CGUI_RuntimeContext* ctx);
-void cgui_destroyApplication(CGUI_Application* app);
+void cgui_destroyApplication();
 
 void cgui_application_run(bool isAsync);
 void cgui_application_stop(void);
 
 CGUI_WindowProc cgui_application_getWindowProc();
-int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+long long int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_Option cgui_tryGetApplicationInstance();
 

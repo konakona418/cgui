@@ -38,7 +38,7 @@ typedef struct Color {
 
 typedef struct GDIFontStyle {
     int fontSize;
-    char fontName[32];
+    LPSTR fontName;
     CGUI_Color foregroundColor;
     CGUI_Color backgroundColor;
 } CGUI_GDIFontStyle;
@@ -62,6 +62,10 @@ HFONT cgui_createFont(CGUI_GDITextContext* fontCtx);
 UINT cgui_textAlignIntoGdi(CGUI_TextAlignment alignment);
 
 CGUI_GDITextContext* cgui_createGdiTextContext();
+
+CGUI_GDITextContext* cgui_createGdiTextContextFromInstance(CGUI_GDITextContext instance);
+
+void cgui_destroyGdiTextContext(CGUI_GDITextContext* context);
 
 void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry);
 

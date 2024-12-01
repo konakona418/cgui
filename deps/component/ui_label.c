@@ -113,7 +113,7 @@ void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextCon
     self->_gdiRefreshFlag = true;
 
     HFONT hFont = cgui_createFont(gdiTextContext);
-    self->window->postMessage(self->window, WM_SETFONT, (WPARAM) hFont, TRUE);
+    self->window->postMessageAsync(self->window, WM_SETFONT, (WPARAM) hFont, TRUE);
     self->update(self); // this will signal repaint.
 }
 

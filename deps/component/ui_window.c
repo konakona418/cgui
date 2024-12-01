@@ -124,7 +124,7 @@ CGUI_Result cgui_uiNativeWindow_setState(CGUI_UINativeWindow* self, int swState)
 }
 
 CGUI_Result cgui_uiNativeWindow_postMessage(CGUI_UINativeWindow* self, UINT msg, WPARAM wParam, LPARAM lParam) {
-    return self->window->postMessage(self->window, msg, wParam, lParam);
+    return self->window->postMessageAsync(self->window, msg, wParam, lParam);
 }
 
 CGUI_Result cgui_uiNativeWindow_show(CGUI_UINativeWindow* self) {

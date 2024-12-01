@@ -123,6 +123,9 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
     wndFactory->setWindowMenu(wndFactory, NULL); // no menu for now.
+    if (options->parent) {
+        wndFactory->setWindowParent(wndFactory, cgui_getComponentWindowHandle(options->parent));
+    }
     // todo: fill the rest of the options.
 
     wnd = unwrap(wndFactory->createWindow(wndFactory));
@@ -149,12 +152,6 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     return create_ok(wndComp);
 }
 
-void cgui_uiFactory_wrapNormalButton(CGUI_Window* window);
-
-void cgui_uiFactory_wrapCheckBox(CGUI_Window* window);
-
-void cgui_uiFactory_wrapRadioButton(CGUI_Window* window);
-
 CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     if (argc < 1) {
         return create_err(CGUI_Error_InvalidArgument());
@@ -169,13 +166,18 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
 
     CGUI_WindowFactory* wndFactory = app->core->wndFactory;
+    wndFactory->setWindowExStyle(wndFactory, WS_EX_TRANSPARENT);
     wndFactory->setWindowClassName(wndFactory, "BUTTON");
     wndFactory->setWindowName(wndFactory, options->text);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
-    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPSIBLINGS);
+    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS);
 
+    HWND hParent;
     if (options->parent) {
-        wndFactory->setWindowParent(wndFactory, options->parent->win32Impl->getWindowHandle(options->parent));
+        hParent = cgui_getComponentWindowHandle(options->parent);
+        wndFactory->setWindowParent(wndFactory, hParent);
+    } else {
+        hParent = NULL;
     }
     wndFactory->setWindowMenu(wndFactory, (HMENU) nextId);
     wndFactory->setWindowInstance(wndFactory, app->ctx->hInstance);
@@ -183,21 +185,6 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     CGUI_Window* wnd = unwrap(wndFactory->createWindow(wndFactory));
 
     CGUI_UINativeButton* buttonComp = cgui_createUINativeButtonFromWindow(wnd, options->parent, nextId);
-
-    switch (buttonType) {
-        case CGUI_ButtonType_Default:
-            cgui_uiFactory_wrapNormalButton(wnd);
-            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_Default);
-            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Normal);
-        case CGUI_ButtonType_CheckBox:
-            cgui_uiFactory_wrapCheckBox(wnd);
-            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_CheckBox);
-            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
-        case CGUI_ButtonType_RadioButton:
-            cgui_uiFactory_wrapRadioButton(wnd);
-            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_RadioButton);
-            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
-    }
 
     compManager->addComponent(compManager, buttonComp->component);
 
@@ -211,19 +198,32 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
 
     buttonComp->setEventHandler(buttonComp, eventHandler);
 
+    switch (buttonType) {
+        case CGUI_ButtonType_Default:
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_Default);
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Normal);
+            break;
+        case CGUI_ButtonType_CheckBox:
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_CheckBox);
+            options->defaultState ?
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Checked) :
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
+            break;
+        case CGUI_ButtonType_RadioButton:
+            buttonComp->setButtonStyle(buttonComp, CGUI_ButtonStyle_RadioButton);
+            options->defaultState ?
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Checked) :
+            buttonComp->setButtonState(buttonComp, CGUI_ButtonState_Unchecked);
+            break;
+    }
+
+    // todo: low-end function calls.
+    if (IsWindow(hParent)) {
+        UpdateWindow(hParent);
+        InvalidateRect(hParent, NULL, TRUE);
+    }
+
     return create_ok(buttonComp);
-}
-
-void cgui_uiFactory_wrapNormalButton(CGUI_Window* window) {
-    window->setWindowStyle(window, window->getWindowStyle(window) | BS_DEFPUSHBUTTON);
-}
-
-void cgui_uiFactory_wrapCheckBox(CGUI_Window* window) {
-    window->setWindowStyle(window, window->getWindowStyle(window) | BS_CHECKBOX);
-}
-
-void cgui_uiFactory_wrapRadioButton(CGUI_Window* window) {
-    window->setWindowStyle(window, window->getWindowStyle(window) | BS_RADIOBUTTON);
 }
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {

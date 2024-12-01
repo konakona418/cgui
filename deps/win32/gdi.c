@@ -103,6 +103,7 @@ CGUI_GDITextContext* cgui_createGdiTextContext() {
     CGUI_GDITextContext* context = (CGUI_GDITextContext*) malloc(sizeof(CGUI_GDITextContext));
     context->alignment = CGUI_TextAlignment_Left;
     context->fontStyle.backgroundColor = cgui_transparentColor();
+    context->fontStyle.fontName = (char*) malloc(64);
     strcpy(context->fontStyle.fontName, "Arial");
     context->fontStyle.fontSize = 12;
     context->fontStyle.foregroundColor = cgui_rgbaToColor(0, 0, 0);
@@ -113,4 +114,27 @@ CGUI_GDITextContext* cgui_createGdiTextContext() {
     context->textStyle.strikeout = false;
     context->textStyle.underline = false;
     return context;
+}
+
+CGUI_GDITextContext* cgui_createGdiTextContextFromInstance(CGUI_GDITextContext instance) {
+    CGUI_GDITextContext* context = (CGUI_GDITextContext*) malloc(sizeof(CGUI_GDITextContext));
+
+    context->alignment = instance.alignment;
+    context->fontStyle.backgroundColor = instance.fontStyle.backgroundColor;
+    context->fontStyle.fontName = (char*) malloc(64);
+    strcpy(context->fontStyle.fontName, instance.fontStyle.fontName);
+    context->fontStyle.fontSize = instance.fontStyle.fontSize;
+    context->fontStyle.foregroundColor = instance.fontStyle.foregroundColor;
+    context->multiLine = instance.multiLine;
+    context->orientation = instance.orientation;
+    context->textStyle.bold = instance.textStyle.bold;
+    context->textStyle.italic = instance.textStyle.italic;
+    context->textStyle.strikeout = instance.textStyle.strikeout;
+    context->textStyle.underline = instance.textStyle.underline;
+    return context;
+}
+
+void cgui_destroyGdiTextContext(CGUI_GDITextContext* context) {
+    // free(context->fontStyle.fontName);
+    free(context);
 }

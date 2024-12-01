@@ -25,7 +25,7 @@ typedef struct UINativeLabel {
     CGUI_Window* window;
 
     CGUI_GDITextContext* gdiTextContext;
-    bool _gdiRefreshFlag;
+    obsolete bool _gdiRefreshFlag;
 
     void                (* show)                 (CGUI_UINativeLabel* self);
     void                (* hide)                 (CGUI_UINativeLabel* self);

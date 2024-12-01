@@ -186,7 +186,8 @@ CGUI_Window* cgui_createWindow(HWND hwnd, LPCSTR wndName, LPCSTR wndClassName) {
     window->setEnabled = cgui_window_setEnabled;
 
     window->setState = cgui_window_setState;
-    window->postMessage = cgui_window_postMessage;
+    window->postMessageAsync = cgui_window_postMessageAsync;
+    window->postMessageSync = cgui_window_postMessageSync;
 
     window->setWindowName = cgui_window_setWindowName;
     window->getWindowName = cgui_window_getWindowName;
@@ -288,12 +289,20 @@ CGUI_Result cgui_window_setState(CGUI_Window* self, int swState) {
     return create_ok(NULL);
 }
 
-CGUI_Result cgui_window_postMessage(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam) {
+CGUI_Result cgui_window_postMessageAsync(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (self == NULL) {
         return create_err(CGUI_Error_IllegalNullPtr());
     }
     PostMessage(self->hwnd, msg, wParam, lParam);
     return create_ok(NULL);
+}
+
+CGUI_Result cgui_window_postMessageSync(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (self == NULL) {
+        return create_err(CGUI_Error_IllegalNullPtr());
+    }
+    void* result = (void*) SendMessage(self->hwnd, msg, wParam, lParam);
+    return create_ok(result);
 }
 
 CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName) {

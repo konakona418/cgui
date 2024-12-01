@@ -11,10 +11,8 @@
 #include "../win32/window.h"
 #include "../util/error.h"
 
-#define CGUI_UIWindow CGUI_UINativeWindow
-#define UIWindow UINativeWindow
-
 typedef struct UINativeWindow CGUI_UINativeWindow;
+typedef CGUI_UINativeWindow CGUI_UIWindow;
 
 /**
  * Secondary encapsulation of native win32 window instance.

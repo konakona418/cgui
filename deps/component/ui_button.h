@@ -11,7 +11,14 @@
 #include "../win32/window.h"
 #include "../win32/gdi.h"
 
+#define CGUI_DEFAULT_BUTTON_PRESET (BS_PUSHBUTTON | BS_FLAT)
+#define CGUI_CHECKBOX_BUTTON_PRESET (BS_CHECKBOX | BS_FLAT)
+#define CGUI_RADIOBUTTON_BUTTON_PRESET (BS_RADIOBUTTON | BS_FLAT)
+
 typedef struct UINativeButton CGUI_UINativeButton;
+typedef CGUI_UINativeButton CGUI_UIButton;
+typedef CGUI_UINativeButton CGUI_UIRadioButton;
+typedef CGUI_UINativeButton CGUI_UICheckBox;
 
 typedef enum UINativeButtonStyle {
     CGUI_ButtonStyle_Default,
@@ -37,13 +44,13 @@ typedef struct UINativeButton {
     CGUI_UINativeButtonState buttonState;
 
     CGUI_GDITextContext* gdiTextContext;
-    bool _gdiRefreshFlag;
+    obsolete bool _gdiRefreshFlag;
 
     /* methods */
     CGUI_Result (* bindWindowInstance)(CGUI_UINativeButton* self, CGUI_Window* nativeWindow);
 
     CGUI_Result (* setState)(CGUI_UINativeButton* self, int swState);
-    CGUI_Result (* postMessage)(CGUI_UINativeButton* self, UINT msg, WPARAM wParam, LPARAM lParam);
+    CGUI_Result (* postMessage)(CGUI_UINativeButton* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
     CGUI_Result (* hide)(CGUI_UINativeButton* self);
     CGUI_Result (* show)(CGUI_UINativeButton* self);
     CGUI_Result (* update)(CGUI_UINativeButton* self);
@@ -102,7 +109,8 @@ void cgui_uiNativeButton_refreshCallback(CGUI_UIComponent* component);
 
 CGUI_Result cgui_uiNativeButton_setState(CGUI_UINativeButton* self, int swState);
 
-CGUI_Result cgui_uiNativeButton_postMessage(CGUI_UINativeButton* self, UINT msg, WPARAM wParam, LPARAM lParam);
+CGUI_Result
+cgui_uiNativeButton_postMessage(CGUI_UINativeButton* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CGUI_Result cgui_uiNativeButton_hide(CGUI_UINativeButton* self);
 

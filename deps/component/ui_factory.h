@@ -9,6 +9,7 @@
 
 #include "../util/hashmap.h"
 #include "../geo/rect.h"
+#include "../win32/gdi.h"
 
 #include "../app/application.h"
 
@@ -36,6 +37,8 @@ CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, 
 void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster);
 
 typedef struct WindowClassOptions {
+    CGUI_UIComponent* parent;
+
     LPCSTR className;
     LPCSTR menuName;
 
@@ -50,22 +53,39 @@ typedef struct WindowClassOptions {
 
 CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv);
 
-typedef enum CGUI_ButtonType {
+typedef enum ButtonType {
     CGUI_ButtonType_Default,
     CGUI_ButtonType_CheckBox,
     CGUI_ButtonType_RadioButton,
 } CGUI_ButtonType;
 
-typedef struct CGUI_ButtonOptions {
+/**
+ * Default state of the button.
+ * When set to false, the button will remain unchecked;
+ * When set to true, the button will be checked.
+ * @note Only available when buttonType is CGUI_ButtonType_CheckBox or CGUI_ButtonType_RadioButton.
+ */
+typedef bool CGUI_ButtonDefaultState;
+
+typedef struct ButtonOptions {
     CGUI_UIComponent* parent;
 
     CGUI_ButtonType buttonType;
 
     LPCSTR text;
     CGUI_Rectangle geometry;
+
+    CGUI_ButtonDefaultState defaultState;
 } CGUI_ButtonOptions;
 
 CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv);
+
+typedef struct LabelOptions {
+    CGUI_UIComponent* parent;
+
+    LPCSTR text;
+    CGUI_Rectangle geometry;
+} CGUI_LabelOptions;
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv);
 

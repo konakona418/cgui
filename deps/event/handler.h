@@ -25,7 +25,7 @@ typedef struct ListBoxHandler CGUI_ListBoxHandler;
 
 typedef unsigned int LocalHandlerFlag;
 
-typedef int (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef long long int (*LocalEventHandler)    (void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef void (*LocalHandlerDestructor) (void* handler);
 
@@ -70,8 +70,8 @@ CGUI_WindowHandler* cgui_createWindowHandler();
 
 void cgui_destroyWindowHandler(void* handler);
 
-int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                        WPARAM wParam, LPARAM lParam);
+long long int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                  WPARAM wParam, LPARAM lParam);
 
 typedef struct LabelHandler {
     void (*onGdiReady)         (CGUI_GdiReadyEventArgs args);
@@ -83,8 +83,9 @@ CGUI_LabelHandler* cgui_createLabelHandler();
 
 void cgui_destroyLabelHandler(CGUI_LabelHandler* handler);
 
-int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                       WPARAM wParam, LPARAM lParam);
+long long int
+cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                 WPARAM wParam, LPARAM lParam);
 
 typedef struct ButtonHandler {
     void (*onClick)        (CGUI_MouseEventArgs args);
@@ -103,7 +104,8 @@ CGUI_ButtonHandler* cgui_createButtonHandler();
 
 void cgui_destroyButtonHandler(void* handler);
 
-int cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+long long int
+cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                         WPARAM wParam, LPARAM lParam);
 
 typedef struct TextBoxHandler {
@@ -122,8 +124,9 @@ CGUI_TextBoxHandler* cgui_createTextBoxHandler();
 
 void cgui_destroyTextBoxHandler(void* handler);
 
-int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam);
+long long int
+cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                   WPARAM wParam, LPARAM lParam);
 
 typedef struct ListBoxHandler {
     void (*onItemSelected) (CGUI_EventArgs args);
@@ -151,7 +154,7 @@ typedef struct EventHandler {
     void* localHandler;
     LocalHandlerDestructor localHandlerDestructor;
 
-    int (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+    long long int (*handleEvent)     (CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
     void (*setComponent)    (CGUI_EventHandler* self, void* component);
 } CGUI_EventHandler;
@@ -170,7 +173,8 @@ void cgui_eventHandler_setComponent(CGUI_EventHandler* handler, void* component)
 
 void cgui_destroyEventHandler(CGUI_EventHandler* handler);
 
-int cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
+long long int
+cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback);
 
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args);
 

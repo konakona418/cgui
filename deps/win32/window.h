@@ -167,7 +167,9 @@ typedef struct Window {
 
     CGUI_Result (* setEnabled)(CGUI_Window* self, bool enabled);
 
-    CGUI_Result (* postMessage)(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
+    CGUI_Result (* postMessageAsync)(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    CGUI_Result (* postMessageSync)(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
 
     CGUI_Result (* setWindowName)(CGUI_Window* self, LPCSTR wndName);
 
@@ -229,8 +231,11 @@ CGUI_Result cgui_window_setState(CGUI_Window* self, int swState);
 /* Enables or disables the window. */
 CGUI_Result cgui_window_setEnabled(CGUI_Window* self, bool enabled);
 
-/* Posts a message to the window. */
-CGUI_Result cgui_window_postMessage(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
+/* Posts a message to the window asynchronously. */
+CGUI_Result cgui_window_postMessageAsync(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
+
+/* Posts a message to the window and waits for the response. */
+CGUI_Result cgui_window_postMessageSync(CGUI_Window* self, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Sets the name of the window. */
 CGUI_Result cgui_window_setWindowName(CGUI_Window* self, LPCSTR wndName);

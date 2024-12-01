@@ -81,6 +81,9 @@ _primitive_ptr;                                        \
 /* This macro is intended for indicating that the return value of a function should be used. */
 #define nodiscard __attribute__((warn_unused_result))
 
+#define obsolete __attribute__((deprecated("This function/property is obsolete.")))
+#define obsolete_for(_msg) __attribute__((deprecated("This function/property is obsolete: " _msg)))
+
 int random(int min, int max);
 
 /* This type is intended for representing a boolean value. */

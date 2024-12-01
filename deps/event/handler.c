@@ -60,7 +60,11 @@ int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWN
     }
 }
 
-int cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
+#define eq_wm(_msg) eq_any((int) _msg, 7, WM_CTLCOLORBTN, WM_CTLCOLOREDIT, WM_CTLCOLORMSGBOX, \
+WM_CTLCOLORLISTBOX, WM_CTLCOLORSCROLLBAR, WM_CTLCOLORSTATIC, WM_CTLCOLORDLG)
+
+long long int
+cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
     if (msg == WM_COMMAND) {
         HWND hComponent = (HWND) lParam;
         if (likely(query.hwnd != hComponent)) {
@@ -81,8 +85,7 @@ int cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery q
             dbg_printf("WM_COMMAND: child component hwnd eq hwnd, routing.\n");
             return cgui_routeToLocalHandler(self, self->localHandler, query.hwnd, msg, wParam, lParam);
         }
-    } else if (eq_any((int) msg, 7, WM_CTLCOLORBTN, WM_CTLCOLOREDIT, WM_CTLCOLORMSGBOX,
-                      WM_CTLCOLORLISTBOX, WM_CTLCOLORSCROLLBAR, WM_CTLCOLORSTATIC, WM_CTLCOLORDLG)) {
+    } else if (eq_wm(msg)) {
         HWND hComponent = (HWND) lParam;
         if (likely(query.hwnd != hComponent)) {
             if (unlikely(hComponent == NULL)) {
@@ -136,8 +139,8 @@ void cgui_destroyWindowHandler(void* handler) {
     free((CGUI_WindowHandler*) handler);
 }
 
-int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                        WPARAM wParam, LPARAM lParam) {
+long long int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                  WPARAM wParam, LPARAM lParam) {
     CGUI_WindowHandler* self = (CGUI_WindowHandler*) pSelf;
     CGUI_EventArgs args = cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam);
     switch (msg) {
@@ -246,7 +249,7 @@ void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     }
     CGUI_UINativeLabel* label = (CGUI_UINativeLabel*) component->disposableImpl->upperLevel;
 
-    if (!label->_gdiRefreshFlag || label->gdiTextContext == NULL) {
+    if (label->gdiTextContext == NULL) {
         return;
     }
 
@@ -255,7 +258,7 @@ void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
 
     CGUI_GDITextContext* drawCtx = label->gdiTextContext;
     SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
-    SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
+    // SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
 
     if (drawCtx->fontStyle.backgroundColor.transparent) {
         SetBkMode(hdc, TRANSPARENT);
@@ -277,18 +280,18 @@ void cgui_destroyLabelHandler(CGUI_LabelHandler* handler) {
     free(handler);
 }
 
-int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                       WPARAM wParam, LPARAM lParam) {
+long long int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                 WPARAM wParam, LPARAM lParam) {
     CGUI_LabelHandler* self = (CGUI_LabelHandler*) pSelf;
-    if (msg == WM_CTLCOLORSTATIC) {
+    if (eq_wm(msg)) {
         CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
         if (self->onGdiReady) {
             self->onGdiReady(args);
         }
-        return DefWindowProc(hwnd, msg, wParam, lParam); // todo: can return background brush here.
+        return (LPARAM) GetStockObject(NULL_BRUSH); // todo: can return background brush here.
     } else {
-        InvalidateRect(hwnd, NULL, TRUE);
-        UpdateWindow(hwnd);
+        //InvalidateRect(hwnd, NULL, TRUE);
+        //UpdateWindow(hwnd);
         return DefWindowProc(hwnd, msg, wParam, lParam);
     }
 }
@@ -300,22 +303,27 @@ void cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     }
     CGUI_UINativeButton* button = (CGUI_UINativeButton*) component->disposableImpl->upperLevel;
 
-    if (!button->_gdiRefreshFlag || button->gdiTextContext == NULL) {
+    if (button->gdiTextContext == NULL) {
+        //dbg_printf("onGdiReady, not painted.\n");
         return;
     }
+    //dbg_printf("onGdiReady, painted.\n");
 
     HDC hdc = args.hdc;
     HWND hwnd = args.hwnd;
 
     CGUI_GDITextContext* drawCtx = button->gdiTextContext;
     SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
-    SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
+    //SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
 
     if (drawCtx->fontStyle.backgroundColor.transparent) {
         SetBkMode(hdc, TRANSPARENT);
     } else {
         SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
     }
+
+    // button->update(button);
+
     button->_gdiRefreshFlag = false;
 }
 
@@ -339,17 +347,17 @@ void cgui_destroyButtonHandler(void* handler) {
     free((CGUI_ButtonHandler*) handler);
 }
 
-int cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                         WPARAM wParam, LPARAM lParam) {
     CGUI_ButtonHandler* self = (CGUI_ButtonHandler*) pSelf;
     CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
 
-    if (msg == WM_CTLCOLORBTN) {
+    if (eq_wm(msg)) {
         CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
         if (self->onGdiReady) {
             self->onGdiReady(args);
         }
-        return DefWindowProc(hwnd, msg, wParam, lParam); // todo: can return background brush here.
+        return (LPARAM) GetStockObject(NULL_BRUSH); // todo: can return background brush here.
     }
 
     int bnMessage = HIWORD(wParam);
@@ -403,8 +411,8 @@ void cgui_destroyTextBoxHandler(void* handler) {
     free((CGUI_TextBoxHandler*) handler);
 }
 
-int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                         WPARAM wParam, LPARAM lParam) {
+long long int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                   WPARAM wParam, LPARAM lParam) {
     CGUI_TextBoxHandler* self = (CGUI_TextBoxHandler*) pSelf;
     int notificationCode = HIWORD(wParam);
     switch (notificationCode) {
@@ -427,8 +435,8 @@ int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent,
             break;
     }
 
-    InvalidateRect(hwnd, NULL, TRUE);
-    UpdateWindow(hwnd);
+    //InvalidateRect(hwnd, NULL, TRUE);
+    //UpdateWindow(hwnd);
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 

@@ -25,6 +25,7 @@ void onClick(CGUI_MouseEventArgs args) {
 void btnOnClick(CGUI_MouseEventArgs args) {
     CGUI_UINativeButton* btn = into(CGUI_UINativeButton, ((CGUI_UIComponent*) args.base.component)->disposableImpl->upperLevel);
     CGUI_UINativeButtonState state = btn->getButtonState(btn);
+    //btn->update(btn);
     if (state == CGUI_ButtonState_Unchecked) {
         btn->setButtonState(btn, CGUI_ButtonState_Checked);
         printf("Checked!\n");
@@ -37,6 +38,7 @@ void btnOnClick(CGUI_MouseEventArgs args) {
 int main(void) {
     CGUI_RuntimeContext* ctx = cgui_defaultRuntimeContext();
     CGUI_Application* app = cgui_createApplication(ctx);
+
     CGUI_UIFactoryCluster* uiFactory = cgui_createUIFactoryCluster();
 
     CGUI_WindowClassOptions options = {
@@ -69,15 +71,31 @@ int main(void) {
             },
             .parent = wnd->component,
             .text = "Click me!",
-            .buttonType = CGUI_ButtonType_CheckBox
+            .buttonType = CGUI_ButtonType_RadioButton,
+            .defaultState = true,
     };
     CGUI_UINativeButton* button = unwrap(uiFactory->createComponent(uiFactory, "Button", 1, into_box(&buttonOptions)));
     wnd->addChild(wnd, button->component);
-    button->show(button);
+
+    button->setVisible(button, true);
 
     CGUI_ButtonHandler* btnHandler = into(CGUI_ButtonHandler, button->component->eventHandler->localHandler);
     btnHandler->onClick = btnOnClick;
     btnHandler->onDoubleClick = btnOnClick;
+
+    CGUI_GDITextContext gdiTextContext = {
+            .fontStyle = {
+                    .fontName = "Segoe UI",
+                    .fontSize = 20,
+                    .foregroundColor = cgui_rgbaToColor(255, 0, 0),
+                    .backgroundColor = cgui_rgbaToColor(0, 255, 255),
+            },
+            .alignment = CGUI_TextAlignment_Center,
+            .orientation = CGUI_TextOrientation_Horizontal,
+    };
+
+    CGUI_GDITextContext* ctxTextDisp = cgui_createGdiTextContextFromInstance(gdiTextContext);
+    button->setTextDisplay(button, ctxTextDisp);
 
     app->run(false);
 
