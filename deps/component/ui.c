@@ -179,7 +179,6 @@ void cgui_uiDrawable_refresh(void* pComponent) {
             component->drawableImpl->refreshCallback(component);
         }
     }
-    // todo: segfault
     component->children->iter(component->children, cgui_uiDrawable_refresh);
 }
 

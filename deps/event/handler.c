@@ -239,7 +239,7 @@ long long int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler
             return DefWindowProc(hwnd, msg, wParam, lParam);
             break;
     }
-    return 0;
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
@@ -276,8 +276,8 @@ CGUI_LabelHandler* cgui_createLabelHandler() {
 }
 
 
-void cgui_destroyLabelHandler(CGUI_LabelHandler* handler) {
-    free(handler);
+void cgui_destroyLabelHandler(void* handler) {
+    free((CGUI_LabelHandler*) handler);
 }
 
 long long int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,

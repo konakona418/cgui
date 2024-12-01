@@ -81,7 +81,7 @@ typedef struct LabelHandler {
 
 CGUI_LabelHandler* cgui_createLabelHandler();
 
-void cgui_destroyLabelHandler(CGUI_LabelHandler* handler);
+void cgui_destroyLabelHandler(void* handler);
 
 long long int
 cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,

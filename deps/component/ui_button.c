@@ -27,7 +27,7 @@ CGUI_UINativeButton* cgui_createUINativeButtonFromWindow(CGUI_Window* nativeWind
 
     button->component->layoutImpl = cgui_createUILayout();
     button->component->drawableImpl = cgui_createUIDrawable(
-            NULL,
+            cgui_uiNativeButton_readyCallback,
             cgui_uiNativeButton_drawCallback,
             cgui_uiNativeButton_refreshCallback);
     button->component->stateImpl = cgui_createUIState();
@@ -102,6 +102,14 @@ void cgui_destroyUINativeButton(CGUI_UINativeButton* window) {
     cgui_destroyWindowInstance(window->window);
     cgui_destroyGdiTextContext(window->gdiTextContext);
     free(window);
+}
+
+void cgui_uiNativeButton_readyCallback(CGUI_UIComponent* component) {
+    dbg_printf("uiNativeButton ready: %s\n", component->name);
+    if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        CGUI_UINativeButton* self = (CGUI_UINativeButton*) component->disposableImpl->upperLevel;
+        self->update(self);
+    }
 }
 
 void cgui_uiNativeButton_drawCallback(CGUI_UIComponent* component) {
@@ -279,7 +287,8 @@ LPCSTR cgui_uiNativeButton_getText(CGUI_UINativeButton* self) {
 }
 
 CGUI_Result cgui_uiNativeButton_setText(CGUI_UINativeButton* self, LPCSTR text) {
-    return self->window->setWindowName(self->window, text);
+    self->window->setWindowName(self->window, text);
+    return self->update(self);
 }
 
 CGUI_Result cgui_uiNativeButton_setTextDisplay(CGUI_UINativeButton* self, CGUI_GDITextContext* gdiTextContext) {

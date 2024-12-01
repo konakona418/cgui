@@ -61,6 +61,14 @@ LPCSTR cgui_toUppercase(LPCSTR str) {
     return result;
 }
 
+LPCSTR cgui_digitToString(long long digit) {
+    char* buffer = malloc(sizeof(char) * 32);
+    sprintf(buffer, "%lld", digit);
+    const char* result = strdup(buffer);
+    free(buffer);
+    return result;
+}
+
 bool eq_any(int value, size_t count, ...)  {
     va_list args;
     va_start(args, count);

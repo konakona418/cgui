@@ -103,6 +103,8 @@ void cgui_destroyUINativeButton(CGUI_UINativeButton* window);
 
 void cgui_uiNativeButton_destroyCallback(CGUI_UIComponent* component);
 
+void cgui_uiNativeButton_readyCallback(CGUI_UIComponent* component);
+
 void cgui_uiNativeButton_drawCallback(CGUI_UIComponent* component);
 
 void cgui_uiNativeButton_refreshCallback(CGUI_UIComponent* component);

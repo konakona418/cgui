@@ -41,6 +41,8 @@ CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWind
     window->setState = cgui_uiNativeWindow_setState;
     window->postMessage = cgui_uiNativeWindow_postMessage;
 
+    window->ready = cgui_uiNativeWindow_ready;
+
     /* trait implementation for CGUI_UIComponent */
     window->addChild = cgui_uiNativeWindow_addChild;
     window->removeChild = cgui_uiNativeWindow_removeChild;
@@ -151,7 +153,16 @@ CGUI_Result cgui_uiNativeWindow_setWindowName(CGUI_UINativeWindow* self, LPCSTR 
     return self->window->setWindowName(self->window, wndName);
 }
 
+CGUI_Result cgui_uiNativeWindow_ready(CGUI_UINativeWindow* self) {
+    dbg_printf("ready: %s\n", self->component->name);
+    if (impl(self->component->implFlag, CGUI_Trait_UIDrawable)) {
+        self->component->drawableImpl->ready(self->component);
+    }
+    return create_ok(NULL);
+}
+
 void cgui_uiNativeWindow_addChild(CGUI_UINativeWindow* self, CGUI_UIComponent* child) {
+    dbg_printf("cgui_uiNativeWindow_addChild: %s\n", child->name);
     self->component->addChild(self->component, child);
     self->update(self); // refresh the window.
 }

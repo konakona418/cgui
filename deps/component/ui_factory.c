@@ -6,8 +6,8 @@
 
 #include "ui_factory.h"
 #include "ui_window.h"
-#include "../event/handler.h"
 #include "ui_button.h"
+#include "ui_label.h"
 
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
 
@@ -120,6 +120,7 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     wndFactory->setWindowClass(wndFactory, wndClass);
     wndFactory->setWindowName(wndFactory, options->title);
     // todo: further updates should allow the user to specify the style.
+    wndFactory->setWindowExStyle(wndFactory, WS_EX_COMPOSITED); // use double buffering.
     wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
     wndFactory->setWindowMenu(wndFactory, NULL); // no menu for now.
@@ -227,7 +228,54 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
 }
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
-    return create_err(CGUI_Error_NotImplemented());
+    if (argc < 1) {
+        return create_err(CGUI_Error_InvalidArgument());
+    }
+    CGUI_LabelOptions* options = unbox_as(CGUI_LabelOptions, &argv[0]);
+
+    CGUI_Application* app = cgui_applicationInstance();
+
+    CGUI_ComponentManager* compManager = app->core->compManager;
+    CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
+
+    CGUI_WindowFactory* wndFactory = app->core->wndFactory;
+    wndFactory->setWindowExStyle(wndFactory, WS_EX_TRANSPARENT);
+    wndFactory->setWindowClassName(wndFactory, "STATIC");
+    wndFactory->setWindowName(wndFactory, options->text);
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS);
+
+    HWND hParent;
+    if (options->parent) {
+        hParent = cgui_getComponentWindowHandle(options->parent);
+        wndFactory->setWindowParent(wndFactory, hParent);
+    } else {
+        hParent = NULL;
+    }
+
+    wndFactory->setWindowMenu(wndFactory, (HMENU) nextId);
+    wndFactory->setWindowInstance(wndFactory, app->ctx->hInstance);
+    CGUI_Window* wnd = unwrap(wndFactory->createWindow(wndFactory));
+
+    CGUI_UINativeLabel* labelComp = cgui_createUINativeLabelFromWindow(wnd, options->parent, nextId);
+    compManager->addComponent(compManager, labelComp->component);
+
+    CGUI_LabelHandler* localHandler = cgui_createLabelHandler();
+    CGUI_LocalHandlerContext localHandlerCtx = {
+            .destructor = cgui_destroyLabelHandler,
+            .handlerFlag = CGUI_LocalHandler_Label,
+            .localHandler = localHandler
+    };
+
+    CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, labelComp->component);
+    labelComp->setEventHandler(labelComp, eventHandler);
+
+    if (IsWindow(hParent)) {
+        UpdateWindow(hParent);
+        InvalidateRect(hParent, NULL, TRUE);
+    }
+
+    return create_ok(labelComp);
 }
 
 CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {

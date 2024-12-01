@@ -8,11 +8,16 @@
 #include "deps/component/ui_factory.h"
 #include "deps/component/ui_window.h"
 #include "deps/component/ui_button.h"
+#include "deps/component/ui_label.h"
 
-// todo: fix core.c: L42
+CGUI_UINativeWindow* wnd;
+CGUI_UINativeLabel* label;
+CGUI_UINativeLabel* label2;
+
+int cnt = 0;
+
 
 void onClose(CGUI_EventArgs args) {
-    CGUI_UINativeWindow* wnd = into(CGUI_UIWindow, ((CGUI_UIComponent*) args.component)->disposableImpl->upperLevel);
     wnd->close(wnd);
     wnd->destroy(wnd);
     cgui_applicationInstance()->stop();
@@ -28,11 +33,14 @@ void btnOnClick(CGUI_MouseEventArgs args) {
     //btn->update(btn);
     if (state == CGUI_ButtonState_Unchecked) {
         btn->setButtonState(btn, CGUI_ButtonState_Checked);
-        printf("Checked!\n");
+        btn->setText(btn, "Unchecked!");
+        label->setText(label, "Unchecked!");
     } else {
         btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
-        printf("Unchecked!\n");
+        btn->setText(btn, "Checked!");
+        label->setText(label, "Checked!");
     }
+    label2->setText(label2, cgui_digitToString(cnt++));
 }
 
 int main(void) {
@@ -55,12 +63,25 @@ int main(void) {
             .title = "CGUI Window",
             .allowDoubleClick = false
     };
-    CGUI_UINativeWindow* wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, into_box(&options)));
+    wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, into_box(&options)));
     wnd->show(wnd);
 
     CGUI_WindowHandler* wndHandler = into(CGUI_WindowHandler, wnd->component->eventHandler->localHandler);
     wndHandler->onClose = onClose;
     wndHandler->onMouseUp = onClick;
+
+    CGUI_GDITextContext gdiTextContext = {
+            .fontStyle = {
+                    .fontName = "Segoe UI",
+                    .fontSize = 20,
+                    .foregroundColor = cgui_rgbaToColor(255, 0, 0),
+                    .backgroundColor = cgui_rgbaToColor(0, 255, 255),
+            },
+            .alignment = CGUI_TextAlignment_Center,
+            .orientation = CGUI_TextOrientation_Horizontal,
+    };
+
+    CGUI_GDITextContext* ctxTextDisp = cgui_createGdiTextContextFromInstance(gdiTextContext);
 
     CGUI_ButtonOptions buttonOptions = {
             .geometry = {
@@ -83,55 +104,46 @@ int main(void) {
     btnHandler->onClick = btnOnClick;
     btnHandler->onDoubleClick = btnOnClick;
 
-    CGUI_GDITextContext gdiTextContext = {
-            .fontStyle = {
-                    .fontName = "Segoe UI",
-                    .fontSize = 20,
-                    .foregroundColor = cgui_rgbaToColor(255, 0, 0),
-                    .backgroundColor = cgui_rgbaToColor(0, 255, 255),
-            },
-            .alignment = CGUI_TextAlignment_Center,
-            .orientation = CGUI_TextOrientation_Horizontal,
-    };
-
-    CGUI_GDITextContext* ctxTextDisp = cgui_createGdiTextContextFromInstance(gdiTextContext);
     button->setTextDisplay(button, ctxTextDisp);
 
-    app->run(false);
+    CGUI_LabelOptions labelOptions = {
+            .geometry = {
+                    .x = 10,
+                    .y = 120,
+                    .width = 100,
+                    .height = 100
+            },
+            .parent = wnd->component,
+            .text = "Label",
+    };
+    label = unwrap(uiFactory->createComponent(uiFactory, "Label", 1, into_box(&labelOptions)));
+    wnd->addChild(wnd, label->component);
+
+    label->setVisible(label, true);
+    label->setTextDisplay(label, ctxTextDisp);
+
+    CGUI_LabelOptions labelOptions2 = {
+            .geometry = {
+                    .x = 200,
+                    .y = 160,
+                    .width = 300,
+                    .height = 150
+            },
+            .parent = wnd->component,
+            .text = "Label2",
+    };
+
+    label2 = unwrap(uiFactory->createComponent(uiFactory, "Label", 1, into_box(&labelOptions2)));
+    wnd->addChild(wnd, label2->component);
+
+    label2->setTextDisplay(label2, ctxTextDisp);
+    label2->setVisible(label2, true);
+
+    wnd->ready(wnd);
 
     cgui_destroyUIFactoryCluster(uiFactory);
 
+    app->run(false);
 
-    /*CGUI_Core* core = unwrap(cgui_createCoreFromContext(ctx));
-    core->wndClassFactory->setWindowClassStyle(core->wndClassFactory, CS_HREDRAW | CS_VREDRAW);
-    core->wndClassFactory->setWindowClassName(core->wndClassFactory, "CGUI_Window");
-    core->wndClassFactory->setWindowInstance(core->wndClassFactory, GetModuleHandle(NULL));
-    core->wndClassFactory->setWindowProc(core->wndClassFactory, DefWindowProc);
-    core->wndClassFactory->setWindowBackgroundBrush(core->wndClassFactory, (HBRUSH)(COLOR_WINDOW + 1));
-    CGUI_WindowClass* wndClass = unwrap(core->wndClassFactory->createWindowClass(core->wndClassFactory));
-
-    core->wndClassManager->addWindowClassAndRegister(core->wndClassManager, wndClass);
-
-    core->wndFactory->setWindowClass(core->wndFactory, wndClass);
-    core->wndFactory->setWindowName(core->wndFactory, "CGUI Window");
-    core->wndFactory->setWindowStyle(core->wndFactory, WS_OVERLAPPEDWINDOW);
-    core->wndFactory->setWindowSize(core->wndFactory, 640, 480);
-    core->wndFactory->setWindowPosition(core->wndFactory, 100, 100);
-    CGUI_Window* wnd = unwrap(core->wndFactory->createWindow(core->wndFactory));
-
-    core->wndManager->addWindow(core->wndManager, wnd);
-    HWND hwnd = wnd->hwnd;
-    wnd = unwrap_option(core->wndManager->getWindowByHwnd(core->wndManager, hwnd));
-    wnd->show(wnd);
-
-    MSG msg = { };
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    cgui_destroyWindowInstance(wnd);
-
-    cgui_destroyCore(core);*/
     return 0;
 }

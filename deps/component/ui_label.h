@@ -31,6 +31,7 @@ typedef struct UINativeLabel {
     void                (* hide)                 (CGUI_UINativeLabel* self);
     void                (* update)               (CGUI_UINativeLabel* self);
     CGUI_Result         (* close)                (CGUI_UINativeLabel* self);
+    CGUI_Result         (* postMessage)          (CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
     void                (* setText)              (CGUI_UINativeLabel* self, LPCSTR text);
     LPCSTR              (* getText)              (CGUI_UINativeLabel* self);
@@ -72,6 +73,8 @@ void cgui_uiNativeLabel_hide(CGUI_UINativeLabel* self);
 void cgui_uiNativeLabel_update(CGUI_UINativeLabel* self);
 
 CGUI_Result cgui_uiNativeLabel_close(CGUI_UINativeLabel* self);
+
+CGUI_Result cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void cgui_uiNativeLabel_setText(CGUI_UINativeLabel* self, LPCSTR text);
 

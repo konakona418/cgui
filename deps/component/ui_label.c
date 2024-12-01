@@ -36,6 +36,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->hide = cgui_uiNativeLabel_hide;
     label->close = cgui_uiNativeLabel_close;
     label->update = cgui_uiNativeLabel_update;
+    label->postMessage = cgui_uiNativeLabel_postMessage;
 
     label->setText = cgui_uiNativeLabel_setText;
     label->setTextDisplay = cgui_uiNativeLabel_setTextDisplay;
@@ -88,6 +89,7 @@ CGUI_Result cgui_uiNativeLabel_bindWindowInstance(CGUI_UINativeLabel* self, CGUI
 }
 
 void cgui_uiNativeLabel_show(CGUI_UINativeLabel* self) {
+    self->update(self);
     self->window->show(self->window);
 }
 
@@ -103,6 +105,14 @@ CGUI_Result cgui_uiNativeLabel_close(CGUI_UINativeLabel* self) {
     return self->window->close(self->window);
 }
 
+CGUI_Result cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
+    if (isAsync) {
+        return self->window->postMessageAsync(self->window, msg, wParam, lParam);
+    } else {
+        return self->window->postMessageSync(self->window, msg, wParam, lParam);
+    }
+}
+
 void cgui_uiNativeLabel_setText(CGUI_UINativeLabel* self, LPCSTR text) {
     self->window->setWindowName(self->window, text);
     self->update(self);
@@ -112,8 +122,17 @@ void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextCon
     self->gdiTextContext = gdiTextContext;
     self->_gdiRefreshFlag = true;
 
+    CGUI_Window* wnd = self->window;
+    if (gdiTextContext->alignment == CGUI_TextAlignment_Center) {
+        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_CENTER);
+    } else if (gdiTextContext->alignment == CGUI_TextAlignment_Left) {
+        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_LEFT);
+    } else {
+        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_RIGHT);
+    }
+
     HFONT hFont = cgui_createFont(gdiTextContext);
-    self->window->postMessageAsync(self->window, WM_SETFONT, (WPARAM) hFont, TRUE);
+    self->postMessage(self, false, WM_SETFONT, (WPARAM) hFont, 0);
     self->update(self); // this will signal repaint.
 }
 
@@ -212,6 +231,7 @@ CGUI_Result cgui_uiNativeLabel_setVisible(CGUI_UINativeLabel* self, bool visible
     if (impl(self->component->implFlag, CGUI_Trait_UIState)) {
         self->component->stateImpl->setVisible(self->component, visible);
         if (visible) {
+            self->update(self);
             return self->window->show(self->window);
         } else {
             return self->window->hide(self->window);
@@ -240,7 +260,11 @@ HWND cgui_uiNativeLabel_getWindowHandle(CGUI_UIComponent* component) {
 }
 
 void cgui_uiNativeLabel_readyCallback(CGUI_UIComponent* component) {
-    // todo: ready callback
+    dbg_printf("uiNativeLabel ready: %s\n", component->name);
+    if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        CGUI_UINativeLabel* self = (CGUI_UINativeLabel*) component->disposableImpl->upperLevel;
+        self->update(self);
+    }
 }
 
 void cgui_uiNativeLabel_drawCallback(CGUI_UIComponent* component) {
