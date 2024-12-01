@@ -38,7 +38,7 @@ void destroy_vector_with_destructor(Vector* vector, void (* destructor)(void* el
     if (vector == NULL) return;
     size_t i = 0;
     while (vector->size > 0) {
-        destructor(vector->data + i * vector->element_size);
+        destructor(vector->data + i);
         i++;
     }
     free(vector);
@@ -51,7 +51,7 @@ void vector_clear(Vector* vector) {
 
 void* vector_get(Vector* vector, size_t index) {
     if (index < vector->size) {
-        return unbox(vector->data + index * vector->element_size);
+        return unbox(vector->data + index);
     }
     return NULL;
 }
@@ -59,14 +59,14 @@ void* vector_get(Vector* vector, size_t index) {
 void vector_set(Vector* vector, size_t index, const void* element) {
     if (index < vector->size) {
         void* elem = (void*) element;
-        memcpy(vector->data + index * vector->element_size, into_box(elem), vector->element_size);
+        memcpy(vector->data + index, into_box(elem), vector->element_size);
     }
 }
 
 void* vector_remove(Vector* vector, size_t index) {
     if (index < vector->size) {
         void* element = vector->data + index * vector->element_size;
-        memmove(vector->data + index * vector->element_size, vector->data + (index + 1) * vector->element_size,
+        memmove(vector->data + index, vector->data + (index + 1),
                 (vector->size - index - 1) * vector->element_size);
         vector->size--;
         return unbox(element);
@@ -84,14 +84,14 @@ void vector_resize(Vector* vector, size_t new_size) {
 void vector_push_back(Vector* vector, const void* element) {
     vector_resize(vector, vector->size + 1);
     void* elem = (void*) element;
-    memcpy(vector->data + vector->size * vector->element_size, into_box(elem), vector->element_size);
+    memcpy(vector->data + vector->size, into_box(elem), vector->element_size);
     vector->size++;
 }
 
 void* vector_pop_back(Vector* vector) {
     if (vector->size > 0) {
         vector->size--;
-        return unbox(vector->data + vector->size * vector->element_size);
+        return unbox(vector->data + vector->size);
     }
     return NULL;
 }
@@ -99,7 +99,7 @@ void* vector_pop_back(Vector* vector) {
 void vector_iter(Vector* vector, void (* callback)(void* element)) {
     size_t i = 0;
     while (i < vector->size) {
-        callback(unbox(vector->data + i * vector->element_size));
+        callback(unbox(vector->data + i));
         i++;
     }
 }
@@ -107,7 +107,7 @@ void vector_iter(Vector* vector, void (* callback)(void* element)) {
 CGUI_Result vector_iter_result(Vector* vector, CGUI_Result (* callback)(void* element)) {
     size_t i = 0;
     while (i < vector->size) {
-        CGUI_Result result = callback(unbox(vector->data + i * vector->element_size));
+        CGUI_Result result = callback(unbox(vector->data + i));
         if (is_err(&result)) return result;
         i++;
     }
