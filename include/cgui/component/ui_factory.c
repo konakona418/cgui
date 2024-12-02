@@ -358,6 +358,7 @@ CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
 
     CGUI_WindowFactory* wndFactory = app->core->wndFactory;
 
+    wndFactory->setWindowExStyle(wndFactory, WS_EX_TRANSPARENT);
     wndFactory->setWindowClassName(wndFactory, "EDIT");
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
     wndFactory->setWindowName(wndFactory, options->text);
@@ -427,10 +428,9 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
 
     CGUI_WindowFactory* wndFactory = app->core->wndFactory;
 
+    wndFactory->setWindowExStyle(wndFactory, WS_EX_TRANSPARENT);
     wndFactory->setWindowClassName(wndFactory, "LISTBOX");
-
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
-
     // wndFactory->setWindowName(wndFactory, options->text);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
 
@@ -438,6 +438,9 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
     aggregatedStyle |= options->allowMultipleSelection ? LBS_MULTIPLESEL : 0;
     aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
     aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
+
+    // todo: this is just a temporal solution. this will cause the list to be a multi-selectable list
+    // but it will be found when the user used SHIFT/CTRL+click to select multiple items
     aggregatedStyle |= options->extendItemToFit ? LBS_EXTENDEDSEL : 0;
     aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
     aggregatedStyle |= options->hasComboBox ? LBS_COMBOBOX : 0;
