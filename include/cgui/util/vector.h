@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-#include "../util/common.h"
+#include "common.h"
 
 /* Prototype */
 typedef struct Vector Vector;
