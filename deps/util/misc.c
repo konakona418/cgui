@@ -10,3 +10,7 @@ CGUI_ComponentQuery cgui_createComponentQuery(HWND hwnd, int internalId) {
     CGUI_ComponentQuery query = {hwnd, internalId};
     return query;
 }
+
+int cgui_cStringLen(LPCSTR str) {
+    return (int) strlen(str);
+}

@@ -33,12 +33,12 @@ void btnOnClick(CGUI_MouseEventArgs args) {
     //btn->update(btn);
     if (state == CGUI_ButtonState_Unchecked) {
         btn->setButtonState(btn, CGUI_ButtonState_Checked);
-        btn->setText(btn, "Unchecked!");
-        label->setText(label, "Unchecked!");
-    } else {
-        btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
         btn->setText(btn, "Checked!");
         label->setText(label, "Checked!");
+    } else {
+        btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
+        btn->setText(btn, "Unchecked!");
+        label->setText(label, "Unchecked!");
     }
     label2->setText(label2, cgui_digitToString(cnt++));
 }
@@ -76,8 +76,10 @@ int main(void) {
                     .fontSize = 20,
                     .foregroundColor = cgui_rgbaToColor(255, 0, 0),
                     .backgroundColor = cgui_rgbaToColor(0, 255, 255),
+                    .realBackgroundColor = cgui_rgbaToColor(255, 0, 255),
             },
-            .alignment = CGUI_TextAlignment_Center,
+            .alignHorizontal = CGUI_TextAlignmentH_Center,
+            .alignVertical = CGUI_TextAlignmentV_Center,
             .orientation = CGUI_TextOrientation_Horizontal,
     };
 
@@ -88,11 +90,11 @@ int main(void) {
                     .x = 10,
                     .y = 10,
                     .width = 100,
-                    .height = 100
+                    .height = 30
             },
             .parent = wnd->component,
             .text = "Click me!",
-            .buttonType = CGUI_ButtonType_RadioButton,
+            .buttonType = CGUI_ButtonType_CheckBox,
             .defaultState = true,
     };
     CGUI_UINativeButton* button = unwrap(uiFactory->createComponent(uiFactory, "Button", 1, into_box(&buttonOptions)));
@@ -124,8 +126,8 @@ int main(void) {
 
     CGUI_LabelOptions labelOptions2 = {
             .geometry = {
-                    .x = 200,
-                    .y = 160,
+                    .x = 50,
+                    .y = 120,
                     .width = 300,
                     .height = 150
             },

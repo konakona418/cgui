@@ -74,7 +74,7 @@ long long int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler
                                                   WPARAM wParam, LPARAM lParam);
 
 typedef struct LabelHandler {
-    void (*onGdiReady)         (CGUI_GdiReadyEventArgs args);
+    long long int (*onGdiReady)         (CGUI_GdiReadyEventArgs args);
 
     LocalEventHandler      handleEventLocal;
 } CGUI_LabelHandler;
@@ -95,7 +95,7 @@ typedef struct ButtonHandler {
     void (*onFocus)        (CGUI_EventArgs args);
     void (*onDefocus)      (CGUI_EventArgs args);
 
-    void (*onGdiReady)     (CGUI_GdiReadyEventArgs args);
+    long long int (*onGdiReady)     (CGUI_GdiReadyEventArgs args);
 
     LocalEventHandler      handleEventLocal;
 } CGUI_ButtonHandler;

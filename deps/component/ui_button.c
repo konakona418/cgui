@@ -293,16 +293,21 @@ CGUI_Result cgui_uiNativeButton_setText(CGUI_UINativeButton* self, LPCSTR text) 
 
 CGUI_Result cgui_uiNativeButton_setTextDisplay(CGUI_UINativeButton* self, CGUI_GDITextContext* gdiTextContext) {
     CGUI_Window* wnd = self->window;
-    if (gdiTextContext->alignment == CGUI_TextAlignment_Center) {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_CENTER);
-    } else if (gdiTextContext->alignment == CGUI_TextAlignment_Left) {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_LEFT);
-    } else {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_RIGHT);
-    }
 
-    HFONT font = cgui_createFont(gdiTextContext);
-    self->postMessage(self, false, WM_SETFONT, (WPARAM) font, 0);
+    if (self->getButtonStyle(self) != CGUI_ButtonStyle_Default) {
+        if (gdiTextContext->alignHorizontal == CGUI_TextAlignmentH_Center) {
+            wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_CENTER);
+        } else if (gdiTextContext->alignHorizontal == CGUI_TextAlignmentH_Left) {
+            wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_LEFT);
+        } else {
+            wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | BS_RIGHT);
+        }
+
+        HFONT font = cgui_createFont(gdiTextContext);
+        self->postMessage(self, false, WM_SETFONT, (WPARAM) font, 0);
+    } else {
+        dbg_printf("Default button state, use deferred font setting instead.\n");
+    }
 
     self->gdiTextContext = gdiTextContext;
     self->_gdiRefreshFlag = true;

@@ -13,11 +13,21 @@
 #include "../geo/layout.h"
 #include "../geo/rect.h"
 
-typedef enum TextAlignment {
-    CGUI_TextAlignment_Left,
-    CGUI_TextAlignment_Center,
-    CGUI_TextAlignment_Right
-} CGUI_TextAlignment;
+typedef LONG CGUI_Win32DTParam;
+typedef LONG CGUI_Win32TAParam;
+typedef LONG CGUI_Win32SSParam;
+
+typedef enum TextAlignmentHorizontal {
+    CGUI_TextAlignmentH_Left,
+    CGUI_TextAlignmentH_Center,
+    CGUI_TextAlignmentH_Right
+} CGUI_TextAlignmentHorizontal;
+
+typedef enum TextAlignmentVertical {
+    CGUI_TextAlignmentV_Top,
+    CGUI_TextAlignmentV_Center,
+    CGUI_TextAlignmentV_Bottom
+} CGUI_TextAlignmentVertical;
 
 typedef enum TextOrientation {
     CGUI_TextOrientation_Horizontal,
@@ -31,8 +41,16 @@ typedef struct TextStyle {
     bool strikeout;
 } CGUI_TextStyle;
 
+typedef struct ColorInner {
+    int r;
+    int g;
+    int b;
+} CGUI_ColorInner;
+
 typedef struct Color {
     COLORREF rgb;
+
+    CGUI_ColorInner _inner;
     bool transparent;
 } CGUI_Color;
 
@@ -41,13 +59,17 @@ typedef struct GDIFontStyle {
     LPSTR fontName;
     CGUI_Color foregroundColor;
     CGUI_Color backgroundColor;
+
+    CGUI_Color realBackgroundColor;
 } CGUI_GDIFontStyle;
 
 typedef struct GDITextContext {
     CGUI_GDIFontStyle fontStyle;
     CGUI_TextStyle textStyle;
 
-    CGUI_TextAlignment alignment;
+    CGUI_TextAlignmentHorizontal alignHorizontal;
+    CGUI_TextAlignmentVertical alignVertical;
+
     CGUI_TextOrientation orientation;
 
     bool multiLine;
@@ -55,11 +77,17 @@ typedef struct GDITextContext {
 
 CGUI_Color cgui_rgbaToColor(int r, int g, int b);
 
+HBRUSH cgui_intoSolidBrush(CGUI_Color color);
+
 CGUI_Color cgui_transparentColor();
 
 HFONT cgui_createFont(CGUI_GDITextContext* fontCtx);
 
-UINT cgui_textAlignIntoGdi(CGUI_TextAlignment alignment);
+CGUI_Win32TAParam cgui_textAlignIntoGdi(CGUI_TextAlignmentHorizontal alignment);
+
+CGUI_Win32DTParam cgui_textAlignIntoDrawText(CGUI_GDITextContext* fontCtx);
+
+CGUI_Win32SSParam cgui_textAlignIntoStaticStyle(CGUI_GDITextContext* fontCtx);
 
 CGUI_GDITextContext* cgui_createGdiTextContext();
 

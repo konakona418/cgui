@@ -242,7 +242,7 @@ long long int cgui_windowHandler_handleEventLocal(void* pSelf, CGUI_EventHandler
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
+long long int cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     CGUI_UIComponent* component = args.base.component;
     if (!impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         panic("Fatal! Not a valid NativeLabel component!");
@@ -250,13 +250,14 @@ void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     CGUI_UINativeLabel* label = (CGUI_UINativeLabel*) component->disposableImpl->upperLevel;
 
     if (label->gdiTextContext == NULL) {
-        return;
+        return (LPARAM) GetStockObject(NULL_BRUSH);
     }
 
     HDC hdc = args.hdc;
     HWND hwnd = args.hwnd;
 
     CGUI_GDITextContext* drawCtx = label->gdiTextContext;
+
     SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
     // SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
 
@@ -266,6 +267,12 @@ void cgui_labelHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
         SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
     }
     label->_gdiRefreshFlag = false;
+
+    if (drawCtx->fontStyle.realBackgroundColor.transparent) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    } else {
+        return (LPARAM) CreateSolidBrush(drawCtx->fontStyle.realBackgroundColor.rgb);
+    }
 }
 
 CGUI_LabelHandler* cgui_createLabelHandler() {
@@ -286,9 +293,9 @@ long long int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler*
     if (eq_wm(msg)) {
         CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
         if (self->onGdiReady) {
-            self->onGdiReady(args);
+            return self->onGdiReady(args);
         }
-        return (LPARAM) GetStockObject(NULL_BRUSH); // todo: can return background brush here.
+        return (LPARAM) GetStockObject(NULL_BRUSH);
     } else {
         //InvalidateRect(hwnd, NULL, TRUE);
         //UpdateWindow(hwnd);
@@ -296,7 +303,7 @@ long long int cgui_labelHandler_handleEventLocal(void* pSelf, CGUI_EventHandler*
     }
 }
 
-void cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
+long long int cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     CGUI_UIComponent* component = args.base.component;
     if (!impl(component->implFlag, CGUI_Trait_UIDisposable)) {
         panic("Fatal! Not a valid NativeLabel component!");
@@ -305,7 +312,7 @@ void cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
 
     if (button->gdiTextContext == NULL) {
         //dbg_printf("onGdiReady, not painted.\n");
-        return;
+        return (LPARAM) GetStockObject(NULL_BRUSH);
     }
     //dbg_printf("onGdiReady, painted.\n");
 
@@ -313,6 +320,37 @@ void cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     HWND hwnd = args.hwnd;
 
     CGUI_GDITextContext* drawCtx = button->gdiTextContext;
+
+    /**
+     * Default button specific draw implementation.
+     * As the Win32 native button does not support custom styles,
+     * we need to overwrite its original draw implementation. */
+    if (button->getButtonStyle(button) == CGUI_ButtonStyle_Default) {
+        RECT rect;
+        LPCSTR text;
+
+        text = button->getText(button);
+        GetClientRect(hwnd, &rect);
+        SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
+        if (drawCtx->fontStyle.backgroundColor.transparent) {
+            SetBkMode(hdc, TRANSPARENT);
+        } else {
+            SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
+        }
+        HFONT hFont = cgui_createFont(drawCtx);
+        //SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
+        SelectObject(hdc, hFont);
+
+        CGUI_Win32DTParam dtParam = cgui_textAlignIntoDrawText(drawCtx);
+        DrawText(hdc, text, cgui_cStringLen(text), &rect, dtParam);
+
+        if (drawCtx->fontStyle.realBackgroundColor.transparent) {
+            return (LPARAM) GetStockObject(NULL_BRUSH);
+        } else {
+            return (LPARAM) cgui_intoSolidBrush(drawCtx->fontStyle.realBackgroundColor);
+        }
+    }
+
     SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
     //SetTextAlign(hdc, cgui_textAlignIntoGdi(drawCtx->alignment));
 
@@ -325,6 +363,12 @@ void cgui_buttonHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
     // button->update(button);
 
     button->_gdiRefreshFlag = false;
+
+    if (drawCtx->fontStyle.realBackgroundColor.transparent) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    } else {
+        return (LPARAM) cgui_intoSolidBrush(drawCtx->fontStyle.realBackgroundColor);
+    }
 }
 
 CGUI_ButtonHandler* cgui_createButtonHandler() {
@@ -355,9 +399,9 @@ long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* pa
     if (eq_wm(msg)) {
         CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
         if (self->onGdiReady) {
-            self->onGdiReady(args);
+            return self->onGdiReady(args);
         }
-        return (LPARAM) GetStockObject(NULL_BRUSH); // todo: can return background brush here.
+        return (LPARAM) GetStockObject(NULL_BRUSH);
     }
 
     int bnMessage = HIWORD(wParam);

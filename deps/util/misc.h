@@ -12,6 +12,8 @@
 typedef struct ComponentQuery CGUI_ComponentQuery;
 typedef long long int CGUI_InternalID;
 
+int cgui_cStringLen(LPCSTR str);
+
 typedef long long int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef struct ComponentQuery {

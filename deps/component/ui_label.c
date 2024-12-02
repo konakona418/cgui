@@ -122,14 +122,8 @@ void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextCon
     self->gdiTextContext = gdiTextContext;
     self->_gdiRefreshFlag = true;
 
-    CGUI_Window* wnd = self->window;
-    if (gdiTextContext->alignment == CGUI_TextAlignment_Center) {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_CENTER);
-    } else if (gdiTextContext->alignment == CGUI_TextAlignment_Left) {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_LEFT);
-    } else {
-        wnd->setWindowStyle(wnd, wnd->getWindowStyle(wnd) | SS_RIGHT);
-    }
+    CGUI_Win32SSParam ssParam = cgui_textAlignIntoStaticStyle(gdiTextContext);
+    self->window->setWindowStyle(self->window, self->window->getWindowStyle(self->window) | ssParam);
 
     HFONT hFont = cgui_createFont(gdiTextContext);
     self->postMessage(self, false, WM_SETFONT, (WPARAM) hFont, 0);

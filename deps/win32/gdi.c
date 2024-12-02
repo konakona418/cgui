@@ -9,14 +9,28 @@
 CGUI_Color cgui_rgbaToColor(int r, int g, int b) {
     CGUI_Color color = {
         .rgb = RGB(r, g, b),
+        ._inner = {
+                .r = r,
+                .g = g,
+                .b = b,
+        },
         .transparent = false
     };
     return color;
 }
 
+HBRUSH cgui_intoSolidBrush(CGUI_Color color) {
+    return CreateSolidBrush(color.rgb);
+}
+
 CGUI_Color cgui_transparentColor() {
     CGUI_Color color = {
         .rgb = 0,
+        ._inner = {
+                .r = 0,
+                .g = 0,
+                .b = 0,
+        },
         .transparent = true
     };
     return color;
@@ -70,17 +84,81 @@ HFONT cgui_createFont(CGUI_GDITextContext* fontCtx) {
     return CreateFontIndirect(&lf);
 }
 
-UINT cgui_textAlignIntoGdi(CGUI_TextAlignment alignment) {
+CGUI_Win32TAParam cgui_textAlignIntoGdi(CGUI_TextAlignmentHorizontal alignment) {
     switch (alignment) {
-        case CGUI_TextAlignment_Center:
+        case CGUI_TextAlignmentH_Center:
             return TA_CENTER;
-        case CGUI_TextAlignment_Left:
+        case CGUI_TextAlignmentH_Left:
             return TA_LEFT;
-        case CGUI_TextAlignment_Right:
+        case CGUI_TextAlignmentH_Right:
             return TA_RIGHT;
         default:
             return 0;
     }
+}
+
+CGUI_Win32DTParam cgui_textAlignIntoDrawText(CGUI_GDITextContext* fontCtx) {
+    CGUI_Win32DTParam aggregated = 0;
+
+    switch (fontCtx->alignVertical) {
+        case CGUI_TextAlignmentV_Bottom:
+            aggregated |= DT_BOTTOM;
+            break;
+        case CGUI_TextAlignmentV_Center:
+            aggregated |= DT_VCENTER;
+            break;
+        case CGUI_TextAlignmentV_Top:
+            aggregated |= DT_TOP;
+            break;
+        default:
+            panic("Invalid text v-alignment");
+            break;
+    }
+
+    switch (fontCtx->alignHorizontal) {
+        case CGUI_TextAlignmentH_Center:
+            aggregated |= DT_VCENTER;
+            break;
+        case CGUI_TextAlignmentH_Left:
+            aggregated |= DT_LEFT;
+            break;
+        case CGUI_TextAlignmentH_Right:
+            aggregated |= DT_RIGHT;
+            break;
+        default:
+            panic("Invalid text h-alignment");
+            break;
+    }
+
+    if (fontCtx->multiLine) {
+        aggregated |= DT_WORDBREAK;
+        dbg_printf("Multi-line text\n");
+    } else {
+        aggregated |= DT_SINGLELINE;
+    }
+
+    return aggregated;
+}
+
+CGUI_Win32SSParam cgui_textAlignIntoStaticStyle(CGUI_GDITextContext* fontCtx) {
+    CGUI_Win32SSParam aggregated = 0;
+
+    switch (fontCtx->alignHorizontal) {
+        case CGUI_TextAlignmentH_Center:
+            aggregated |= SS_CENTER;
+            break;
+        case CGUI_TextAlignmentH_Left:
+            aggregated |= SS_LEFT;
+            break;
+        case CGUI_TextAlignmentH_Right:
+            aggregated |= SS_RIGHT;
+            break;
+        default:
+            panic("Invalid text h-alignment");
+            break;
+    }
+
+    return aggregated;
 }
 
 void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry) {
@@ -101,12 +179,14 @@ void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Re
 
 CGUI_GDITextContext* cgui_createGdiTextContext() {
     CGUI_GDITextContext* context = (CGUI_GDITextContext*) malloc(sizeof(CGUI_GDITextContext));
-    context->alignment = CGUI_TextAlignment_Left;
+    context->alignHorizontal = CGUI_TextAlignmentH_Left;
+    context->alignVertical = CGUI_TextAlignmentV_Top;
     context->fontStyle.backgroundColor = cgui_transparentColor();
     context->fontStyle.fontName = (char*) malloc(64);
     strcpy(context->fontStyle.fontName, "Arial");
-    context->fontStyle.fontSize = 12;
+    context->fontStyle.fontSize = 16;
     context->fontStyle.foregroundColor = cgui_rgbaToColor(0, 0, 0);
+    context->fontStyle.realBackgroundColor = cgui_transparentColor();
     context->multiLine = false;
     context->orientation = CGUI_TextOrientation_Horizontal;
     context->textStyle.bold = false;
@@ -119,12 +199,14 @@ CGUI_GDITextContext* cgui_createGdiTextContext() {
 CGUI_GDITextContext* cgui_createGdiTextContextFromInstance(CGUI_GDITextContext instance) {
     CGUI_GDITextContext* context = (CGUI_GDITextContext*) malloc(sizeof(CGUI_GDITextContext));
 
-    context->alignment = instance.alignment;
+    context->alignHorizontal = instance.alignHorizontal;
+    context->alignVertical = instance.alignVertical;
     context->fontStyle.backgroundColor = instance.fontStyle.backgroundColor;
     context->fontStyle.fontName = (char*) malloc(64);
     strcpy(context->fontStyle.fontName, instance.fontStyle.fontName);
     context->fontStyle.fontSize = instance.fontStyle.fontSize;
     context->fontStyle.foregroundColor = instance.fontStyle.foregroundColor;
+    context->fontStyle.realBackgroundColor = instance.fontStyle.realBackgroundColor;
     context->multiLine = instance.multiLine;
     context->orientation = instance.orientation;
     context->textStyle.bold = instance.textStyle.bold;
