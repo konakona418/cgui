@@ -29,6 +29,35 @@ typedef struct ComponentQuery {
     void* component;
 } CGUI_ComponentQuery;
 
+typedef union ListViewItemSelector_ {
+    int idx;
+    LPCSTR name;
+} CGUI_ListViewItemSelector_;
+
+typedef enum ListViewItemSelectorType {
+    CGUI_ListViewItemSelectorType_Index,
+    CGUI_ListViewItemSelectorType_Name
+} CGUI_ListViewItemSelectorType;
+
+typedef struct ListViewItemSelector {
+    CGUI_ListViewItemSelectorType selectorType;
+    CGUI_ListViewItemSelector_ inner;
+} CGUI_ListViewItemSelector;
+
+typedef struct ListViewItem {
+    LPSTR text;
+    int idx;
+} CGUI_ListViewItem;
+
+void cgui_destroyListViewItem(CGUI_ListViewItem* item);
+
+typedef struct ListViewItems {
+    CGUI_ListViewItem* items;
+    int count;
+} CGUI_ListViewItems;
+
+void cgui_destroyListViewItems(CGUI_ListViewItems* items);
+
 #define cgui_getComponentWindowHandle(_Component) ((_Component)->win32Impl->getWindowHandle((_Component)))
 #define cgui_getUpperLevel(_TComponentImpl, _Component) (into((_TComponentImpl), ((CGUI_UIComponent*) (_Component))->disposableImpl->upperLevel))
 #define cgui_getComponentHandler(_THandler, _Component) (into(_THandler, (_Component)->eventHandler->localHandler))

@@ -9,6 +9,7 @@
 
 #include <windows.h>
 #include "../util/common.h"
+#include "../util/misc.h"
 
 typedef struct EventArgs CGUI_EventArgs;
 
@@ -128,5 +129,38 @@ typedef struct GdiReadyEventArgs {
 } CGUI_GdiReadyEventArgs;
 
 CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+typedef struct ListViewItemSelectedEventArgs CGUI_ListViewSelectedEventArgs;
+
+/**
+ * This struct is designed for acquiring listview items.
+ * When the callback of the listview is invoked, it will be provided with a ListViewItemAcquisitionHandle.
+ * This is to prevent potential memory leak caused by the char* string type.
+ * Because the string memory is only allocated when this handle is used.
+ */
+typedef struct ListViewItemAcquisitionHandle CGUI_ListViewItemAcquisitionHandle;
+
+typedef struct ListViewItemAcquisitionHandle {
+    CGUI_ListViewItems (* _inner)(void* pSelf);
+    void* pSelf;
+
+    /**
+     * Acquire the listview items from the listview.
+     * @param self The handle itself.
+     */
+    CGUI_ListViewItems (* acquire)(CGUI_ListViewItemAcquisitionHandle* self);
+} CGUI_ListViewItemAcquisitionHandle;
+
+CGUI_ListViewItemAcquisitionHandle cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf);
+
+CGUI_ListViewItems cgui_listViewItemAcquisitionHandle_acquire(CGUI_ListViewItemAcquisitionHandle* self);
+
+typedef struct ListViewItemSelectedEventArgs {
+    CGUI_EventArgs base;
+
+    CGUI_ListViewItemAcquisitionHandle acquisitionHandle;
+} CGUI_ListViewSelectedEventArgs;
+
+CGUI_ListViewSelectedEventArgs cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle);
 
 #endif //CGUI_ARGS_H

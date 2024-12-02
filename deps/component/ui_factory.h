@@ -51,7 +51,18 @@ typedef struct WindowClassOptions {
     CGUI_Rectangle geometry;
 
     bool allowDoubleClick;
+
+    bool displayScrollBarH;
+    bool displayScrollBarV;
+
+    bool hasCaption;
+    bool hasSystemMenu;
+    bool isThickFrame;
+    bool hasMinimizeButton;
+    bool hasMaximizeButton;
 } CGUI_WindowClassOptions;
+
+CGUI_WindowClassOptions cgui_defaultWindowOptions(const char* className);
 
 CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv);
 
@@ -91,6 +102,9 @@ typedef struct LabelOptions {
     CGUI_Rectangle geometry;
 
     bool hasBorder;
+
+    bool displayScrollBarH;
+    bool displayScrollBarV;
 } CGUI_LabelOptions;
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv);
@@ -113,11 +127,26 @@ typedef struct TextBoxOptions {
 
     bool isReadOnly;
     // this property does not function well.
-    obsolete bool isPassword;
+    unavailable bool isPassword;
 } CGUI_TextBoxOptions;
 
 CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv);
 
-CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv);
+typedef struct ListBoxOptions {
+    CGUI_UIComponent* parent;
+    CGUI_Rectangle geometry;
+
+    unavailable LPCSTR text;
+    bool allowMultipleSelection;
+    unavailable bool allowDragDrop;
+
+    bool hasBorder;
+    bool hasComboBox;
+    bool extendItemToFit;
+    bool displayScrollBarH;
+    bool displayScrollBarV;
+} CGUI_ListViewOptions;
+
+CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv);
 
 #endif //CGUI_UI_FACTORY_H

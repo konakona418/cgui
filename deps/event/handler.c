@@ -12,6 +12,7 @@
 #include "../component/ui_label.h"
 #include "../component/ui_button.h"
 #include "../component/ui_textbox.h"
+#include "../component/ui_list.h"
 
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
     CGUI_UIComponent* component = (CGUI_UIComponent*) args.component;
@@ -56,6 +57,8 @@ int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWN
         return into(CGUI_TextBoxHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
     } else if (handle(handler->handlerFlag, CGUI_LocalHandler_Label)) {
         return into(CGUI_LabelHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+    } else if (handle(handler->handlerFlag, CGUI_LocalHandler_ListView)) {
+        return into(CGUI_ListViewHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
     } else {
         panic("Invalid handler type.");
     }
@@ -525,6 +528,102 @@ long long int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandle
 
     //InvalidateRect(hwnd, NULL, TRUE);
     //UpdateWindow(hwnd);
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+long long int cgui_listViewHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
+    CGUI_UIComponent* component = args.base.component;
+    if (!impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        panic("Fatal! Not a valid NativeLabel component!");
+    }
+    CGUI_UINativeListView* listView = (CGUI_UINativeListView*) component->disposableImpl->upperLevel;
+    if (listView->gdiTextContext == NULL) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    }
+
+    HDC hdc = args.hdc;
+
+    CGUI_GDITextContext* drawCtx = listView->gdiTextContext;
+
+    SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
+
+    if (drawCtx->fontStyle.backgroundColor.transparent) {
+        SetBkMode(hdc, TRANSPARENT);
+    } else {
+        SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
+    }
+    listView->_gdiRefreshFlag = false;
+
+    if (drawCtx->fontStyle.realBackgroundColor.transparent) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    } else {
+        return (LPARAM) CreateSolidBrush(drawCtx->fontStyle.realBackgroundColor.rgb);
+    }
+}
+
+CGUI_ListViewHandler* cgui_createListViewHandler() {
+    CGUI_ListViewHandler* handler = (CGUI_ListViewHandler*) malloc(sizeof(CGUI_ListViewHandler));
+
+    handler->onItemSelected = NULL;
+    handler->onItemDoubleClicked = NULL;
+    handler->onMouseDown = NULL;
+    handler->onMouseUp = NULL;
+    handler->onMouseWheel = NULL;
+    handler->onDefocus = NULL;
+    handler->onFocus = NULL;
+
+    handler->onGdiReady = cgui_listViewHandler_defaultOnGdiReady;
+
+    handler->handleEventLocal = cgui_listViewHandler_handleEventLocal;
+    return handler;
+}
+
+void cgui_destroyListViewHandler(void* handler) {
+    free((CGUI_ListViewHandler*) handler);
+}
+
+long long int cgui_listViewHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
+                                                    WPARAM wParam, LPARAM lParam) {
+    CGUI_ListViewHandler* self = (CGUI_ListViewHandler*) pSelf;
+
+    if (eq_wm(msg)) {
+        CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
+        if (self->onGdiReady) {
+            return self->onGdiReady(args);
+        }
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    }
+
+    int code = HIWORD(wParam);
+    switch (code) {
+        case LBN_SELCHANGE:
+            if (self->onItemSelected) {
+                CGUI_EventArgs base = cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam);
+                CGUI_UINativeListView* listView = (CGUI_UINativeListView*) ((CGUI_UIComponent*) (base.component))->disposableImpl->upperLevel;
+
+                CGUI_ListViewItemAcquisitionHandle handle = cgui_createListViewItemAcquisitionHandle(
+                        (CGUI_ListViewItems (*)(void*)) listView->getSelectedItem, listView);
+                self->onItemSelected(cgui_createListViewSelectedEventArgs(base, handle));
+            }
+            break;
+        case LBN_DBLCLK:
+            if (self->onItemDoubleClicked) {
+                self->onItemDoubleClicked(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        case LBN_SETFOCUS:
+            if (self->onFocus) {
+                self->onFocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        case LBN_KILLFOCUS:
+            if (self->onDefocus) {
+                self->onDefocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
+            }
+            break;
+        default:
+            break;
+    }
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 

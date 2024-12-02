@@ -10,10 +10,12 @@
 #include "deps/component/ui_button.h"
 #include "deps/component/ui_label.h"
 #include "deps/component/ui_textbox.h"
+#include "deps/component/ui_list.h"
 
 CGUI_UINativeWindow* wnd;
 CGUI_UINativeLabel* label;
 CGUI_UINativeLabel* label2;
+CGUI_UINativeListView* listView;
 
 int cnt = 0;
 
@@ -41,6 +43,12 @@ void btnOnClick(CGUI_MouseEventArgs args) {
         btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
         btn->setText(btn, "Unchecked!");
         label->setText(label, "Unchecked!");
+
+        CGUI_ListViewItems items = listView->getSelectedItem(listView);
+        for (int i = 0; i < items.count; i++) {
+            CGUI_ListViewItem item = items.items[i];
+            printf("Selected Item %d: %s\n", i, item.text);
+        }
     }
     label2->setText(label2, cgui_digitToString(cnt++));
 }
@@ -54,26 +62,21 @@ void onTextChanged(CGUI_TextBoxEventArgs args) {
     free(buf);
 }
 
+void onItemSelected(CGUI_ListViewSelectedEventArgs args) {
+    CGUI_ListViewItems items = args.acquisitionHandle.acquire(&args.acquisitionHandle);
+    for (int i = 0; i < items.count; i++) {
+        CGUI_ListViewItem item = items.items[i];
+        printf("Called onItemSelected! Item %d: %s\n", i, item.text);
+    }
+}
+
 int main(void) {
     CGUI_RuntimeContext* ctx = cgui_defaultRuntimeContext();
     CGUI_Application* app = app_ctor(ctx);
 
     CGUI_UIFactoryCluster* uiFactory = cgui_createUIFactoryCluster();
 
-    CGUI_WindowClassOptions options = {
-            .className = "CGUI_Window",
-            .cursor = cgui_defaultCursor(),
-            .geometry = {
-                    .x = 100,
-                    .y = 100,
-                    .width = 640,
-                    .height = 480
-            },
-            .icon = cgui_defaultIcon(),
-            .menuName = "test",
-            .title = "CGUI Window",
-            .allowDoubleClick = false
-    };
+    CGUI_WindowClassOptions options = cgui_defaultWindowOptions("CGUI_WINDOW");
     wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, into_box(&options)));
     wnd->show(wnd);
 
@@ -105,7 +108,7 @@ int main(void) {
             },
             .parent = wnd->component,
             .text = "Click me!",
-            .buttonType = CGUI_ButtonType_Default,
+            .buttonType = CGUI_ButtonType_CheckBox,
             .defaultState = true,
             .hasBorder = true,
     };
@@ -147,6 +150,8 @@ int main(void) {
             .hasBorder = true,
             .parent = wnd->component,
             .text = "Label2",
+            .displayScrollBarH = false,
+            .displayScrollBarV = true,
     };
 
     label2 = unwrap(uiFactory->createComponent(uiFactory, "Label", 1, into_box(&labelOptions2)));
@@ -181,6 +186,44 @@ int main(void) {
     // into(CGUI_TextBoxHandler, textBox->component->eventHandler->localHandler)->onTextChanged = onTextChanged;
 
     //wnd->ready(wnd);
+
+    CGUI_ListViewOptions listViewOptions = {
+            .geometry = {
+                    .x = 10,
+                    .y = 250,
+                    .width = 300,
+                    .height = 150
+            },
+            .parent = wnd->component,
+            .allowMultipleSelection = false,
+            .displayScrollBarV = true,
+            .displayScrollBarH = false,
+            .extendItemToFit = true,
+            .hasBorder = true,
+            .hasComboBox = false,
+    };
+    listView = unwrap(uiFactory->createComponent(uiFactory, "ListView", 1, into_box(&listViewOptions)));
+    listView->setVisible(listView, true);
+    listView->setTextDisplay(listView, ctxTextDisp);
+
+    into(CGUI_ListViewHandler, listView->component->eventHandler->localHandler)->onItemSelected = onItemSelected;
+
+    listView->appendItem(listView, "Item 1");
+    listView->appendItem(listView, "Item 2");
+    listView->insertItem(listView, "Item 3", (CGUI_ListViewItemSelector) {
+            .selectorType = CGUI_ListViewItemSelectorType_Index,
+            .inner.idx = 1
+    });
+    listView->insertItem(listView, "Item 4", (CGUI_ListViewItemSelector) {
+            .selectorType = CGUI_ListViewItemSelectorType_Name,
+            .inner.name = "Item 1"
+    });
+
+    CGUI_ListViewItemSelector itemSelector = {
+            .selectorType = CGUI_ListViewItemSelectorType_Name,
+            .inner.name = "Item 1"
+    };
+    listView->removeItem(listView, itemSelector);
 
     cgui_destroyUIFactoryCluster(uiFactory);
 

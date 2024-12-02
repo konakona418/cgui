@@ -76,7 +76,7 @@ CGUI_TextBoxAcquisitionHandle cgui_createTextBoxAcquisitionHandle(HWND hwnd, UIN
     };
 }
 
-void cgui_textBoxAcquisitionHandle_acquire(CGUI_TextBoxAcquisitionHandle* self, char** buffer) {
+abstraction_leak void cgui_textBoxAcquisitionHandle_acquire(CGUI_TextBoxAcquisitionHandle* self, char** buffer) {
     *buffer = (char*) malloc(sizeof(char) * (self->textLength + 1));
     GetWindowText(self->hwnd, *buffer, (int) self->textLength + 1);
 }
@@ -96,5 +96,24 @@ CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, 
         .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
         .hdc = (HDC) wParam,
         .hwnd = (HWND) lParam,
+    };
+}
+
+CGUI_ListViewItemAcquisitionHandle cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf) {
+    return (CGUI_ListViewItemAcquisitionHandle) {
+        .pSelf = pSelf,
+        ._inner = _inner,
+        .acquire = cgui_listViewItemAcquisitionHandle_acquire,
+    };
+}
+
+CGUI_ListViewItems cgui_listViewItemAcquisitionHandle_acquire(CGUI_ListViewItemAcquisitionHandle* self) {
+    return self->_inner(self->pSelf);
+}
+
+CGUI_ListViewSelectedEventArgs cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle) {
+    return (CGUI_ListViewSelectedEventArgs) {
+        .base = base,
+        .acquisitionHandle = handle,
     };
 }

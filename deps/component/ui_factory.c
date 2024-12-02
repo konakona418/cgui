@@ -9,6 +9,7 @@
 #include "ui_button.h"
 #include "ui_label.h"
 #include "ui_textbox.h"
+#include "ui_list.h"
 
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
 
@@ -69,8 +70,34 @@ void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster) {
     cluster->registerFactory(cluster, "window", cgui_uiFactory_createWindow);
     cluster->registerFactory(cluster, "button", cgui_uiFactory_createButton);
     cluster->registerFactory(cluster, "label", cgui_uiFactory_createLabel);
-    cluster->registerFactory(cluster, "listbox", cgui_uiFactory_createListBox);
+    cluster->registerFactory(cluster, "listview", cgui_uiFactory_createListView);
     cluster->registerFactory(cluster, "textbox", cgui_uiFactory_createTextBox);
+}
+
+CGUI_WindowClassOptions cgui_defaultWindowOptions(const char* className) {
+    CGUI_WindowClassOptions options = {
+            .className = className,
+            .cursor = cgui_defaultCursor(),
+            .geometry = {
+                    .x = 100,
+                    .y = 100,
+                    .width = 640,
+                    .height = 480
+            },
+            .icon = cgui_defaultIcon(),
+            .menuName = "Window",
+            .title = "Window",
+            .allowDoubleClick = false,
+            .displayScrollBarH = false,
+            .displayScrollBarV = false,
+            .hasCaption = true,
+            .hasSystemMenu = true,
+            .isThickFrame = true,
+            .hasMinimizeButton = true,
+            .hasMaximizeButton = true,
+            .parent = NULL,
+    };
+    return options;
 }
 
 CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
@@ -122,7 +149,20 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
     wndFactory->setWindowName(wndFactory, options->title);
     // todo: further updates should allow the user to specify the style.
     wndFactory->setWindowExStyle(wndFactory, WS_EX_COMPOSITED); // use double buffering.
-    wndFactory->setWindowStyle(wndFactory, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN);
+
+    CGUI_Win32WSParam aggregatedStyle = 0;
+    aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
+    aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
+
+    aggregatedStyle |= options->hasCaption ? WS_CAPTION : 0;
+    aggregatedStyle |= options->hasSystemMenu ? WS_SYSMENU : 0;
+    aggregatedStyle |= options->isThickFrame ? WS_THICKFRAME : 0;
+    aggregatedStyle |= options->hasMinimizeButton ? WS_MINIMIZEBOX : 0;
+    aggregatedStyle |= options->hasMaximizeButton ? WS_MAXIMIZEBOX : 0;
+
+    aggregatedStyle |= WS_CLIPCHILDREN;
+    wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
+
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
     wndFactory->setWindowMenu(wndFactory, NULL); // no menu for now.
     if (options->parent) {
@@ -261,6 +301,8 @@ CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
 
     CGUI_Win32WSParam aggregatedStyle = 0;
     aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
+    aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
+    aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
     aggregatedStyle |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS;
 
     wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
@@ -372,6 +414,72 @@ CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
     return create_ok(textBoxComp);
 }
 
-CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv) {
-    return create_err(CGUI_Error_NotImplemented());
+CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
+    if (argc < 1) {
+        return create_err(CGUI_Error_InvalidArgument());
+    }
+    CGUI_ListViewOptions* options = unbox_as(CGUI_ListViewOptions, &argv[0]);
+
+    CGUI_Application* app = cgui_applicationInstance();
+
+    CGUI_ComponentManager* compManager = app->core->compManager;
+    CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
+
+    CGUI_WindowFactory* wndFactory = app->core->wndFactory;
+
+    wndFactory->setWindowClassName(wndFactory, "LISTBOX");
+
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+
+    // wndFactory->setWindowName(wndFactory, options->text);
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+
+    CGUI_Win32WSParam aggregatedStyle = 0;
+    aggregatedStyle |= options->allowMultipleSelection ? LBS_MULTIPLESEL : 0;
+    aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
+    aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
+    aggregatedStyle |= options->extendItemToFit ? LBS_EXTENDEDSEL : 0;
+    aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
+    aggregatedStyle |= options->hasComboBox ? LBS_COMBOBOX : 0;
+    aggregatedStyle |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | LBS_NOTIFY;
+
+    wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
+    wndFactory->setWindowInstance(wndFactory, app->ctx->hInstance);
+    wndFactory->setWindowMenu(wndFactory, (HMENU) nextId);
+
+    HWND hParent;
+    if (options->parent) {
+        CGUI_UIComponent* parent = options->parent;
+        hParent = cgui_getComponentWindowHandle(parent);
+    } else {
+        hParent = NULL;
+    }
+
+    wndFactory->setWindowParent(wndFactory, hParent);
+
+    CGUI_Window* wnd = unwrap(wndFactory->createWindow(wndFactory));
+
+    CGUI_UINativeListView* listViewComp = cgui_createUINativeListViewFromWindow(wnd, options->parent, nextId);
+
+    if (options->allowMultipleSelection) {
+        listViewComp->allowMultipleSelection = true;
+    }
+
+    compManager->addComponent(compManager, listViewComp->component);
+
+    CGUI_ListViewHandler* localHandler = cgui_createListViewHandler();
+    CGUI_LocalHandlerContext localHandlerCtx = {
+            .destructor = cgui_destroyListViewHandler,
+            .handlerFlag = CGUI_LocalHandler_ListView,
+            .localHandler = localHandler
+    };
+    CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, listViewComp->component);
+    listViewComp->setEventHandler(listViewComp, eventHandler);
+
+    if (IsWindow(cgui_getComponentWindowHandle(options->parent))) {
+        UpdateWindow(cgui_getComponentWindowHandle(options->parent));
+        InvalidateRect(cgui_getComponentWindowHandle(options->parent), NULL, TRUE);
+    }
+
+    return create_ok(listViewComp);
 }

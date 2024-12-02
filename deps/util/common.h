@@ -81,8 +81,24 @@ _primitive_ptr;                                        \
 /* This macro is intended for indicating that the return value of a function should be used. */
 #define nodiscard __attribute__((warn_unused_result))
 
+/* This macro is intended for indicating that a function/property is obsolete. */
 #define obsolete __attribute__((deprecated("This function/property is obsolete.")))
+
+/**
+ * This macro is intended for indicating that a function/property is obsolete.
+ * @param _msg The message to be displayed.
+ */
 #define obsolete_for(_msg) __attribute__((deprecated("This function/property is obsolete: " _msg)))
+
+/**
+ * This macro is intended for indicating that a function/property is unavailable or under development.
+ */
+#define unavailable __attribute__((deprecated("This function/property is unavailable.")))
+
+/**
+ * This macro is intended for indicating that a function/property should be fixed due to usage of lower level abstraction..
+ */
+#define abstraction_leak __attribute__((deprecated("This function/property should be fixed due to abstraction leak.")))
 
 int random(int min, int max);
 
