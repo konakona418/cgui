@@ -105,7 +105,7 @@ CGUI_Win32DTParam cgui_textAlignIntoDrawText(CGUI_GDITextContext* fontCtx) {
             aggregated |= DT_BOTTOM;
             break;
         case CGUI_TextAlignmentV_Center:
-            aggregated |= DT_VCENTER;
+            aggregated |= DT_CENTER;
             break;
         case CGUI_TextAlignmentV_Top:
             aggregated |= DT_TOP;
@@ -240,4 +240,17 @@ CGUI_GDITextContext* cgui_createGdiTextContextFromInstance(CGUI_GDITextContext i
 void cgui_destroyGdiTextContext(CGUI_GDITextContext* context) {
     // free(context->fontStyle.fontName);
     free(context);
+}
+
+void cgui_drawRect(HDC hdc, RECT rect, CGUI_GDIDrawRectContext context) {
+    if (context.fill) {
+        HBRUSH brush = cgui_intoSolidBrush(context.backgroundColor);
+        FillRect(hdc, &rect, brush);
+        DeleteObject(brush);
+    } else {
+        HPEN pen = CreatePen(PS_SOLID, context.borderWidth, context.borderColor.rgb);
+        SelectObject(hdc, pen);
+        Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+        DeleteObject(pen);
+    }
 }

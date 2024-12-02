@@ -96,4 +96,14 @@ void cgui_destroyGdiTextContext(CGUI_GDITextContext* context);
 
 void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry);
 
+typedef struct GDIDrawRectContext {
+    CGUI_Color borderColor;
+    CGUI_Color backgroundColor;
+
+    int borderWidth;
+    bool fill;
+} CGUI_GDIDrawRectContext;
+
+void cgui_drawRect(HDC hdc, RECT rect, CGUI_GDIDrawRectContext context);
+
 #endif //CGUI_GDI_H

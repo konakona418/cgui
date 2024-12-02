@@ -105,8 +105,9 @@ int main(void) {
             },
             .parent = wnd->component,
             .text = "Click me!",
-            .buttonType = CGUI_ButtonType_CheckBox,
+            .buttonType = CGUI_ButtonType_Default,
             .defaultState = true,
+            .hasBorder = true,
     };
     CGUI_UINativeButton* button = unwrap(uiFactory->createComponent(uiFactory, "Button", 1, into_box(&buttonOptions)));
     //wnd->addChild(wnd, button->component);
