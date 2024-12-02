@@ -24,6 +24,9 @@ typedef struct Application {
     void (* stop)(void);
 } CGUI_Application;
 
+#define app_ctor(_ctx) cgui_createApplication(_ctx)
+#define app_dtor() cgui_destroyApplication()
+
 CGUI_Application* cgui_createApplication(CGUI_RuntimeContext* ctx);
 void cgui_destroyApplication();
 

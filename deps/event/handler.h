@@ -117,6 +117,8 @@ typedef struct TextBoxHandler {
     void (*onFocus)         (CGUI_EventArgs args);
     void (*onDefocus)       (CGUI_EventArgs args);
 
+    long long int (*onGdiReady)     (CGUI_GdiReadyEventArgs args);
+
     LocalEventHandler    handleEventLocal;
 } CGUI_TextBoxHandler;
 

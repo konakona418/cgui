@@ -68,16 +68,27 @@ CGUI_KeyEventArgs cgui_createKeyEventArgs(void* component, HWND hwnd, UINT msg, 
     };
 }
 
+CGUI_TextBoxAcquisitionHandle cgui_createTextBoxAcquisitionHandle(HWND hwnd, UINT len) {
+    return (CGUI_TextBoxAcquisitionHandle) {
+        .hwnd = hwnd,
+        .textLength = len,
+        .acquire = cgui_textBoxAcquisitionHandle_acquire,
+    };
+}
+
+void cgui_textBoxAcquisitionHandle_acquire(CGUI_TextBoxAcquisitionHandle* self, char** buffer) {
+    *buffer = (char*) malloc(sizeof(char) * (self->textLength + 1));
+    GetWindowText(self->hwnd, *buffer, (int) self->textLength + 1);
+}
+
 CGUI_TextBoxEventArgs cgui_createTextBoxEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     int len = GetWindowTextLength(hwnd);
-    char buffer[len];
-    GetWindowText(hwnd, buffer, len);
-
-    return (CGUI_TextBoxEventArgs) {
-        .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
-        .text = buffer,
-        .textLength = len,
+    CGUI_TextBoxEventArgs eventArgs = {
+            .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
+            .acquisitionHandle = cgui_createTextBoxAcquisitionHandle(hwnd, len),
+            .textLength = len,
     };
+    return eventArgs;
 }
 
 CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {

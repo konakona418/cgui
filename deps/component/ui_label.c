@@ -125,6 +125,8 @@ void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextCon
     CGUI_Win32SSParam ssParam = cgui_textAlignIntoStaticStyle(gdiTextContext);
     self->window->setWindowStyle(self->window, self->window->getWindowStyle(self->window) | ssParam);
 
+    // todo: note that the default implementation of label will ignore the V-align property.
+
     HFONT hFont = cgui_createFont(gdiTextContext);
     self->postMessage(self, false, WM_SETFONT, (WPARAM) hFont, 0);
     self->update(self); // this will signal repaint.

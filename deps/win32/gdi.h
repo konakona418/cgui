@@ -10,12 +10,9 @@
 #include <windows.h>
 
 #include "../util/common.h"
+#include "../util/misc.h"
 #include "../geo/layout.h"
 #include "../geo/rect.h"
-
-typedef LONG CGUI_Win32DTParam;
-typedef LONG CGUI_Win32TAParam;
-typedef LONG CGUI_Win32SSParam;
 
 typedef enum TextAlignmentHorizontal {
     CGUI_TextAlignmentH_Left,
@@ -88,6 +85,8 @@ CGUI_Win32TAParam cgui_textAlignIntoGdi(CGUI_TextAlignmentHorizontal alignment);
 CGUI_Win32DTParam cgui_textAlignIntoDrawText(CGUI_GDITextContext* fontCtx);
 
 CGUI_Win32SSParam cgui_textAlignIntoStaticStyle(CGUI_GDITextContext* fontCtx);
+
+CGUI_Win32ESParam cgui_textAlignIntoEditStyle(CGUI_GDITextContext* fontCtx);
 
 CGUI_GDITextContext* cgui_createGdiTextContext();
 

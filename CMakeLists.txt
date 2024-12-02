@@ -57,4 +57,6 @@ add_executable(cgui main.c
         deps/component/ui_button.h
         deps/component/ui_list.c
         deps/component/ui_list.h
+        deps/threading/lock.c
+        deps/threading/lock.h
 )

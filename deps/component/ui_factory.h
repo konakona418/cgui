@@ -89,6 +89,24 @@ typedef struct LabelOptions {
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv);
 
+typedef struct TextBoxOptions {
+    CGUI_UIComponent* parent;
+
+    LPCSTR text;
+    CGUI_Rectangle geometry;
+
+    bool allowMultiline;
+
+    bool allowAutoScrollH;
+    bool allowAutoScrollV;
+
+    bool displayScrollBarH;
+    bool displayScrollBarV;
+
+    bool isReadOnly;
+    bool isPassword;
+} CGUI_TextBoxOptions;
+
 CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv);
 
 CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv);

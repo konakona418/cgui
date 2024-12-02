@@ -82,12 +82,37 @@ typedef struct KeyEventArgs {
 
 CGUI_KeyEventArgs cgui_createKeyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+typedef nodiscard struct TextBoxAcquisitionHandle CGUI_TextBoxAcquisitionHandle;
 typedef struct TextBoxEventArgs CGUI_TextBoxEventArgs;
+
+/**
+ * This struct is designed for acquiring text from a textbox.
+ * When the callback of the textbox is invoked, it will be provided with a TextBoxAcquisitionHandle.
+ * This is to prevent potential memory leak caused by the char* string type.
+ * Because the string memory is only allocated when this handle is used.
+ */
+typedef nodiscard struct TextBoxAcquisitionHandle {
+    HWND hwnd;
+    UINT textLength;
+
+    /**
+     * Acquire the text from the textbox.
+     * @param self The handle itself.
+     * @param buffer the designated buffer created by the caller.
+     * @note @b DO @b NOT initialize the buffer forehand.
+     * @note @b DO @b NOT call this method twice.
+     */
+    void (* acquire)(CGUI_TextBoxAcquisitionHandle* self, char** buffer);
+} CGUI_TextBoxAcquisitionHandle;
+
+CGUI_TextBoxAcquisitionHandle cgui_createTextBoxAcquisitionHandle(HWND hwnd, UINT len);
+
+void cgui_textBoxAcquisitionHandle_acquire(CGUI_TextBoxAcquisitionHandle* self, char** buffer);
 
 typedef struct TextBoxEventArgs {
     CGUI_EventArgs base;
 
-    LPCSTR text;
+    CGUI_TextBoxAcquisitionHandle acquisitionHandle;
     UINT textLength;
 } CGUI_TextBoxEventArgs;
 

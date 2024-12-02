@@ -12,6 +12,12 @@
 typedef struct ComponentQuery CGUI_ComponentQuery;
 typedef long long int CGUI_InternalID;
 
+typedef LONG CGUI_Win32DTParam;
+typedef LONG CGUI_Win32TAParam;
+typedef LONG CGUI_Win32SSParam;
+typedef LONG CGUI_Win32ESParam;
+typedef LONG CGUI_Win32WSParam;
+
 int cgui_cStringLen(LPCSTR str);
 
 typedef long long int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);

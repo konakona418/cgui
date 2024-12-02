@@ -8,6 +8,7 @@
 #include "ui_window.h"
 #include "ui_button.h"
 #include "ui_label.h"
+#include "ui_textbox.h"
 
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
 
@@ -294,7 +295,71 @@ CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
 }
 
 CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
-    return create_err(CGUI_Error_NotImplemented());
+    if (argc < 1) {
+        return create_err(CGUI_Error_InvalidArgument());
+    }
+    CGUI_TextBoxOptions* options = unbox_as(CGUI_TextBoxOptions, &argv[0]);
+
+    CGUI_Application* app = cgui_applicationInstance();
+
+    CGUI_ComponentManager* compManager = app->core->compManager;
+    CGUI_InternalID nextId = compManager->getNextInternalId(compManager);
+
+    CGUI_WindowFactory* wndFactory = app->core->wndFactory;
+
+    wndFactory->setWindowClassName(wndFactory, "EDIT");
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+    wndFactory->setWindowName(wndFactory, options->text);
+    wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
+
+    CGUI_Win32WSParam aggregatedStyle = 0;
+    aggregatedStyle |= options->allowMultiline ? ES_MULTILINE : 0;
+    aggregatedStyle |= options->allowAutoScrollH ? ES_AUTOHSCROLL : 0;
+    aggregatedStyle |= options->allowAutoScrollV ? ES_AUTOVSCROLL : 0;
+    aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
+    aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
+    aggregatedStyle |= options->isReadOnly ? ES_READONLY : 0;
+    aggregatedStyle |= options->isPassword ? ES_PASSWORD : 0;
+    aggregatedStyle |= (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER);
+
+    wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
+
+    HWND hParent;
+    if (options->parent) {
+        hParent = cgui_getComponentWindowHandle(options->parent);
+        wndFactory->setWindowParent(wndFactory, hParent);
+    } else {
+        hParent = NULL;
+    }
+
+    wndFactory->setWindowMenu(wndFactory, (HMENU) nextId);
+    wndFactory->setWindowInstance(wndFactory, app->ctx->hInstance);
+
+    CGUI_Window* wnd = unwrap(wndFactory->createWindow(wndFactory));
+
+    CGUI_UINativeTextBox* textBoxComp = cgui_createUINativeTextboxFromWindow(wnd, options->parent, nextId);
+    compManager->addComponent(compManager, textBoxComp->component);
+
+    if (options->parent) {
+        CGUI_UIComponent* parent = options->parent;
+        parent->addChild(parent, textBoxComp->component);
+    }
+
+    CGUI_TextBoxHandler* localHandler = cgui_createTextBoxHandler();
+    CGUI_LocalHandlerContext localHandlerCtx = {
+            .destructor = cgui_destroyTextBoxHandler,
+            .handlerFlag = CGUI_LocalHandler_TextBox,
+            .localHandler = localHandler
+    };
+    CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, textBoxComp->component);
+    textBoxComp->setEventHandler(textBoxComp, eventHandler);
+
+    if (IsWindow(hParent)) {
+        UpdateWindow(hParent);
+        InvalidateRect(hParent, NULL, TRUE);
+    }
+
+    return create_ok(textBoxComp);
 }
 
 CGUI_Result cgui_uiFactory_createListBox(int argc, CGUI_Box* argv) {

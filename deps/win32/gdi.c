@@ -161,6 +161,27 @@ CGUI_Win32SSParam cgui_textAlignIntoStaticStyle(CGUI_GDITextContext* fontCtx) {
     return aggregated;
 }
 
+CGUI_Win32ESParam cgui_textAlignIntoEditStyle(CGUI_GDITextContext* fontCtx) {
+    CGUI_Win32ESParam aggregated = 0;
+
+    switch (fontCtx->alignHorizontal) {
+        case CGUI_TextAlignmentH_Center:
+            aggregated |= ES_CENTER;
+            break;
+        case CGUI_TextAlignmentH_Left:
+            aggregated |= ES_LEFT;
+            break;
+        case CGUI_TextAlignmentH_Right:
+            aggregated |= ES_RIGHT;
+            break;
+        default:
+            panic("Invalid text h-alignment");
+            break;
+    }
+
+    return aggregated;
+}
+
 void cgui_drawText(LPCSTR text, HWND hwnd, CGUI_GDITextContext* context, CGUI_Rectangle geometry) {
     PAINTSTRUCT ps;
     BeginPaint(hwnd, &ps);

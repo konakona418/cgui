@@ -11,6 +11,7 @@
 #include "../component/ui.h"
 #include "../component/ui_label.h"
 #include "../component/ui_button.h"
+#include "../component/ui_textbox.h"
 
 void cgui_eventHandler_defaultOnPaint(CGUI_EventArgs args) {
     CGUI_UIComponent* component = (CGUI_UIComponent*) args.component;
@@ -82,7 +83,7 @@ cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query
                 printf("WM_COMMAND: Child component not a window. Ignoring.\n");
             }
         } else {
-            dbg_printf("WM_COMMAND: child component hwnd eq hwnd, routing.\n");
+            // dbg_printf("WM_COMMAND: child component hwnd eq hwnd, routing.\n");
             return cgui_routeToLocalHandler(self, self->localHandler, query.hwnd, msg, wParam, lParam);
         }
     } else if (eq_wm(msg)) {
@@ -394,7 +395,6 @@ void cgui_destroyButtonHandler(void* handler) {
 long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                         WPARAM wParam, LPARAM lParam) {
     CGUI_ButtonHandler* self = (CGUI_ButtonHandler*) pSelf;
-    CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
 
     if (eq_wm(msg)) {
         CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
@@ -405,6 +405,7 @@ long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* pa
     }
 
     int bnMessage = HIWORD(wParam);
+    CGUI_MouseEventArgs mouseArgs = cgui_createMouseEventArgs(parent->component, hwnd, msg, wParam, lParam);
 
     switch (bnMessage) {
         case BN_CLICKED:
@@ -436,6 +437,37 @@ long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* pa
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
+long long int cgui_textBoxHandler_defaultOnGdiReady(CGUI_GdiReadyEventArgs args) {
+    CGUI_UIComponent* component = args.base.component;
+    if (!impl(component->implFlag, CGUI_Trait_UIDisposable)) {
+        panic("Fatal! Not a valid NativeLabel component!");
+    }
+    CGUI_UINativeTextBox* textBox = (CGUI_UINativeTextBox*) component->disposableImpl->upperLevel;
+
+    if (textBox->gdiTextContext == NULL) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    }
+
+    HDC hdc = args.hdc;
+
+    CGUI_GDITextContext* drawCtx = textBox->gdiTextContext;
+
+    SetTextColor(hdc, drawCtx->fontStyle.foregroundColor.rgb);
+
+    if (drawCtx->fontStyle.backgroundColor.transparent) {
+        SetBkMode(hdc, TRANSPARENT);
+    } else {
+        SetBkColor(hdc, drawCtx->fontStyle.backgroundColor.rgb);
+    }
+    textBox->_gdiRefreshFlag = false;
+
+    if (drawCtx->fontStyle.realBackgroundColor.transparent) {
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    } else {
+        return (LPARAM) CreateSolidBrush(drawCtx->fontStyle.realBackgroundColor.rgb);
+    }
+}
+
 CGUI_TextBoxHandler* cgui_createTextBoxHandler() {
     CGUI_TextBoxHandler* handler = (CGUI_TextBoxHandler*) malloc(sizeof(CGUI_TextBoxHandler));
 
@@ -446,6 +478,8 @@ CGUI_TextBoxHandler* cgui_createTextBoxHandler() {
     handler->onMouseUp = NULL;
     handler->onDefocus = NULL;
     handler->onFocus = NULL;
+
+    handler->onGdiReady = cgui_textBoxHandler_defaultOnGdiReady;
 
     handler->handleEventLocal = cgui_textBoxHandler_handleEventLocal;
     return handler;
@@ -458,6 +492,15 @@ void cgui_destroyTextBoxHandler(void* handler) {
 long long int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
                                                    WPARAM wParam, LPARAM lParam) {
     CGUI_TextBoxHandler* self = (CGUI_TextBoxHandler*) pSelf;
+
+    if (eq_wm(msg)) {
+        CGUI_GdiReadyEventArgs args = cgui_createGdiReadyEventArgs(parent->component, hwnd, msg, wParam, lParam);
+        if (self->onGdiReady) {
+            return self->onGdiReady(args);
+        }
+        return (LPARAM) GetStockObject(NULL_BRUSH);
+    }
+
     int notificationCode = HIWORD(wParam);
     switch (notificationCode) {
         case EN_CHANGE:
@@ -467,6 +510,7 @@ long long int cgui_textBoxHandler_handleEventLocal(void* pSelf, CGUI_EventHandle
             break;
         case EN_SETFOCUS:
             if (self->onFocus) {
+                dbg_printf("onFocus\n");
                 self->onFocus(cgui_createEventArgs(parent->component, hwnd, msg, wParam, lParam));
             }
             break;

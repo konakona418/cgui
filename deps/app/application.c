@@ -64,7 +64,7 @@ void cgui_application_stop() {
     if (app == NULL) return;
     app->dispatcher->stop(app->dispatcher, true);
 
-    cgui_destroyApplication();
+    app_dtor();
 }
 
 CGUI_WindowProc cgui_application_getWindowProc() {

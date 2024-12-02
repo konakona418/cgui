@@ -9,6 +9,7 @@
 #include "deps/component/ui_window.h"
 #include "deps/component/ui_button.h"
 #include "deps/component/ui_label.h"
+#include "deps/component/ui_textbox.h"
 
 CGUI_UINativeWindow* wnd;
 CGUI_UINativeLabel* label;
@@ -43,9 +44,18 @@ void btnOnClick(CGUI_MouseEventArgs args) {
     label2->setText(label2, cgui_digitToString(cnt++));
 }
 
+void onTextChanged(CGUI_TextBoxEventArgs args) {
+    printf("Text length: %d\n", args.textLength);
+    CGUI_TextBoxAcquisitionHandle h = args.acquisitionHandle;
+    char* buf;
+    h.acquire(&h, &buf);
+    assert(strlen(buf) == args.textLength);
+    free(buf);
+}
+
 int main(void) {
     CGUI_RuntimeContext* ctx = cgui_defaultRuntimeContext();
-    CGUI_Application* app = cgui_createApplication(ctx);
+    CGUI_Application* app = app_ctor(ctx);
 
     CGUI_UIFactoryCluster* uiFactory = cgui_createUIFactoryCluster();
 
@@ -140,6 +150,30 @@ int main(void) {
 
     label2->setTextDisplay(label2, ctxTextDisp);
     label2->setVisible(label2, true);
+
+    CGUI_TextBoxOptions textBoxOptions = {
+            .geometry = {
+                    .x = 500,
+                    .y = 200,
+                    .width = 300,
+                    .height = 150
+            },
+            .parent = wnd->component,
+            .text = "TextBox",
+            .allowAutoScrollH = true,
+            .allowAutoScrollV = true,
+            .allowMultiline = true,
+            .displayScrollBarH = false,
+            .displayScrollBarV = true,
+            .isPassword = false,
+            .isReadOnly = false
+    };
+
+    CGUI_UINativeTextBox* textBox = unwrap(uiFactory->createComponent(uiFactory, "TextBox", 1, into_box(&textBoxOptions)));
+
+    textBox->setTextDisplay(textBox, ctxTextDisp);
+    textBox->setVisible(textBox, true);
+    // into(CGUI_TextBoxHandler, textBox->component->eventHandler->localHandler)->onTextChanged = onTextChanged;
 
     //wnd->ready(wnd);
 
