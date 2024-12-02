@@ -177,7 +177,11 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     wndFactory->setWindowClassName(wndFactory, "BUTTON");
     wndFactory->setWindowName(wndFactory, options->text);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
-    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS);
+
+    CGUI_Win32WSParam aggregatedStyle = 0;
+    aggregatedStyle |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS;
+    aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
+    wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
 
     HWND hParent;
     if (options->parent) {
@@ -254,7 +258,12 @@ CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
     wndFactory->setWindowClassName(wndFactory, "STATIC");
     wndFactory->setWindowName(wndFactory, options->text);
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
-    wndFactory->setWindowStyle(wndFactory, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS);
+
+    CGUI_Win32WSParam aggregatedStyle = 0;
+    aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
+    aggregatedStyle |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS;
+
+    wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
 
     HWND hParent;
     if (options->parent) {
@@ -319,8 +328,9 @@ CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
     aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
     aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
     aggregatedStyle |= options->isReadOnly ? ES_READONLY : 0;
-    aggregatedStyle |= options->isPassword ? ES_PASSWORD : 0;
-    aggregatedStyle |= (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_BORDER);
+    // aggregatedStyle |= options->isPassword ? ES_PASSWORD : 0;
+    aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
+    aggregatedStyle |= (WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS);
 
     wndFactory->setWindowStyle(wndFactory, aggregatedStyle);
 

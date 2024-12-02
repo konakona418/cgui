@@ -56,6 +56,7 @@ CGUI_UINativeTextBox* cgui_createUINativeTextboxFromWindow(CGUI_Window* nativeWi
     textbox->getGeometry = cgui_uiNativeTextbox_getGeometry;
     textbox->getLayout = cgui_uiNativeTextbox_getLayout;
     textbox->getGeometry = cgui_uiNativeTextbox_getGeometry;
+    textbox->setGeometry = cgui_uiNativeTextbox_setGeometry;
     textbox->setLayout = cgui_uiNativeTextbox_setLayout;
 
     textbox->isEnabled = cgui_uiNativeTextbox_isEnabled;

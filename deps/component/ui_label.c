@@ -57,6 +57,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->getLayout = cgui_uiNativeLabel_getLayout;
     label->getGeometry = cgui_uiNativeLabel_getGeometry;
     label->setLayout = cgui_uiNativeLabel_setLayout;
+    label->setGeometry = cgui_uiNativeLabel_setGeometry;
     
     label->isEnabled = cgui_uiNativeLabel_isEnabled;
     label->isVisible = cgui_uiNativeLabel_isVisible;

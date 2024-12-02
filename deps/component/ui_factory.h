@@ -30,6 +30,8 @@ CGUI_UIFactoryCluster* cgui_createUIFactoryCluster();
 void cgui_destroyUIFactoryCluster(CGUI_UIFactoryCluster* cluster);
 CGUI_UIFactoryCluster* cgui_getUIFactoryClusterInstance();
 
+#define cgui_uiFactoryCluster() cgui_getUIFactoryClusterInstance()
+
 CGUI_Result cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
 CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster, const char* name);
 CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
@@ -76,6 +78,8 @@ typedef struct ButtonOptions {
     CGUI_Rectangle geometry;
 
     CGUI_ButtonDefaultState defaultState;
+
+    bool hasBorder;
 } CGUI_ButtonOptions;
 
 CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv);
@@ -85,6 +89,8 @@ typedef struct LabelOptions {
 
     LPCSTR text;
     CGUI_Rectangle geometry;
+
+    bool hasBorder;
 } CGUI_LabelOptions;
 
 CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv);
@@ -95,6 +101,8 @@ typedef struct TextBoxOptions {
     LPCSTR text;
     CGUI_Rectangle geometry;
 
+    bool hasBorder;
+
     bool allowMultiline;
 
     bool allowAutoScrollH;
@@ -104,7 +112,8 @@ typedef struct TextBoxOptions {
     bool displayScrollBarV;
 
     bool isReadOnly;
-    bool isPassword;
+    // this property does not function well.
+    obsolete bool isPassword;
 } CGUI_TextBoxOptions;
 
 CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv);

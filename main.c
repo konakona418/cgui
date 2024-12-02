@@ -35,6 +35,7 @@ void btnOnClick(CGUI_MouseEventArgs args) {
     if (state == CGUI_ButtonState_Unchecked) {
         btn->setButtonState(btn, CGUI_ButtonState_Checked);
         btn->setText(btn, "Checked!");
+        label->setGeometry(label, cgui_createRectangle(random(0, 400), random(0, 400), 100, 100));
         label->setText(label, "Checked!");
     } else {
         btn->setButtonState(btn, CGUI_ButtonState_Unchecked);
@@ -125,6 +126,7 @@ int main(void) {
                     .width = 100,
                     .height = 100
             },
+            .hasBorder = true,
             .parent = wnd->component,
             .text = "Label",
     };
@@ -141,6 +143,7 @@ int main(void) {
                     .width = 300,
                     .height = 150
             },
+            .hasBorder = true,
             .parent = wnd->component,
             .text = "Label2",
     };
@@ -153,8 +156,8 @@ int main(void) {
 
     CGUI_TextBoxOptions textBoxOptions = {
             .geometry = {
-                    .x = 500,
-                    .y = 200,
+                    .x = 200,
+                    .y = 10,
                     .width = 300,
                     .height = 150
             },
@@ -166,6 +169,7 @@ int main(void) {
             .displayScrollBarH = false,
             .displayScrollBarV = true,
             .isPassword = false,
+            .hasBorder = true,
             .isReadOnly = false
     };
 
