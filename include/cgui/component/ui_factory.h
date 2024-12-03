@@ -137,12 +137,11 @@ typedef struct ListBoxOptions {
     CGUI_Rectangle geometry;
 
     unavailable LPCSTR text;
-    bool allowMultipleSelection;
+    CGUI_ListViewSelectionMode selectionMode;
     unavailable bool allowDragDrop;
 
     bool hasBorder;
     bool hasComboBox;
-    bool extendItemToFit;
     bool displayScrollBarH;
     bool displayScrollBarV;
 } CGUI_ListViewOptions;

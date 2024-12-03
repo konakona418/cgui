@@ -49,6 +49,12 @@ typedef struct ListViewItem {
     int idx;
 } CGUI_ListViewItem;
 
+typedef enum ListViewSelectionMode {
+    CGUI_ListViewSelectionMode_Single,
+    CGUI_ListViewSelectionMode_Multiple,
+    CGUI_ListViewSelectionMode_ExtendedMultiple,
+} CGUI_ListViewSelectionMode;
+
 void cgui_destroyListViewItem(CGUI_ListViewItem* item);
 
 typedef struct ListViewItems {

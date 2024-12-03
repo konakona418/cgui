@@ -435,13 +435,23 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
     wndFactory->setWindowGeometryRect(wndFactory, &options->geometry);
 
     CGUI_Win32WSParam aggregatedStyle = 0;
-    aggregatedStyle |= options->allowMultipleSelection ? LBS_MULTIPLESEL : 0;
+
+    switch (options->selectionMode) {
+        case CGUI_ListViewSelectionMode_Single:
+            // todo: has some display issues.
+            aggregatedStyle |= 0;
+            break;
+        case CGUI_ListViewSelectionMode_Multiple:
+            aggregatedStyle |= LBS_MULTIPLESEL;
+            break;
+        case CGUI_ListViewSelectionMode_ExtendedMultiple:
+            aggregatedStyle |= LBS_EXTENDEDSEL;
+            break;
+    }
+
     aggregatedStyle |= options->displayScrollBarV ? WS_VSCROLL : 0;
     aggregatedStyle |= options->displayScrollBarH ? WS_HSCROLL : 0;
 
-    // todo: this is just a temporal solution. this will cause the list to be a multi-selectable list
-    // but it will be found when the user used SHIFT/CTRL+click to select multiple items
-    aggregatedStyle |= options->extendItemToFit ? LBS_EXTENDEDSEL : 0;
     aggregatedStyle |= options->hasBorder ? WS_BORDER : 0;
     aggregatedStyle |= options->hasComboBox ? LBS_COMBOBOX : 0;
     aggregatedStyle |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | LBS_NOTIFY;
@@ -464,9 +474,7 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
 
     CGUI_UINativeListView* listViewComp = cgui_createUINativeListViewFromWindow(wnd, options->parent, nextId);
 
-    if (options->allowMultipleSelection) {
-        listViewComp->allowMultipleSelection = true;
-    }
+    listViewComp->selectionMode = options->selectionMode;
 
     compManager->addComponent(compManager, listViewComp->component);
 

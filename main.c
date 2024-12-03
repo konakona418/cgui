@@ -90,7 +90,20 @@ int main(void) {
                     .fontSize = 20,
                     .foregroundColor = cgui_rgbaToColor(255, 0, 0),
                     .backgroundColor = cgui_rgbaToColor(0, 255, 255),
-                    .realBackgroundColor = cgui_rgbaToColor(255, 0, 255),
+                    .realBackgroundColor = cgui_transparentColor(),//cgui_rgbaToColor(255, 0, 255),
+            },
+            .alignHorizontal = CGUI_TextAlignmentH_Center,
+            .alignVertical = CGUI_TextAlignmentV_Center,
+            .orientation = CGUI_TextOrientation_Horizontal,
+    };
+
+    CGUI_GDITextContext gdiTextContext2 = {
+            .fontStyle = {
+                    .fontName = "Segoe UI",
+                    .fontSize = 20,
+                    .foregroundColor = cgui_rgbaToColor(0, 0, 255),
+                    .backgroundColor = cgui_rgbaToColor(255, 255, 0),
+                    .realBackgroundColor = cgui_transparentColor(),//cgui_rgbaToColor(255, 255, 255),
             },
             .alignHorizontal = CGUI_TextAlignmentH_Center,
             .alignVertical = CGUI_TextAlignmentV_Center,
@@ -98,6 +111,7 @@ int main(void) {
     };
 
     CGUI_GDITextContext* ctxTextDisp = cgui_createGdiTextContextFromInstance(gdiTextContext);
+    CGUI_GDITextContext* ctxTextDisp2 = cgui_createGdiTextContextFromInstance(gdiTextContext2);
 
     CGUI_ButtonOptions buttonOptions = {
             .geometry = {
@@ -195,16 +209,15 @@ int main(void) {
                     .height = 150
             },
             .parent = wnd->component,
-            .allowMultipleSelection = false,
+            .selectionMode = CGUI_ListViewSelectionMode_Single,
             .displayScrollBarV = true,
             .displayScrollBarH = false,
-            .extendItemToFit = true,
             .hasBorder = true,
             .hasComboBox = false,
     };
     listView = unwrap(uiFactory->createComponent(uiFactory, "ListView", 1, into_box(&listViewOptions)));
     listView->setVisible(listView, true);
-    listView->setTextDisplay(listView, ctxTextDisp);
+    listView->setTextDisplay(listView, ctxTextDisp2);
 
     into(CGUI_ListViewHandler, listView->component->eventHandler->localHandler)->onItemSelected = onItemSelected;
 

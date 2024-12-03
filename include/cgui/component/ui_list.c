@@ -11,7 +11,7 @@
 CGUI_UINativeListView* cgui_createUINativeListViewFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeListView* listView = (CGUI_UINativeListView*) malloc(sizeof(CGUI_UINativeListView));
 
-    listView->allowMultipleSelection = false;
+    listView->selectionMode = CGUI_ListViewSelectionMode_Single;
 
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
@@ -166,7 +166,7 @@ CGUI_Result cgui_uiNativeListView_removeItem(CGUI_UINativeListView* self, CGUI_L
 }
 
 abstraction_leak CGUI_ListViewItems cgui_uiNativeListView_getSelectedItemLeaked(CGUI_UINativeListView* self) {
-    int count = self->allowMultipleSelection ?
+    int count = self->selectionMode != CGUI_ListViewSelectionMode_Single ?
                 (int) (LPARAM) SendMessage(self->window->hwnd, LB_GETSELCOUNT, 0, 0) :
                 1;
     CGUI_ListViewItems items = {

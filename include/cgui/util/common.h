@@ -96,7 +96,7 @@ _primitive_ptr;                                        \
 #define unavailable __attribute__((deprecated("This function/property is unavailable.")))
 
 /**
- * This macro is intended for indicating that a function/property should be fixed due to usage of lower level abstraction..
+ * This macro is intended for indicating that a function/property should be fixed due to usage of lower level abstraction.
  */
 #define abstraction_leak __attribute__((deprecated("This function/property should be fixed due to abstraction leak.")))
 

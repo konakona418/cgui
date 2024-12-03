@@ -24,7 +24,7 @@ typedef struct UINativeListView {
 
     CGUI_Window* window;
 
-    bool allowMultipleSelection;
+    CGUI_ListViewSelectionMode selectionMode;
 
     CGUI_GDITextContext* gdiTextContext;
     obsolete bool _gdiRefreshFlag;
