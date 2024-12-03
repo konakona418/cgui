@@ -42,6 +42,8 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->setTextDisplay = cgui_uiNativeLabel_setTextDisplay;
     label->getText = cgui_uiNativeLabel_getText;
     label->getTextDisplay = cgui_uiNativeLabel_getTextDisplay;
+
+    label->setImage = cgui_uiNativeLabel_setImage;
     
     label->addChild = cgui_uiNativeLabel_addChild;
     label->removeChild = cgui_uiNativeLabel_removeChild;
@@ -141,6 +143,27 @@ CGUI_GDITextContext cgui_uiNativeLabel_getTextDisplay(CGUI_UINativeLabel* self) 
     // todo: get text display
     unwrap(create_err(CGUI_Error_NotImplemented()));
     return (CGUI_GDITextContext) {0};
+}
+
+void cgui_uiNativeLabel_setImage(CGUI_UINativeLabel* self, CGUI_ImageLike imageLike) {
+    if (imageLike.type == CGUI_ImageLike_Failed) {
+        panic("corrupted image data");
+    }
+    if (imageLike.type == CGUI_ImageLike_Bitmap) {
+        if (!(self->window->getWindowStyle(self->window) & SS_BITMAP)) {
+            //self->window->setWindowStyle(self->window, self->window->getWindowStyle(self->window) | SS_BITMAP);
+            panic("not a image label");
+        }
+        self->postMessage(self, false, STM_SETIMAGE, (WPARAM) IMAGE_BITMAP, (LPARAM) imageLike.bitmap);
+        self->update(self);
+    } else if (imageLike.type == CGUI_ImageLike_Icon) {
+        if (!(self->window->getWindowStyle(self->window) & SS_ICON)) {
+            //self->window->setWindowStyle(self->window, self->window->getWindowStyle(self->window) | SS_ICON);
+            panic("not a image label");
+        }
+        self->postMessage(self, false, STM_SETIMAGE, (WPARAM) IMAGE_ICON, (LPARAM) imageLike.icon);
+        self->update(self);
+    }
 }
 
 void cgui_uiNativeLabel_addChild(CGUI_UINativeLabel* self, CGUI_UIComponent* child) {

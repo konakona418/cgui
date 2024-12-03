@@ -15,6 +15,7 @@
 #include "../win32/gdi.h"
 
 typedef struct UINativeLabel CGUI_UINativeLabel;
+typedef CGUI_UINativeLabel CGUI_UINativeImageLabel;
 
 /**
  * Secondary encapsulation of native win32 label control instance.
@@ -37,6 +38,7 @@ typedef struct UINativeLabel {
     LPCSTR              (* getText)              (CGUI_UINativeLabel* self);
     void                (* setTextDisplay)       (CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext);
     CGUI_GDITextContext (* getTextDisplay)       (CGUI_UINativeLabel* self);
+    void                (* setImage)             (CGUI_UINativeLabel* self, CGUI_ImageLike imageLike);
 
     /* implementation for CGUI_UIComponent */
     void                (* addChild)            (CGUI_UINativeLabel* self, CGUI_UIComponent* child);
@@ -83,6 +85,8 @@ void cgui_uiNativeLabel_setTextDisplay(CGUI_UINativeLabel* self, CGUI_GDITextCon
 LPCSTR cgui_uiNativeLabel_getText(CGUI_UINativeLabel* self);
 
 CGUI_GDITextContext cgui_uiNativeLabel_getTextDisplay(CGUI_UINativeLabel* self);
+
+void cgui_uiNativeLabel_setImage(CGUI_UINativeLabel* self, CGUI_ImageLike imageLike);
 
 /**
  * Create a native label component.

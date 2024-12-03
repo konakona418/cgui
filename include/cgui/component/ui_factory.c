@@ -5,11 +5,6 @@
 //
 
 #include "ui_factory.h"
-#include "ui_window.h"
-#include "ui_button.h"
-#include "ui_label.h"
-#include "ui_textbox.h"
-#include "ui_list.h"
 
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
 
@@ -493,4 +488,9 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
     }
 
     return create_ok(listViewComp);
+}
+
+CGUI_UINativeImageLabel* cgui_wrapImageLabel(CGUI_UINativeLabel* standardLabel) {
+    standardLabel->window->setWindowStyle(standardLabel->window, standardLabel->window->getWindowStyle(standardLabel->window) | SS_BITMAP);
+    return (CGUI_UINativeImageLabel*) standardLabel;
 }

@@ -80,7 +80,7 @@ int main(void) {
     wnd = unwrap(uiFactory->createComponent(uiFactory, "Window", 1, into_box(&options)));
     wnd->show(wnd);
 
-    CGUI_WindowHandler* wndHandler = into(CGUI_WindowHandler, wnd->component->eventHandler->localHandler);
+    CGUI_WindowHandler* wndHandler = cgui_getComponentHandler(CGUI_WindowHandler, wnd);
     wndHandler->onClose = onClose;
     wndHandler->onMouseUp = onClick;
 
@@ -131,7 +131,7 @@ int main(void) {
 
     button->setVisible(button, true);
 
-    CGUI_ButtonHandler* btnHandler = into(CGUI_ButtonHandler, button->component->eventHandler->localHandler);
+    CGUI_ButtonHandler* btnHandler = cgui_getComponentHandler(CGUI_ButtonHandler, button);
     btnHandler->onClick = btnOnClick;
     btnHandler->onDoubleClick = btnOnClick;
 
@@ -219,7 +219,7 @@ int main(void) {
     listView->setVisible(listView, true);
     listView->setTextDisplay(listView, ctxTextDisp2);
 
-    into(CGUI_ListViewHandler, listView->component->eventHandler->localHandler)->onItemSelected = onItemSelected;
+    cgui_getComponentHandler(CGUI_ListViewHandler, listView)->onItemSelected = onItemSelected;
 
     listView->appendItem(listView, "Item 1");
     listView->appendItem(listView, "Item 2");

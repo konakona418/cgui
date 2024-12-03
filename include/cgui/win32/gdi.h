@@ -11,6 +11,7 @@
 
 #include "../util/common.h"
 #include "../util/misc.h"
+#include "../util/error.h"
 #include "../geo/layout.h"
 #include "../geo/rect.h"
 
@@ -105,5 +106,28 @@ typedef struct GDIDrawRectContext {
 } CGUI_GDIDrawRectContext;
 
 void cgui_drawRect(HDC hdc, RECT rect, CGUI_GDIDrawRectContext context);
+
+typedef struct ImageLike CGUI_ImageLike;
+
+typedef enum ImageLikeType CGUI_ImageLikeType;
+
+typedef enum ImageLikeType {
+    CGUI_ImageLike_Bitmap,
+    CGUI_ImageLike_Icon,
+    CGUI_ImageLike_Cursor,
+    CGUI_ImageLike_Failed
+} CGUI_ImageLikeType;
+
+typedef struct ImageLike {
+    CGUI_ImageLikeType type;
+    CGUI_Rectangle imageGeometry;
+    union {
+        HBITMAP bitmap;
+        HICON icon;
+        HCURSOR cursor;
+    };
+} CGUI_ImageLike;
+
+CGUI_ImageLike cgui_loadBitmap(LPCSTR path);
 
 #endif //CGUI_GDI_H

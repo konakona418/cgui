@@ -66,7 +66,7 @@ void cgui_destroyListViewItems(CGUI_ListViewItems* items);
 
 #define cgui_getComponentWindowHandle(_Component) ((_Component)->win32Impl->getWindowHandle((_Component)))
 #define cgui_getUpperLevel(_TComponentImpl, _Component) (into((_TComponentImpl), ((CGUI_UIComponent*) (_Component))->disposableImpl->upperLevel))
-#define cgui_getComponentHandler(_THandler, _Component) (into(_THandler, (_Component)->eventHandler->localHandler))
+#define cgui_getComponentHandler(_THandler, _ComponentImpl) (into(_THandler, (_ComponentImpl)->component->eventHandler->localHandler))
 
 #define cgui_defaultRuntimeContext() (unwrap(cgui_createRuntimeContext(GetModuleHandle(NULL), GetCommandLine(), SW_SHOW)))
 #define cgui_defaultIcon() (LoadIcon(NULL, IDI_APPLICATION))

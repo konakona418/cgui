@@ -254,3 +254,31 @@ void cgui_drawRect(HDC hdc, RECT rect, CGUI_GDIDrawRectContext context) {
         DeleteObject(pen);
     }
 }
+
+CGUI_ImageLike cgui_loadBitmap(LPCSTR path) {
+    HBITMAP hBmp = (HBITMAP) LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    if (!hBmp) {
+        return (CGUI_ImageLike) {
+            .imageGeometry = (CGUI_Rectangle) {
+                .x = 0,
+                .y = 0,
+                .width = 0,
+                .height = 0,
+            },
+            .type = CGUI_ImageLike_Failed,
+        };
+    }
+
+    SIZE size;
+    GetBitmapDimensionEx(hBmp, &size);
+    return (CGUI_ImageLike) {
+        .imageGeometry = (CGUI_Rectangle) {
+            .x = 0,
+            .y = 0,
+            .width = size.cx,
+            .height = size.cy,
+        },
+        .type = CGUI_ImageLike_Bitmap,
+        .bitmap = hBmp,
+    };
+}

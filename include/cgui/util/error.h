@@ -34,4 +34,6 @@
 
 #define CGUI_Error_FactoryNotFound() (CGUI_Error_Prototype(CGUI_FACTORY_NOT_FOUND_CODE, CGUI_FACTORY_NOT_FOUND_MESSAGE))
 
+#define CGUI_Error_BitmapLoadFailed() (CGUI_Error_Prototype(CGUI_BITMAP_LOAD_FAILED_CODE, CGUI_BITMAP_LOAD_FAILED_MESSAGE))
+
 #endif //CGUI_ERROR_H

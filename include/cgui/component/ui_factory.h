@@ -11,6 +11,12 @@
 #include "../geo/rect.h"
 #include "../win32/gdi.h"
 
+#include "ui_window.h"
+#include "ui_button.h"
+#include "ui_label.h"
+#include "ui_textbox.h"
+#include "ui_list.h"
+
 #include "../app/application.h"
 
 typedef struct UIFactoryCluster CGUI_UIFactoryCluster;
@@ -147,5 +153,15 @@ typedef struct ListBoxOptions {
 } CGUI_ListViewOptions;
 
 CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv);
+
+typedef struct ComponentWrapper_ {
+    CGUI_UINativeImageLabel* (* wrapImageLabel)(CGUI_UINativeLabel* standardLabel);
+} CGUI_ComponentWrapper_;
+
+CGUI_UINativeImageLabel* cgui_wrapImageLabel(CGUI_UINativeLabel* standardLabel);
+
+static CGUI_ComponentWrapper_ CGUI_ComponentWrapper = {
+        .wrapImageLabel = cgui_wrapImageLabel,
+};
 
 #endif //CGUI_UI_FACTORY_H
