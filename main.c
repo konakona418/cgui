@@ -1,16 +1,5 @@
 #include <stdio.h>
-#include "include/cgui/util/common.h"
-#include "include/cgui/util/hashmap.h"
-#include "include/cgui/util/vector.h"
-#include "include/cgui/win32/window.h"
-#include "include/cgui/app/core.h"
-#include "include/cgui/app/application.h"
-#include "include/cgui/component/ui_factory.h"
-#include "include/cgui/component/ui_window.h"
-#include "include/cgui/component/ui_button.h"
-#include "include/cgui/component/ui_label.h"
-#include "include/cgui/component/ui_textbox.h"
-#include "include/cgui/component/ui_list.h"
+#include "include/cgui/prelude.h"
 
 CGUI_UINativeWindow* wnd;
 CGUI_UINativeLabel* label;
