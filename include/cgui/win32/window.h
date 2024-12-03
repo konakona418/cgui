@@ -453,4 +453,9 @@ CGUI_Result cgui_windowClassManager_removeWindowClassByName(CGUI_WindowClassMana
 /* Destroys all window classes in the manager. */
 CGUI_Result cgui_windowClassManager_destroyAllWindowClasses(CGUI_WindowClassManager* manager);
 
+/* Util methods */
+void cgui_setWindowAsTopmost(CGUI_Window* window);
+
+void cgui_setWindowAsBottommost(CGUI_Window* window);
+
 #endif //CGUI_WINDOW_H

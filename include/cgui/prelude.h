@@ -1,11 +1,11 @@
 //
 // Created on: 2024/12/3, 11:09.
 // Author: Zimeng LI (zimengli@mail.nwpu.edu.cn)
-// Project: include/cgui
+// Project: cgui
 //
 
-#ifndef INCLUDE_CGUI_PRELUDE_H
-#define INCLUDE_CGUI_PRELUDE_H
+#ifndef CGUI_PRELUDE_H
+#define CGUI_PRELUDE_H
 
 #include "util/common.h"
 #include "util/hashmap.h"
@@ -20,4 +20,4 @@
 #include "component/ui_textbox.h"
 #include "component/ui_list.h"
 
-#endif //INCLUDE_CGUI_PRELUDE_H
+#endif //CGUI_PRELUDE_H

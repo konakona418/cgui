@@ -79,4 +79,7 @@ void cgui_destroyListViewItems(CGUI_ListViewItems* items);
 
 CGUI_ComponentQuery cgui_createComponentQuery(HWND hwnd, int internalId);
 
+#define cgui_setComponentAsTopmost(_ComponentImpl) cgui_setWindowAsTopmost(_ComponentImpl->window)
+#define cgui_setComponentAsBottommost(_ComponentImpl) cgui_setWindowAsBottommost(_ComponentImpl->window)
+
 #endif //CGUI_MISC_H
