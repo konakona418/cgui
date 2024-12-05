@@ -23,7 +23,15 @@ typedef struct UIFactoryCluster CGUI_UIFactoryCluster;
 typedef void* CGUI_AnyComponent;
 typedef CGUI_Result (* CGUI_UIFactory)(int argc, CGUI_Box* argv);
 
+typedef struct UIFactoryClusterConfig {
+    bool forceUpdateParent;
+} CGUI_UIFactoryClusterConfig;
+
+CGUI_UIFactoryClusterConfig cgui_createUIFactoryClusterConfig();
+
 typedef struct UIFactoryCluster {
+    CGUI_UIFactoryClusterConfig config;
+
     HashTable* factories;
 
     CGUI_Result (* registerFactory)(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);

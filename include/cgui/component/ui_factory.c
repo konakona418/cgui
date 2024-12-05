@@ -6,13 +6,23 @@
 
 #include "ui_factory.h"
 
+#define cgui_getClusterConfig() cgui_getUIFactoryClusterInstance()->config
+
 static CGUI_Singleton* cgui_uiFactoryClusterSingleton = NULL;
+
+CGUI_UIFactoryClusterConfig cgui_createUIFactoryClusterConfig() {
+    return (CGUI_UIFactoryClusterConfig) {
+            .forceUpdateParent = false,
+    };
+}
 
 CGUI_UIFactoryCluster* cgui_createUIFactoryCluster() {
     if (unlikely(cgui_uiFactoryClusterSingleton == NULL)) {
         cgui_uiFactoryClusterSingleton = cgui_createSingleton();
 
         CGUI_UIFactoryCluster* cluster = (CGUI_UIFactoryCluster*) malloc(sizeof(CGUI_UIFactoryCluster));
+        cluster->config = cgui_createUIFactoryClusterConfig();
+
         cluster->factories = create_hash_table(DEFAULT_BUCKET_COUNT);
 
         cluster->registerFactory = cgui_factoryCluster_registerFactory;
@@ -269,9 +279,11 @@ CGUI_Result cgui_uiFactory_createButton(int argc, CGUI_Box* argv) {
     }
 
     // todo: low-end function calls.
-    if (IsWindow(hParent)) {
-        UpdateWindow(hParent);
-        InvalidateRect(hParent, NULL, TRUE);
+    if (cgui_getClusterConfig().forceUpdateParent) {
+        if (IsWindow(hParent)) {
+            UpdateWindow(hParent);
+            InvalidateRect(hParent, NULL, TRUE);
+        }
     }
 
     return create_ok(buttonComp);
@@ -332,9 +344,11 @@ CGUI_Result cgui_uiFactory_createLabel(int argc, CGUI_Box* argv) {
     CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, labelComp->component);
     labelComp->setEventHandler(labelComp, eventHandler);
 
-    if (IsWindow(hParent)) {
-        UpdateWindow(hParent);
-        InvalidateRect(hParent, NULL, TRUE);
+    if (cgui_getClusterConfig().forceUpdateParent) {
+        if (IsWindow(hParent)) {
+            UpdateWindow(hParent);
+            InvalidateRect(hParent, NULL, TRUE);
+        }
     }
 
     return create_ok(labelComp);
@@ -402,9 +416,11 @@ CGUI_Result cgui_uiFactory_createTextBox(int argc, CGUI_Box* argv) {
     CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, textBoxComp->component);
     textBoxComp->setEventHandler(textBoxComp, eventHandler);
 
-    if (IsWindow(hParent)) {
-        UpdateWindow(hParent);
-        InvalidateRect(hParent, NULL, TRUE);
+    if (cgui_getClusterConfig().forceUpdateParent) {
+        if (IsWindow(hParent)) {
+            UpdateWindow(hParent);
+            InvalidateRect(hParent, NULL, TRUE);
+        }
     }
 
     return create_ok(textBoxComp);
@@ -482,9 +498,11 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
     CGUI_EventHandler* eventHandler = cgui_createEventHandler(localHandlerCtx, listViewComp->component);
     listViewComp->setEventHandler(listViewComp, eventHandler);
 
-    if (IsWindow(cgui_getComponentWindowHandle(options->parent))) {
-        UpdateWindow(cgui_getComponentWindowHandle(options->parent));
-        InvalidateRect(cgui_getComponentWindowHandle(options->parent), NULL, TRUE);
+    if (cgui_getClusterConfig().forceUpdateParent) {
+        if (IsWindow(hParent)) {
+            UpdateWindow(hParent);
+            InvalidateRect(hParent, NULL, TRUE);
+        }
     }
 
     return create_ok(listViewComp);
