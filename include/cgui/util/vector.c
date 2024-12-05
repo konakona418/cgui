@@ -51,7 +51,8 @@ void vector_clear(Vector* vector) {
 
 void* vector_get(Vector* vector, size_t index) {
     if (index < vector->size) {
-        return unbox(vector->data + index);
+        CGUI_Box* box = (CGUI_Box*) vector->data + index;
+        return unbox(box);
     }
     return NULL;
 }
