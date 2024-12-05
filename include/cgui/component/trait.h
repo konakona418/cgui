@@ -16,7 +16,7 @@ typedef unsigned int CGUI_Trait;
 #define CGUI_Trait_UILayout         0x00000010
 #define CGUI_Trait_UIStyle          0x00000020
 
-#define CGUI_Trait_UIWin32            0x00000100
+#define CGUI_Trait_UIWin32          0x00000100
 
 /**
  * @note This macro can be applied to evaluating whether the given component implements all the required traits.

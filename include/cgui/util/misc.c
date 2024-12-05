@@ -24,3 +24,16 @@ void cgui_destroyListViewItems(CGUI_ListViewItems* items) {
         cgui_destroyListViewItem(&items->items[i]);
     }
 }
+
+LPCSTR cgui_utf16ToAnsi(LPCWCH str) {
+    if (str == NULL) return NULL;
+
+    size_t size = WideCharToMultiByte(CP_UTF8, 0, str, -1, NULL, 0, NULL, NULL) + 1;
+    char* ansiString = (char*) malloc(size);
+    size_t realSize = WideCharToMultiByte(CP_UTF8, 0, str, -1, ansiString, size, NULL, NULL);
+    if (realSize == 0) {
+        free(ansiString);
+        return NULL;
+    }
+    return ansiString;
+}

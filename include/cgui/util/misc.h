@@ -82,4 +82,6 @@ CGUI_ComponentQuery cgui_createComponentQuery(HWND hwnd, int internalId);
 #define cgui_setComponentAsTopmost(_ComponentImpl) cgui_setWindowAsTopmost(_ComponentImpl->window)
 #define cgui_setComponentAsBottommost(_ComponentImpl) cgui_setWindowAsBottommost(_ComponentImpl->window)
 
+LPCSTR cgui_utf16ToAnsi(LPCWSTR str);
+
 #endif //CGUI_MISC_H
