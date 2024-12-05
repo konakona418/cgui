@@ -670,7 +670,7 @@ CGUI_Result cgui_windowClassManager_destroyAllWindowClasses(CGUI_WindowClassMana
 }
 
 void cgui_setWindowAsTopmost(CGUI_Window* window) {
-    SetWindowPos(window->hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    SetWindowPos(window->hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
 
 void cgui_setWindowAsBottommost(CGUI_Window* window) {
