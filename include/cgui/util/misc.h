@@ -20,7 +20,8 @@ typedef LONG CGUI_Win32WSParam;
 
 int cgui_cStringLen(LPCSTR str);
 
-typedef long long int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+typedef long long int (* CGUI_ApplicationMessageCallback)(CGUI_ComponentQuery query, UINT msg, WPARAM wParam,
+                                                          LPARAM lParam);
 
 typedef struct ComponentQuery {
     HWND hwnd;

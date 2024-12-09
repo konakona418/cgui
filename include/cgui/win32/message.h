@@ -27,6 +27,7 @@ typedef struct DispatcherThreadStart {
 } CGUI_DispatcherThreadStart;
 
 CGUI_DispatcherThreadStart* cgui_createDispatcherThreadStart(CGUI_MessageDispatcher* dispatcher);
+
 void cgui_destroyDispatcherThreadStart(CGUI_DispatcherThreadStart* threadStart);
 
 /* Structure of MessageDispatcher */
@@ -75,7 +76,8 @@ typedef struct MessageHandler {
 
     CGUI_ApplicationMessageCallback applicationCallback;
 
-    long long int (* routeToApplication)(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+    long long int (* routeToApplication)(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam,
+                                         LPARAM lParam);
 
     CGUI_WindowProc (* getWindowProc)(CGUI_MessageHandler* handler);
 } CGUI_MessageHandler;
@@ -91,7 +93,8 @@ cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 /* Route the message to the application. */
 long long int
-cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam);
+cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam,
+                                       LPARAM lParam);
 
 CGUI_WindowProc cgui_messageHandler_getWindowProc(CGUI_MessageHandler* handler);
 

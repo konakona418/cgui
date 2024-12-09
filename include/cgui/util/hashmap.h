@@ -35,7 +35,8 @@ typedef struct HashTable {
 
     void* (* find)(HashTable* table, const char* key);
 
-    void* (* find_if)(HashTable* table, void* target, IterPredicateResult (* predicate)(const char* key, void* value, void* target));
+    void* (* find_if)(HashTable* table, void* target,
+                      IterPredicateResult (* predicate)(const char* key, void* value, void* target));
 
     int (* contains)(HashTable* table, const char* key);
 
@@ -67,7 +68,8 @@ int hash_table_insert(HashTable* table, const char* key, void* value);
 void* hash_table_find(HashTable* table, const char* key);
 
 /* Find the value associated with the given key if the predicate is true. */
-void* hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target));
+void*
+hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target));
 
 /* Check whether the hash table contains the given key. */
 int hash_table_contains(HashTable* table, const char* key);

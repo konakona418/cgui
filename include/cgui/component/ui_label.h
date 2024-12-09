@@ -28,43 +28,61 @@ typedef struct UINativeLabel {
     CGUI_GDITextContext* gdiTextContext;
     obsolete bool _gdiRefreshFlag;
 
-    void                (* show)                 (CGUI_UINativeLabel* self);
-    void                (* hide)                 (CGUI_UINativeLabel* self);
-    void                (* update)               (CGUI_UINativeLabel* self);
-    CGUI_Result         (* close)                (CGUI_UINativeLabel* self);
-    CGUI_Result         (* postMessage)          (CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+    void (* show)(CGUI_UINativeLabel* self);
 
-    void                (* setText)              (CGUI_UINativeLabel* self, LPCSTR text);
-    LPCSTR              (* getText)              (CGUI_UINativeLabel* self);
-    void                (* setTextDisplay)       (CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext);
-    CGUI_GDITextContext (* getTextDisplay)       (CGUI_UINativeLabel* self);
-    void                (* setImage)             (CGUI_UINativeLabel* self, CGUI_ImageLike imageLike);
+    void (* hide)(CGUI_UINativeLabel* self);
+
+    void (* update)(CGUI_UINativeLabel* self);
+
+    CGUI_Result (* close)(CGUI_UINativeLabel* self);
+
+    CGUI_Result (* postMessage)(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void (* setText)(CGUI_UINativeLabel* self, LPCSTR text);
+
+    LPCSTR (* getText)(CGUI_UINativeLabel* self);
+
+    void (* setTextDisplay)(CGUI_UINativeLabel* self, CGUI_GDITextContext* gdiTextContext);
+
+    CGUI_GDITextContext (* getTextDisplay)(CGUI_UINativeLabel* self);
+
+    void (* setImage)(CGUI_UINativeLabel* self, CGUI_ImageLike imageLike);
 
     /* implementation for CGUI_UIComponent */
-    void                (* addChild)            (CGUI_UINativeLabel* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UINativeLabel* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UINativeLabel* self, LONG_PTR id);
+    void (* addChild)(CGUI_UINativeLabel* self, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UINativeLabel* self, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UINativeLabel* self);
+    CGUI_UIComponent* (* removeChild)(CGUI_UINativeLabel* self, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UINativeLabel* self, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UINativeLabel* self, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UINativeLabel* self, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UINativeLabel* self);
+
+    void (* setEventHandler)(CGUI_UINativeLabel* self, CGUI_EventHandler* handler);
 
     /* implementation for CGUI_UIDrawable */
-    void (* draw)       (CGUI_UINativeLabel* self);
-    void (* refresh)    (CGUI_UINativeLabel* self);
+    void (* draw)(CGUI_UINativeLabel* self);
+
+    void (* refresh)(CGUI_UINativeLabel* self);
 
     /* implementation for CGUI_UILayout */
-    CGUI_Result       (* setGeometry) (CGUI_UINativeLabel* self, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UINativeLabel* self, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UINativeLabel* self);
-    CGUI_Layout*      (* getLayout)   (CGUI_UINativeLabel* self);
+    CGUI_Result (* setGeometry)(CGUI_UINativeLabel* self, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UINativeLabel* self, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UINativeLabel* self);
+
+    CGUI_Layout* (* getLayout)(CGUI_UINativeLabel* self);
 
     /* implementation for CGUI_UIState */
-    CGUI_Result (* setVisible)  (CGUI_UINativeLabel* self, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UINativeLabel* self, bool enabled);
-    bool        (* isVisible)   (CGUI_UINativeLabel* self);
-    bool        (* isEnabled)   (CGUI_UINativeLabel* self);
+    CGUI_Result (* setVisible)(CGUI_UINativeLabel* self, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UINativeLabel* self, bool enabled);
+
+    bool (* isVisible)(CGUI_UINativeLabel* self);
+
+    bool (* isEnabled)(CGUI_UINativeLabel* self);
 
 } CGUI_UINativeLabel;
 
@@ -76,7 +94,8 @@ void cgui_uiNativeLabel_update(CGUI_UINativeLabel* self);
 
 CGUI_Result cgui_uiNativeLabel_close(CGUI_UINativeLabel* self);
 
-CGUI_Result cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+CGUI_Result
+cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void cgui_uiNativeLabel_setText(CGUI_UINativeLabel* self, LPCSTR text);
 
@@ -101,7 +120,8 @@ CGUI_UINativeLabel* cgui_createUINativeLabel(CGUI_UIComponent* parent, CGUI_Inte
  * @param nativeWindow the REAL implementation of native window.
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
+CGUI_UINativeLabel*
+cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeLabel_bindWindowInstance(CGUI_UINativeLabel* self, CGUI_Window* nativeWindow);
 

@@ -82,7 +82,8 @@ void* hash_table_find(HashTable* table, const char* key) {
     return NULL;
 }
 
-void* hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target)) {
+void*
+hash_table_find_if(HashTable* table, void* target, bool (* predicate)(const char* key, void* value, void* target)) {
     for (size_t i = 0; i < table->bucket_count; i++) {
         HashNode* node = table->buckets[i];
         while (node) {

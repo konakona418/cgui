@@ -26,41 +26,58 @@ typedef struct UINativeWindow {
     CGUI_Result (* bindWindowInstance)(CGUI_UINativeWindow* self, CGUI_Window* nativeWindow);
 
     CGUI_Result (* setState)(CGUI_UINativeWindow* self, int swState);
+
     CGUI_Result (* postMessage)(CGUI_UINativeWindow* self, UINT msg, WPARAM wParam, LPARAM lParam);
+
     CGUI_Result (* hide)(CGUI_UINativeWindow* self);
+
     CGUI_Result (* show)(CGUI_UINativeWindow* self);
+
     CGUI_Result (* update)(CGUI_UINativeWindow* self);
+
     CGUI_Result (* close)(CGUI_UINativeWindow* self);
+
     CGUI_Result (* destroy)(CGUI_UINativeWindow* self);
+
     CGUI_Result (* setWindowName)(CGUI_UINativeWindow* self, LPCSTR wndName);
 
     CGUI_Result (* ready)(CGUI_UINativeWindow* self);
 
     /* implementation for CGUI_UIComponent */
-    void                (* addChild)            (CGUI_UINativeWindow* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UINativeWindow* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UINativeWindow* self, LONG_PTR id);
+    void (* addChild)(CGUI_UINativeWindow* self, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UINativeWindow* self, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UINativeWindow* self);
+    CGUI_UIComponent* (* removeChild)(CGUI_UINativeWindow* self, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UINativeWindow* self, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UINativeWindow* self, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UINativeWindow* self, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UINativeWindow* self);
+
+    void (* setEventHandler)(CGUI_UINativeWindow* self, CGUI_EventHandler* handler);
 
     /* implementation for CGUI_UIDrawable */
-    void (* draw)       (CGUI_UINativeWindow* self);
-    void (* refresh)    (CGUI_UINativeWindow* self);
+    void (* draw)(CGUI_UINativeWindow* self);
+
+    void (* refresh)(CGUI_UINativeWindow* self);
 
     /* implementation for CGUI_UILayout */
-    CGUI_Result       (* setGeometry) (CGUI_UINativeWindow* self, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UINativeWindow* self, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UINativeWindow* self);
-    CGUI_Layout*      (* getLayout)   (CGUI_UINativeWindow* self);
+    CGUI_Result (* setGeometry)(CGUI_UINativeWindow* self, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UINativeWindow* self, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UINativeWindow* self);
+
+    CGUI_Layout* (* getLayout)(CGUI_UINativeWindow* self);
 
     /* implementation for CGUI_UIState */
-    CGUI_Result (* setVisible)  (CGUI_UINativeWindow* self, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UINativeWindow* self, bool enabled);
-    bool        (* isVisible)   (CGUI_UINativeWindow* self);
-    bool        (* isEnabled)   (CGUI_UINativeWindow* self);
+    CGUI_Result (* setVisible)(CGUI_UINativeWindow* self, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UINativeWindow* self, bool enabled);
+
+    bool (* isVisible)(CGUI_UINativeWindow* self);
+
+    bool (* isEnabled)(CGUI_UINativeWindow* self);
 
     /* implementation for CGUI_Win32 */
 } CGUI_UINativeWindow;
@@ -78,7 +95,8 @@ CGUI_UINativeWindow* cgui_createUINativeWindow(CGUI_UIComponent* parent, CGUI_In
  * @param nativeWindow the REAL implementation of native window.
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
+CGUI_UINativeWindow*
+cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeWindow_bindWindowInstance(CGUI_UINativeWindow* self, CGUI_Window* nativeWindow);
 

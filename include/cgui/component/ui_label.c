@@ -7,17 +7,18 @@
 #include "ui_label.h"
 #include "../util/error.h"
 
-CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+CGUI_UINativeLabel*
+cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeLabel* label = (CGUI_UINativeLabel*) malloc(sizeof(CGUI_UINativeLabel));
 
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     label->component = cgui_createUIComponent(cgui_concatString("label", wndIdentifier),
                                               (LONG_PTR) internalId,
-                                              parent, 
+                                              parent,
                                               CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
                                               | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
-    
+
     label->component->layoutImpl = cgui_createUILayout();
     label->component->drawableImpl = cgui_createUIDrawable(
             cgui_uiNativeLabel_readyCallback,
@@ -26,7 +27,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->component->stateImpl = cgui_createUIState();
     label->component->disposableImpl = cgui_createUIDisposable(label, cgui_uiNativeLabel_destroyCallback);
     label->component->win32Impl = cgui_createUIWin32(cgui_uiNativeLabel_getWindowHandle, internalId);
-    
+
     label->window = nativeWindow;
 
     label->gdiTextContext = NULL;
@@ -44,28 +45,28 @@ CGUI_UINativeLabel* cgui_createUINativeLabelFromWindow(CGUI_Window* nativeWindow
     label->getTextDisplay = cgui_uiNativeLabel_getTextDisplay;
 
     label->setImage = cgui_uiNativeLabel_setImage;
-    
+
     label->addChild = cgui_uiNativeLabel_addChild;
     label->removeChild = cgui_uiNativeLabel_removeChild;
     label->removeChildById = cgui_uiNativeLabel_removeChildById;
     label->setComponentName = cgui_uiNativeLabel_setComponentName;
     label->getComponentName = cgui_uiNativeLabel_getComponentName;
     label->setEventHandler = cgui_uiNativeLabel_setEventHandler;
-    
+
     label->draw = cgui_uiNativeLabel_draw;
     label->refresh = cgui_uiNativeLabel_refresh;
-    
+
     label->getGeometry = cgui_uiNativeLabel_getGeometry;
     label->getLayout = cgui_uiNativeLabel_getLayout;
     label->getGeometry = cgui_uiNativeLabel_getGeometry;
     label->setLayout = cgui_uiNativeLabel_setLayout;
     label->setGeometry = cgui_uiNativeLabel_setGeometry;
-    
+
     label->isEnabled = cgui_uiNativeLabel_isEnabled;
     label->isVisible = cgui_uiNativeLabel_isVisible;
     label->setEnabled = cgui_uiNativeLabel_setEnabled;
     label->setVisible = cgui_uiNativeLabel_setVisible;
-    
+
     return label;
 }
 
@@ -109,7 +110,8 @@ CGUI_Result cgui_uiNativeLabel_close(CGUI_UINativeLabel* self) {
     return self->window->close(self->window);
 }
 
-CGUI_Result cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
+CGUI_Result
+cgui_uiNativeLabel_postMessage(CGUI_UINativeLabel* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (isAsync) {
         return self->window->postMessageAsync(self->window, msg, wParam, lParam);
     } else {
@@ -273,7 +275,7 @@ CGUI_Result cgui_uiNativeLabel_setEnabled(CGUI_UINativeLabel* self, bool enabled
 
 HWND cgui_uiNativeLabel_getWindowHandle(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
-        CGUI_UINativeLabel* nativeWindow = (CGUI_UINativeLabel*)component->disposableImpl->upperLevel;
+        CGUI_UINativeLabel* nativeWindow = (CGUI_UINativeLabel*) component->disposableImpl->upperLevel;
         return nativeWindow->window->getWindowHandle(nativeWindow->window);
     } else {
         return NULL;
@@ -311,5 +313,5 @@ void cgui_uiNativeLabel_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIState(component->stateImpl);
     cgui_destroyUIWin32(component->win32Impl);
 
-    cgui_destroyUINativeLabel((CGUI_UINativeLabel*)component->disposableImpl->upperLevel);
+    cgui_destroyUINativeLabel((CGUI_UINativeLabel*) component->disposableImpl->upperLevel);
 }

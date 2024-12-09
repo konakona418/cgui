@@ -50,52 +50,75 @@ typedef struct UINativeButton {
     CGUI_Result (* bindWindowInstance)(CGUI_UINativeButton* self, CGUI_Window* nativeWindow);
 
     CGUI_Result (* setState)(CGUI_UINativeButton* self, int swState);
+
     CGUI_Result (* postMessage)(CGUI_UINativeButton* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+
     CGUI_Result (* hide)(CGUI_UINativeButton* self);
+
     CGUI_Result (* show)(CGUI_UINativeButton* self);
+
     CGUI_Result (* update)(CGUI_UINativeButton* self);
+
     CGUI_Result (* close)(CGUI_UINativeButton* self);
+
     CGUI_Result (* destroy)(CGUI_UINativeButton* self);
-    
+
     CGUI_Result (* setText)(CGUI_UINativeButton* self, LPCSTR text);
-    LPCSTR      (* getText)(CGUI_UINativeButton* self);
+
+    LPCSTR (* getText)(CGUI_UINativeButton* self);
+
     CGUI_Result (* setTextDisplay)(CGUI_UINativeButton* self, CGUI_GDITextContext* ctx);
+
     CGUI_Result (* setButtonStyle)(CGUI_UINativeButton* self, CGUI_UINativeButtonStyle style);
+
     CGUI_UINativeButtonStyle (* getButtonStyle)(CGUI_UINativeButton* self);
+
     CGUI_Result (* setButtonState)(CGUI_UINativeButton* self, CGUI_UINativeButtonState state);
+
     CGUI_UINativeButtonState (* getButtonState)(CGUI_UINativeButton* self);
 
     /* implementation for CGUI_UIComponent */
-    void                (* addChild)            (CGUI_UINativeButton* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UINativeButton* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UINativeButton* self, LONG_PTR id);
+    void (* addChild)(CGUI_UINativeButton* self, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UINativeButton* self, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UINativeButton* self);
+    CGUI_UIComponent* (* removeChild)(CGUI_UINativeButton* self, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UINativeButton* self, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UINativeButton* self, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UINativeButton* self, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UINativeButton* self);
+
+    void (* setEventHandler)(CGUI_UINativeButton* self, CGUI_EventHandler* handler);
 
     /* implementation for CGUI_UIDrawable */
-    void (* draw)       (CGUI_UINativeButton* self);
-    void (* refresh)    (CGUI_UINativeButton* self);
+    void (* draw)(CGUI_UINativeButton* self);
+
+    void (* refresh)(CGUI_UINativeButton* self);
 
     /* implementation for CGUI_UILayout */
-    CGUI_Result       (* setGeometry) (CGUI_UINativeButton* self, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UINativeButton* self, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UINativeButton* self);
-    CGUI_Layout*      (* getLayout)   (CGUI_UINativeButton* self);
+    CGUI_Result (* setGeometry)(CGUI_UINativeButton* self, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UINativeButton* self, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UINativeButton* self);
+
+    CGUI_Layout* (* getLayout)(CGUI_UINativeButton* self);
 
     /* implementation for CGUI_UIState */
-    CGUI_Result (* setVisible)  (CGUI_UINativeButton* self, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UINativeButton* self, bool enabled);
-    bool        (* isVisible)   (CGUI_UINativeButton* self);
-    bool        (* isEnabled)   (CGUI_UINativeButton* self);
+    CGUI_Result (* setVisible)(CGUI_UINativeButton* self, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UINativeButton* self, bool enabled);
+
+    bool (* isVisible)(CGUI_UINativeButton* self);
+
+    bool (* isEnabled)(CGUI_UINativeButton* self);
 
 } CGUI_UINativeButton;
 
 CGUI_UINativeButton* cgui_createUINativeButton(CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
-CGUI_UINativeButton* cgui_createUINativeButtonFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
+CGUI_UINativeButton*
+cgui_createUINativeButtonFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeButton_bindWindowInstance(CGUI_UINativeButton* self, CGUI_Window* nativeWindow);
 
@@ -162,7 +185,7 @@ LPCSTR cgui_uiNativeButton_getText(CGUI_UINativeButton* self);
 
 CGUI_Result cgui_uiNativeButton_setText(CGUI_UINativeButton* self, LPCSTR text);
 
-CGUI_Result cgui_uiNativeButton_setTextDisplay(CGUI_UINativeButton* self, CGUI_GDITextContext * gdiTextContext);
+CGUI_Result cgui_uiNativeButton_setTextDisplay(CGUI_UINativeButton* self, CGUI_GDITextContext* gdiTextContext);
 
 CGUI_Result cgui_uiNativeButton_setButtonStyle(CGUI_UINativeButton* self, CGUI_UINativeButtonStyle style);
 

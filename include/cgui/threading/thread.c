@@ -6,12 +6,12 @@
 
 #include "thread.h"
 
-CGUI_Thread* cgui_createThread(void *(*thread_func)(void *), void *arg) {
-    CGUI_Thread* thread = (CGUI_Thread *)malloc(sizeof(CGUI_Thread));
+CGUI_Thread* cgui_createThread(void* (* thread_func)(void*), void* arg) {
+    CGUI_Thread* thread = (CGUI_Thread*) malloc(sizeof(CGUI_Thread));
     thread->thread_handle = CreateThread(
             NULL,
             0,
-            (LPTHREAD_START_ROUTINE)thread_func,
+            (LPTHREAD_START_ROUTINE) thread_func,
             arg, 0,
             &thread->thread_id);
 

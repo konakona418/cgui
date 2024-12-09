@@ -6,8 +6,7 @@
 
 #include "lock.h"
 
-CGUI_SpinLock* cgui_createSpinLock()
-{
+CGUI_SpinLock* cgui_createSpinLock() {
     CGUI_SpinLock* lock = (CGUI_SpinLock*) malloc(sizeof(CGUI_SpinLock));
     lock->locked = false;
 
@@ -17,8 +16,7 @@ CGUI_SpinLock* cgui_createSpinLock()
     return lock;
 }
 
-void cgui_destroySpinLock(CGUI_SpinLock* lock)
-{
+void cgui_destroySpinLock(CGUI_SpinLock* lock) {
     free(lock);
 }
 

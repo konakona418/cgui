@@ -8,13 +8,13 @@
 
 CGUI_EventArgs cgui_createEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     CGUI_EventArgs args = {
-        .argc = 0,
-        .argv = NULL,
-        .component = component,
-        .hwnd = hwnd,
-        .lParam = lParam,
-        .wParam = wParam,
-        .msg = msg,
+            .argc = 0,
+            .argv = NULL,
+            .component = component,
+            .hwnd = hwnd,
+            .lParam = lParam,
+            .wParam = wParam,
+            .msg = msg,
     };
     return args;
 }
@@ -41,20 +41,20 @@ CGUI_MouseButton cgui_asMouseButton(WPARAM wParam) {
     keyState.isShiftDown = (wParam & MK_SHIFT) != 0;
 
     return (CGUI_MouseButton) {
-        .keyState = keyState,
-        .state = mouseButtonState
+            .keyState = keyState,
+            .state = mouseButtonState
     };
 }
 
 CGUI_MouseEventArgs cgui_createMouseEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // todo: remains to be checked
     return (CGUI_MouseEventArgs) {
-        .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
-        .button = cgui_asMouseButton(wParam),
-        .point = {
-            .x = (short) (LOWORD(lParam)),
-            .y = (short) (HIWORD(lParam)),
-        },
+            .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
+            .button = cgui_asMouseButton(wParam),
+            .point = {
+                    .x = (short) (LOWORD(lParam)),
+                    .y = (short) (HIWORD(lParam)),
+            },
     };
 }
 
@@ -62,17 +62,17 @@ CGUI_MouseEventArgs cgui_createMouseEventArgs(void* component, HWND hwnd, UINT m
 CGUI_KeyEventArgs cgui_createKeyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // todo: remains to be checked
     return (CGUI_KeyEventArgs) {
-        .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
-        .keyCode = (UINT) wParam,
-        .keyState = (CGUI_KeyState) (lParam & 0x000F),
+            .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
+            .keyCode = (UINT) wParam,
+            .keyState = (CGUI_KeyState) (lParam & 0x000F),
     };
 }
 
 CGUI_TextBoxAcquisitionHandle cgui_createTextBoxAcquisitionHandle(HWND hwnd, UINT len) {
     return (CGUI_TextBoxAcquisitionHandle) {
-        .hwnd = hwnd,
-        .textLength = len,
-        .acquire = cgui_textBoxAcquisitionHandle_acquire,
+            .hwnd = hwnd,
+            .textLength = len,
+            .acquire = cgui_textBoxAcquisitionHandle_acquire,
     };
 }
 
@@ -91,19 +91,21 @@ CGUI_TextBoxEventArgs cgui_createTextBoxEventArgs(void* component, HWND hwnd, UI
     return eventArgs;
 }
 
-CGUI_GdiReadyEventArgs cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+CGUI_GdiReadyEventArgs
+cgui_createGdiReadyEventArgs(void* component, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return (CGUI_GdiReadyEventArgs) {
-        .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
-        .hdc = (HDC) wParam,
-        .hwnd = (HWND) lParam,
+            .base = cgui_createEventArgs(component, hwnd, msg, wParam, lParam),
+            .hdc = (HDC) wParam,
+            .hwnd = (HWND) lParam,
     };
 }
 
-CGUI_ListViewItemAcquisitionHandle cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf) {
+CGUI_ListViewItemAcquisitionHandle
+cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf) {
     return (CGUI_ListViewItemAcquisitionHandle) {
-        .pSelf = pSelf,
-        ._inner = _inner,
-        .acquire = cgui_listViewItemAcquisitionHandle_acquire,
+            .pSelf = pSelf,
+            ._inner = _inner,
+            .acquire = cgui_listViewItemAcquisitionHandle_acquire,
     };
 }
 
@@ -111,9 +113,10 @@ CGUI_ListViewItems cgui_listViewItemAcquisitionHandle_acquire(CGUI_ListViewItemA
     return self->_inner(self->pSelf);
 }
 
-CGUI_ListViewSelectedEventArgs cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle) {
+CGUI_ListViewSelectedEventArgs
+cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle) {
     return (CGUI_ListViewSelectedEventArgs) {
-        .base = base,
-        .acquisitionHandle = handle,
+            .base = base,
+            .acquisitionHandle = handle,
     };
 }

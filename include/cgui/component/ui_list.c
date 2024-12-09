@@ -8,7 +8,8 @@
 
 #include "../util/error.h"
 
-CGUI_UINativeListView* cgui_createUINativeListViewFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+CGUI_UINativeListView*
+cgui_createUINativeListViewFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeListView* listView = (CGUI_UINativeListView*) malloc(sizeof(CGUI_UINativeListView));
 
     listView->selectionMode = CGUI_ListViewSelectionMode_Single;
@@ -16,10 +17,10 @@ CGUI_UINativeListView* cgui_createUINativeListViewFromWindow(CGUI_Window* native
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     listView->component = cgui_createUIComponent(cgui_concatString("listView", wndIdentifier),
-                                              (LONG_PTR) internalId,
-                                              parent,
-                                              CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
-                                              | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
+                                                 (LONG_PTR) internalId,
+                                                 parent,
+                                                 CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
+                                                 | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
 
     listView->component->layoutImpl = cgui_createUILayout();
     listView->component->drawableImpl = cgui_createUIDrawable(
@@ -113,7 +114,8 @@ CGUI_Result cgui_uiNativeListView_close(CGUI_UINativeListView* self) {
     return self->window->close(self->window);
 }
 
-CGUI_Result cgui_uiNativeListView_postMessage(CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
+CGUI_Result
+cgui_uiNativeListView_postMessage(CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (isAsync) {
         return self->window->postMessageAsync(self->window, msg, wParam, lParam);
     } else {
@@ -142,7 +144,8 @@ long long int cgui_uiNativeListView_findItem(CGUI_UINativeListView* self, CGUI_L
     if (itemSelector.selectorType == CGUI_ListViewItemSelectorType_Index) {
         return itemSelector.inner.idx;
     } else {
-        return (LPARAM) unwrap(self->postMessage(self, false, LB_FINDSTRINGEXACT, -1, (LPARAM) itemSelector.inner.name));
+        return (LPARAM) unwrap(
+                self->postMessage(self, false, LB_FINDSTRINGEXACT, -1, (LPARAM) itemSelector.inner.name));
     }
 }
 
@@ -150,11 +153,13 @@ CGUI_Result cgui_uiNativeListView_appendItem(CGUI_UINativeListView* self, LPCSTR
     return self->postMessage(self, false, LB_ADDSTRING, 0, (LPARAM) text);
 }
 
-CGUI_Result cgui_uiNativeListView_insertItem(CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector) {
+CGUI_Result
+cgui_uiNativeListView_insertItem(CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector) {
     if (itemSelector.selectorType == CGUI_ListViewItemSelectorType_Index) {
         return self->postMessage(self, false, LB_INSERTSTRING, itemSelector.inner.idx, (LPARAM) text);
     } else {
-        return self->postMessage(self, false, LB_INSERTSTRING, cgui_uiNativeListView_findItem(self, itemSelector), (LPARAM) text);
+        return self->postMessage(self, false, LB_INSERTSTRING, cgui_uiNativeListView_findItem(self, itemSelector),
+                                 (LPARAM) text);
     }
 }
 
@@ -310,7 +315,7 @@ CGUI_Result cgui_uiNativeListView_setEnabled(CGUI_UINativeListView* self, bool e
 
 HWND cgui_uiNativeListView_getWindowHandle(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
-        CGUI_UINativeListView* nativeWindow = (CGUI_UINativeListView*)component->disposableImpl->upperLevel;
+        CGUI_UINativeListView* nativeWindow = (CGUI_UINativeListView*) component->disposableImpl->upperLevel;
         return nativeWindow->window->getWindowHandle(nativeWindow->window);
     } else {
         return NULL;
@@ -348,5 +353,5 @@ void cgui_uiNativeListView_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIState(component->stateImpl);
     cgui_destroyUIWin32(component->win32Impl);
 
-    cgui_destroyUINativeListView((CGUI_UINativeListView*)component->disposableImpl->upperLevel);
+    cgui_destroyUINativeListView((CGUI_UINativeListView*) component->disposableImpl->upperLevel);
 }

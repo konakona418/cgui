@@ -8,7 +8,8 @@
 #include "../util/error.h"
 #include <windows.h>
 
-CGUI_UINativeButton* cgui_createUINativeButtonFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+CGUI_UINativeButton*
+cgui_createUINativeButtonFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeButton* button = (CGUI_UINativeButton*) malloc(sizeof(CGUI_UINativeButton));
 
     button->buttonStyle = CGUI_ButtonStyle_Default;
@@ -134,7 +135,7 @@ void cgui_uiNativeButton_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIState(component->stateImpl);
     cgui_destroyUIWin32(component->win32Impl);
 
-    cgui_destroyUINativeButton((CGUI_UINativeButton*)component->disposableImpl->upperLevel);
+    cgui_destroyUINativeButton((CGUI_UINativeButton*) component->disposableImpl->upperLevel);
 }
 
 CGUI_Result cgui_uiNativeButton_setState(CGUI_UINativeButton* self, int swState) {
@@ -275,7 +276,7 @@ CGUI_Result cgui_uiNativeButton_setEnabled(CGUI_UINativeButton* self, bool enabl
 
 HWND cgui_uiNativeButton_getWindowHandle(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
-        CGUI_UINativeButton* nativeWindow = (CGUI_UINativeButton*)component->disposableImpl->upperLevel;
+        CGUI_UINativeButton* nativeWindow = (CGUI_UINativeButton*) component->disposableImpl->upperLevel;
         return nativeWindow->window->getWindowHandle(nativeWindow->window);
     } else {
         return NULL;
@@ -335,6 +336,7 @@ CGUI_UINativeButtonStyle cgui_uiNativeButton_getButtonStyle(CGUI_UINativeButton*
 }
 
 #define is_radio_or_checkbox(style) (style == CGUI_ButtonStyle_CheckBox || style == CGUI_ButtonStyle_RadioButton)
+
 CGUI_Result cgui_uiNativeButton_setButtonState(CGUI_UINativeButton* self, CGUI_UINativeButtonState state) {
     CGUI_Window* wnd = self->window;
     CGUI_Result result;

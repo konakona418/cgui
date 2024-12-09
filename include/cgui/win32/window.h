@@ -173,11 +173,11 @@ typedef struct Window {
 
     CGUI_Result (* setWindowName)(CGUI_Window* self, LPCSTR wndName);
 
-    LPCSTR      (* getWindowName)(CGUI_Window* self);
+    LPCSTR (* getWindowName)(CGUI_Window* self);
 
     CGUI_Result (* setWindowStyle)(CGUI_Window* self, LONG_PTR dwStyle);
 
-    LONG_PTR    (* getWindowStyle)(CGUI_Window* self);
+    LONG_PTR (* getWindowStyle)(CGUI_Window* self);
 
     CGUI_Result (* setWindowGeometry)(CGUI_Window* self, int x, int y, int width, int height);
 

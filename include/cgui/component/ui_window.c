@@ -7,7 +7,8 @@
 #include <windows.h>
 #include "ui_window.h"
 
-CGUI_UINativeWindow* cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+CGUI_UINativeWindow*
+cgui_createUINativeWindowFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeWindow* window = (CGUI_UINativeWindow*) malloc(sizeof(CGUI_UINativeWindow));
 
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
@@ -118,7 +119,7 @@ void cgui_uiNativeWindow_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIState(component->stateImpl);
     cgui_destroyUIWin32(component->win32Impl);
 
-    cgui_destroyUINativeWindow((CGUI_UINativeWindow*)component->disposableImpl->upperLevel);
+    cgui_destroyUINativeWindow((CGUI_UINativeWindow*) component->disposableImpl->upperLevel);
 }
 
 CGUI_Result cgui_uiNativeWindow_setState(CGUI_UINativeWindow* self, int swState) {
@@ -267,7 +268,7 @@ CGUI_Result cgui_uiNativeWindow_setEnabled(CGUI_UINativeWindow* self, bool enabl
 
 HWND cgui_uiNativeWindow_getWindowHandle(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
-        CGUI_UINativeWindow* nativeWindow = (CGUI_UINativeWindow*)component->disposableImpl->upperLevel;
+        CGUI_UINativeWindow* nativeWindow = (CGUI_UINativeWindow*) component->disposableImpl->upperLevel;
         return nativeWindow->window->getWindowHandle(nativeWindow->window);
     } else {
         return NULL;

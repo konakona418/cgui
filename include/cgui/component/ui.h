@@ -75,19 +75,26 @@ typedef struct UILayout {
     CGUI_Rectangle geometry;
     CGUI_Layout layout;
 
-    CGUI_Result       (* setGeometry) (CGUI_UIComponent* component, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UIComponent* component, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UIComponent* component);
-    CGUI_Layout*      (* getLayout)   (CGUI_UIComponent* component);
+    CGUI_Result (* setGeometry)(CGUI_UIComponent* component, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UIComponent* component, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UIComponent* component);
+
+    CGUI_Layout* (* getLayout)(CGUI_UIComponent* component);
 } CGUI_UILayout;
 
 typedef struct UIDrawable {
     void (* readyCallback)(CGUI_UIComponent* component);
+
     void (* drawCallback)(CGUI_UIComponent* component);
+
     void (* refreshCallback)(CGUI_UIComponent* component);
 
     void (* ready)(void* component);
+
     void (* draw)(void* component);
+
     void (* refresh)(void* component);
 } CGUI_UIDrawable;
 
@@ -95,10 +102,13 @@ typedef struct UIState {
     bool visible;
     bool enabled;
 
-    CGUI_Result (* setVisible)  (CGUI_UIComponent* component, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UIComponent* component, bool enabled);
-    bool        (* isVisible)   (CGUI_UIComponent* component);
-    bool        (* isEnabled)   (CGUI_UIComponent* component);
+    CGUI_Result (* setVisible)(CGUI_UIComponent* component, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UIComponent* component, bool enabled);
+
+    bool (* isVisible)(CGUI_UIComponent* component);
+
+    bool (* isEnabled)(CGUI_UIComponent* component);
 } CGUI_UIState;
 
 typedef struct UIStyle {
@@ -110,10 +120,10 @@ typedef struct UIStyle {
     int borderWidth;
     int cornerRadius;
 
-    int             fontSize;
-    int             fontWeight;
-    CGUI_FontStyle  fontStyle;
-    LPCSTR          fontFamily;
+    int fontSize;
+    int fontWeight;
+    CGUI_FontStyle fontStyle;
+    LPCSTR fontFamily;
 
     CGUI_TextAlign textAlignment;
 
@@ -125,6 +135,7 @@ typedef struct UIStyle {
 
 typedef struct UIWin32 {
     CGUI_InternalID internalId;
+
     HWND (* getWindowHandle)(CGUI_UIComponent* component);
 } CGUI_UIWin32;
 
@@ -146,22 +157,25 @@ typedef struct UIComponent {
     CGUI_EventHandler* eventHandler;
 
     /* Traits Implementation */
-    CGUI_UIDisposable*  disposableImpl;
-    CGUI_UIDrawable*    drawableImpl;
-    CGUI_UIState*       stateImpl;
-    CGUI_UILayout*      layoutImpl;
-    CGUI_UIStyle*       styleImpl;
-    CGUI_UIWin32*       win32Impl;
+    CGUI_UIDisposable* disposableImpl;
+    CGUI_UIDrawable* drawableImpl;
+    CGUI_UIState* stateImpl;
+    CGUI_UILayout* layoutImpl;
+    CGUI_UIStyle* styleImpl;
+    CGUI_UIWin32* win32Impl;
 
     /* Methods */
-    void                (* addChild)            (CGUI_UIComponent* component, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UIComponent* component, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UIComponent* component, LONG_PTR id);
+    void (* addChild)(CGUI_UIComponent* component, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UIComponent* component, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UIComponent* component);
+    CGUI_UIComponent* (* removeChild)(CGUI_UIComponent* component, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UIComponent* component, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UIComponent* component, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UIComponent* component, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UIComponent* component);
+
+    void (* setEventHandler)(CGUI_UIComponent* component, CGUI_EventHandler* handler);
 
 } CGUI_UIComponent;
 
@@ -201,7 +215,7 @@ CGUI_Result cgui_uiComponent_setComponentName(CGUI_UIComponent* component, LPCST
 /**
  * Get the name of the component.
  * @return The name of the component. */
-LPCSTR      cgui_uiComponent_getComponentName(CGUI_UIComponent* component);
+LPCSTR cgui_uiComponent_getComponentName(CGUI_UIComponent* component);
 
 void cgui_uiComponent_addChild(CGUI_UIComponent* component, CGUI_UIComponent* child);
 
@@ -386,14 +400,19 @@ typedef struct ComponentManager {
     CGUI_Result (* addComponent)(CGUI_ComponentManager* self, CGUI_UIComponent* component);
 
     CGUI_Result (* getComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
+
     CGUI_Result (* getComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
+
     CGUI_Result (* getComponentPredicate)(CGUI_ComponentManager* self, void* target, ComponentPredicate predicate);
 
     CGUI_InternalID (* getNextInternalId)(CGUI_ComponentManager* self);
 
     CGUI_Result (* removeComponentById)(CGUI_ComponentManager* self, LONG_PTR id);
+
     CGUI_Result (* removeComponentByName)(CGUI_ComponentManager* self, LPCSTR name);
+
     CGUI_Result (* removeComponent)(CGUI_ComponentManager* self, CGUI_UIComponent* component);
+
     CGUI_Result (* removeAllComponents)(CGUI_ComponentManager* self);
 
     void (* iter)(CGUI_ComponentManager* self, void (* callback)(const char* key, void* value));
@@ -416,7 +435,8 @@ CGUI_Result cgui_componentManager_getComponentById(CGUI_ComponentManager* manage
 
 CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* manager, LPCSTR name);
 
-CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate);
+CGUI_Result
+cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate);
 
 CGUI_InternalID cgui_componentManager_getNextInternalId(CGUI_ComponentManager* manager);
 

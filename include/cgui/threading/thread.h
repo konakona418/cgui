@@ -14,13 +14,15 @@ typedef struct Thread CGUI_Thread;
 typedef struct Thread {
     HANDLE thread_handle;
     DWORD thread_id;
-    void *(*thread_func)(void *);
+
+    void* (* thread_func)(void*);
 
     void (* join)(CGUI_Thread* thread);
+
     void (* joinTimeout)(CGUI_Thread* thread, DWORD milliseconds);
 } CGUI_Thread;
 
-CGUI_Thread* cgui_createThread(void* (*thread_func)(void *), void* arg);
+CGUI_Thread* cgui_createThread(void* (* thread_func)(void*), void* arg);
 
 void cgui_thread_joinThread(CGUI_Thread* thread);
 

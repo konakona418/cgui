@@ -27,42 +27,59 @@ typedef struct UINativeTextBox {
     CGUI_GDITextContext* gdiTextContext;
     obsolete bool _gdiRefreshFlag;
 
-    void                (* show)                 (CGUI_UINativeTextBox* self);
-    void                (* hide)                 (CGUI_UINativeTextBox* self);
-    void                (* update)               (CGUI_UINativeTextBox* self);
-    CGUI_Result         (* close)                (CGUI_UINativeTextBox* self);
-    CGUI_Result         (* postMessage)          (CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+    void (* show)(CGUI_UINativeTextBox* self);
 
-    void                (* setText)              (CGUI_UINativeTextBox* self, LPCSTR text);
-    LPCSTR              (* getText)              (CGUI_UINativeTextBox* self);
-    void                (* setTextDisplay)       (CGUI_UINativeTextBox* self, CGUI_GDITextContext* gdiTextContext);
-    CGUI_GDITextContext (* getTextDisplay)       (CGUI_UINativeTextBox* self);
+    void (* hide)(CGUI_UINativeTextBox* self);
+
+    void (* update)(CGUI_UINativeTextBox* self);
+
+    CGUI_Result (* close)(CGUI_UINativeTextBox* self);
+
+    CGUI_Result (* postMessage)(CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void (* setText)(CGUI_UINativeTextBox* self, LPCSTR text);
+
+    LPCSTR (* getText)(CGUI_UINativeTextBox* self);
+
+    void (* setTextDisplay)(CGUI_UINativeTextBox* self, CGUI_GDITextContext* gdiTextContext);
+
+    CGUI_GDITextContext (* getTextDisplay)(CGUI_UINativeTextBox* self);
 
     /* implementation for CGUI_UIComponent */
-    void                (* addChild)            (CGUI_UINativeTextBox* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UINativeTextBox* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UINativeTextBox* self, LONG_PTR id);
+    void (* addChild)(CGUI_UINativeTextBox* self, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UINativeTextBox* self, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UINativeTextBox* self);
+    CGUI_UIComponent* (* removeChild)(CGUI_UINativeTextBox* self, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UINativeTextBox* self, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UINativeTextBox* self, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UINativeTextBox* self, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UINativeTextBox* self);
+
+    void (* setEventHandler)(CGUI_UINativeTextBox* self, CGUI_EventHandler* handler);
 
     /* implementation for CGUI_UIDrawable */
-    void (* draw)       (CGUI_UINativeTextBox* self);
-    void (* refresh)    (CGUI_UINativeTextBox* self);
+    void (* draw)(CGUI_UINativeTextBox* self);
+
+    void (* refresh)(CGUI_UINativeTextBox* self);
 
     /* implementation for CGUI_UILayout */
-    CGUI_Result       (* setGeometry) (CGUI_UINativeTextBox* self, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UINativeTextBox* self, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UINativeTextBox* self);
-    CGUI_Layout*      (* getLayout)   (CGUI_UINativeTextBox* self);
+    CGUI_Result (* setGeometry)(CGUI_UINativeTextBox* self, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UINativeTextBox* self, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UINativeTextBox* self);
+
+    CGUI_Layout* (* getLayout)(CGUI_UINativeTextBox* self);
 
     /* implementation for CGUI_UIState */
-    CGUI_Result (* setVisible)  (CGUI_UINativeTextBox* self, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UINativeTextBox* self, bool enabled);
-    bool        (* isVisible)   (CGUI_UINativeTextBox* self);
-    bool        (* isEnabled)   (CGUI_UINativeTextBox* self);
+    CGUI_Result (* setVisible)(CGUI_UINativeTextBox* self, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UINativeTextBox* self, bool enabled);
+
+    bool (* isVisible)(CGUI_UINativeTextBox* self);
+
+    bool (* isEnabled)(CGUI_UINativeTextBox* self);
 
 } CGUI_UINativeTextBox;
 
@@ -74,7 +91,8 @@ void cgui_uiNativeTextbox_update(CGUI_UINativeTextBox* self);
 
 CGUI_Result cgui_uiNativeTextbox_close(CGUI_UINativeTextBox* self);
 
-CGUI_Result cgui_uiNativeTextbox_postMessage(CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+CGUI_Result
+cgui_uiNativeTextbox_postMessage(CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void cgui_uiNativeTextbox_setText(CGUI_UINativeTextBox* self, LPCSTR text);
 
@@ -97,7 +115,8 @@ CGUI_UINativeTextBox* cgui_createUINativeTextbox(CGUI_UIComponent* parent, CGUI_
  * @param nativeWindow the REAL implementation of native window.
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeTextBox* cgui_createUINativeTextboxFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
+CGUI_UINativeTextBox*
+cgui_createUINativeTextboxFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeTextbox_bindWindowInstance(CGUI_UINativeTextBox* self, CGUI_Window* nativeWindow);
 

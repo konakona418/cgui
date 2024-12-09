@@ -30,7 +30,7 @@ void CGUI_destroyThreadPool(CGUI_ThreadPool* pool) {
     free(pool);
 }
 
-void CGUI_threadPool_addTask(CGUI_ThreadPool* pool, void* (*func)(void*), void* arg) {
+void CGUI_threadPool_addTask(CGUI_ThreadPool* pool, void* (* func)(void*), void* arg) {
     if (pool->currentNumThreads >= pool->maxNumThreads) {
         return;
     }

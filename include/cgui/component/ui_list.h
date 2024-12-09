@@ -29,45 +29,63 @@ typedef struct UINativeListView {
     CGUI_GDITextContext* gdiTextContext;
     obsolete bool _gdiRefreshFlag;
 
-    void                (* show)                 (CGUI_UINativeListView* self);
-    void                (* hide)                 (CGUI_UINativeListView* self);
-    void                (* update)               (CGUI_UINativeListView* self);
-    CGUI_Result         (* close)                (CGUI_UINativeListView* self);
-    CGUI_Result         (* postMessage)          (CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+    void (* show)(CGUI_UINativeListView* self);
 
-    void                (* setTextDisplay)       (CGUI_UINativeListView* self, CGUI_GDITextContext* gdiTextContext);
-    CGUI_GDITextContext (* getTextDisplay)       (CGUI_UINativeListView* self);
+    void (* hide)(CGUI_UINativeListView* self);
 
-    CGUI_Result         (* appendItem)           (CGUI_UINativeListView* self, LPCSTR text);
-    CGUI_Result         (* insertItem)           (CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector);
-    CGUI_Result         (* removeItem)           (CGUI_UINativeListView* self, CGUI_ListViewItemSelector itemSelector);
-    CGUI_ListViewItems  (* getSelectedItem)      (CGUI_UINativeListView* self);
+    void (* update)(CGUI_UINativeListView* self);
+
+    CGUI_Result (* close)(CGUI_UINativeListView* self);
+
+    CGUI_Result (* postMessage)(CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void (* setTextDisplay)(CGUI_UINativeListView* self, CGUI_GDITextContext* gdiTextContext);
+
+    CGUI_GDITextContext (* getTextDisplay)(CGUI_UINativeListView* self);
+
+    CGUI_Result (* appendItem)(CGUI_UINativeListView* self, LPCSTR text);
+
+    CGUI_Result (* insertItem)(CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector);
+
+    CGUI_Result (* removeItem)(CGUI_UINativeListView* self, CGUI_ListViewItemSelector itemSelector);
+
+    CGUI_ListViewItems (* getSelectedItem)(CGUI_UINativeListView* self);
 
     /* implementation for CGUI_UIComponent */
-    void                (* addChild)            (CGUI_UINativeListView* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChild)         (CGUI_UINativeListView* self, CGUI_UIComponent* child);
-    CGUI_UIComponent*   (* removeChildById)     (CGUI_UINativeListView* self, LONG_PTR id);
+    void (* addChild)(CGUI_UINativeListView* self, CGUI_UIComponent* child);
 
-    CGUI_Result (* setComponentName)    (CGUI_UINativeListView* self, LPCSTR name);
-    LPCSTR      (* getComponentName)    (CGUI_UINativeListView* self);
+    CGUI_UIComponent* (* removeChild)(CGUI_UINativeListView* self, CGUI_UIComponent* child);
 
-    void        (* setEventHandler)     (CGUI_UINativeListView* self, CGUI_EventHandler* handler);
+    CGUI_UIComponent* (* removeChildById)(CGUI_UINativeListView* self, LONG_PTR id);
+
+    CGUI_Result (* setComponentName)(CGUI_UINativeListView* self, LPCSTR name);
+
+    LPCSTR (* getComponentName)(CGUI_UINativeListView* self);
+
+    void (* setEventHandler)(CGUI_UINativeListView* self, CGUI_EventHandler* handler);
 
     /* implementation for CGUI_UIDrawable */
-    void (* draw)       (CGUI_UINativeListView* self);
-    void (* refresh)    (CGUI_UINativeListView* self);
+    void (* draw)(CGUI_UINativeListView* self);
+
+    void (* refresh)(CGUI_UINativeListView* self);
 
     /* implementation for CGUI_UILayout */
-    CGUI_Result       (* setGeometry) (CGUI_UINativeListView* self, CGUI_Rectangle geometry);
-    CGUI_Result       (* setLayout)   (CGUI_UINativeListView* self, CGUI_Layout layout);
-    CGUI_Rectangle*   (* getGeometry) (CGUI_UINativeListView* self);
-    CGUI_Layout*      (* getLayout)   (CGUI_UINativeListView* self);
+    CGUI_Result (* setGeometry)(CGUI_UINativeListView* self, CGUI_Rectangle geometry);
+
+    CGUI_Result (* setLayout)(CGUI_UINativeListView* self, CGUI_Layout layout);
+
+    CGUI_Rectangle* (* getGeometry)(CGUI_UINativeListView* self);
+
+    CGUI_Layout* (* getLayout)(CGUI_UINativeListView* self);
 
     /* implementation for CGUI_UIState */
-    CGUI_Result (* setVisible)  (CGUI_UINativeListView* self, bool visible);
-    CGUI_Result (* setEnabled)  (CGUI_UINativeListView* self, bool enabled);
-    bool        (* isVisible)   (CGUI_UINativeListView* self);
-    bool        (* isEnabled)   (CGUI_UINativeListView* self);
+    CGUI_Result (* setVisible)(CGUI_UINativeListView* self, bool visible);
+
+    CGUI_Result (* setEnabled)(CGUI_UINativeListView* self, bool enabled);
+
+    bool (* isVisible)(CGUI_UINativeListView* self);
+
+    bool (* isEnabled)(CGUI_UINativeListView* self);
 
 } CGUI_UINativeListView;
 
@@ -79,7 +97,8 @@ void cgui_uiNativeListView_update(CGUI_UINativeListView* self);
 
 CGUI_Result cgui_uiNativeListView_close(CGUI_UINativeListView* self);
 
-CGUI_Result cgui_uiNativeListView_postMessage(CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
+CGUI_Result
+cgui_uiNativeListView_postMessage(CGUI_UINativeListView* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void cgui_uiNativeListView_setTextDisplay(CGUI_UINativeListView* self, CGUI_GDITextContext* gdiTextContext);
 
@@ -87,7 +106,8 @@ unavailable CGUI_GDITextContext cgui_uiNativeListView_getTextDisplay(CGUI_UINati
 
 CGUI_Result cgui_uiNativeListView_appendItem(CGUI_UINativeListView* self, LPCSTR text);
 
-CGUI_Result cgui_uiNativeListView_insertItem(CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector);
+CGUI_Result
+cgui_uiNativeListView_insertItem(CGUI_UINativeListView* self, LPCSTR text, CGUI_ListViewItemSelector itemSelector);
 
 CGUI_Result cgui_uiNativeListView_removeItem(CGUI_UINativeListView* self, CGUI_ListViewItemSelector itemSelector);
 
@@ -106,7 +126,8 @@ CGUI_UINativeListView* cgui_createUINativeListView(CGUI_UIComponent* parent, CGU
  * @param nativeWindow the REAL implementation of native window.
  * @param parent the parent component.
  * @return the created component. */
-CGUI_UINativeListView* cgui_createUINativeListViewFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
+CGUI_UINativeListView*
+cgui_createUINativeListViewFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId);
 
 CGUI_Result cgui_uiNativeListView_bindWindowInstance(CGUI_UINativeListView* self, CGUI_Window* nativeWindow);
 

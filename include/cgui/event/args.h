@@ -142,6 +142,7 @@ typedef struct ListViewItemAcquisitionHandle CGUI_ListViewItemAcquisitionHandle;
 
 typedef struct ListViewItemAcquisitionHandle {
     CGUI_ListViewItems (* _inner)(void* pSelf);
+
     void* pSelf;
 
     /**
@@ -151,7 +152,8 @@ typedef struct ListViewItemAcquisitionHandle {
     CGUI_ListViewItems (* acquire)(CGUI_ListViewItemAcquisitionHandle* self);
 } CGUI_ListViewItemAcquisitionHandle;
 
-CGUI_ListViewItemAcquisitionHandle cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf);
+CGUI_ListViewItemAcquisitionHandle
+cgui_createListViewItemAcquisitionHandle(CGUI_ListViewItems (* _inner)(void* pSelf), void* pSelf);
 
 CGUI_ListViewItems cgui_listViewItemAcquisitionHandle_acquire(CGUI_ListViewItemAcquisitionHandle* self);
 
@@ -161,6 +163,7 @@ typedef struct ListViewItemSelectedEventArgs {
     CGUI_ListViewItemAcquisitionHandle acquisitionHandle;
 } CGUI_ListViewSelectedEventArgs;
 
-CGUI_ListViewSelectedEventArgs cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle);
+CGUI_ListViewSelectedEventArgs
+cgui_createListViewSelectedEventArgs(CGUI_EventArgs base, CGUI_ListViewItemAcquisitionHandle handle);
 
 #endif //CGUI_ARGS_H

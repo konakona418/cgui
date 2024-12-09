@@ -7,16 +7,17 @@
 #include "ui_textbox.h"
 #include "../util/error.h"
 
-CGUI_UINativeTextBox* cgui_createUINativeTextboxFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
+CGUI_UINativeTextBox*
+cgui_createUINativeTextboxFromWindow(CGUI_Window* nativeWindow, CGUI_UIComponent* parent, CGUI_InternalID internalId) {
     CGUI_UINativeTextBox* textbox = (CGUI_UINativeTextBox*) malloc(sizeof(CGUI_UINativeTextBox));
 
     LPCSTR wndIdentifier = nativeWindow ? nativeWindow->wndIdentifier : "(anonymous)";
     LONG_PTR wndId = (LONG_PTR) (nativeWindow ? nativeWindow->getWindowHandle(nativeWindow) : 0);
     textbox->component = cgui_createUIComponent(cgui_concatString("textbox", wndIdentifier),
-                                              (LONG_PTR) internalId,
-                                              parent,
-                                              CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
-                                              | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
+                                                (LONG_PTR) internalId,
+                                                parent,
+                                                CGUI_Trait_UIComponent | CGUI_Trait_UILayout | CGUI_Trait_UIDrawable
+                                                | CGUI_Trait_UIState | CGUI_Trait_UIDisposable | CGUI_Trait_UIWin32);
 
     textbox->component->layoutImpl = cgui_createUILayout();
     textbox->component->drawableImpl = cgui_createUIDrawable(
@@ -107,7 +108,8 @@ CGUI_Result cgui_uiNativeTextbox_close(CGUI_UINativeTextBox* self) {
     return self->window->close(self->window);
 }
 
-CGUI_Result cgui_uiNativeTextbox_postMessage(CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
+CGUI_Result
+cgui_uiNativeTextbox_postMessage(CGUI_UINativeTextBox* self, bool isAsync, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (isAsync) {
         return self->window->postMessageAsync(self->window, msg, wParam, lParam);
     } else {
@@ -248,7 +250,7 @@ CGUI_Result cgui_uiNativeTextbox_setEnabled(CGUI_UINativeTextBox* self, bool ena
 
 HWND cgui_uiNativeTextbox_getWindowHandle(CGUI_UIComponent* component) {
     if (impl(component->implFlag, CGUI_Trait_UIDisposable)) {
-        CGUI_UINativeTextBox* nativeWindow = (CGUI_UINativeTextBox*)component->disposableImpl->upperLevel;
+        CGUI_UINativeTextBox* nativeWindow = (CGUI_UINativeTextBox*) component->disposableImpl->upperLevel;
         return nativeWindow->window->getWindowHandle(nativeWindow->window);
     } else {
         return NULL;
@@ -286,6 +288,6 @@ void cgui_uiNativeTextbox_destroyCallback(CGUI_UIComponent* component) {
     cgui_destroyUIState(component->stateImpl);
     cgui_destroyUIWin32(component->win32Impl);
 
-    cgui_destroyUINativeTextbox((CGUI_UINativeTextBox*)component->disposableImpl->upperLevel);
+    cgui_destroyUINativeTextbox((CGUI_UINativeTextBox*) component->disposableImpl->upperLevel);
 }
 

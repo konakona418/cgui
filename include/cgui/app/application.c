@@ -60,7 +60,7 @@ void cgui_application_run(bool isAsync) {
 }
 
 void cgui_application_stop() {
-    CGUI_Application *app = CGUI_APP_INSTANCE;
+    CGUI_Application* app = CGUI_APP_INSTANCE;
     if (app == NULL) return;
     app->dispatcher->stop(app->dispatcher, true);
 
@@ -98,12 +98,14 @@ IterPredicateResult cgui_application_predicateHwnd(const char* key, void* value,
 long long int cgui_application_messageCallback(CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (CGUI_APP_INSTANCE == NULL) return DefWindowProc(query.hwnd, msg, wParam, lParam);
     CGUI_Application* app = CGUI_APP_INSTANCE;
-    CGUI_Result result = app->core->compManager->getComponentPredicate(app->core->compManager, &query.hwnd, cgui_application_predicateHwnd);
+    CGUI_Result result = app->core->compManager->getComponentPredicate(app->core->compManager, &query.hwnd,
+                                                                       cgui_application_predicateHwnd);
     if (is_ok(&result)) {
         CGUI_UIComponent* component = take(&result);
         query.component = component;
         // todo: this may lead to infinite recursive calls. proceed with caution.
-        return component->eventHandler->handleEvent(component->eventHandler, query, msg, wParam, lParam, cgui_application_messageCallback);
+        return component->eventHandler->handleEvent(component->eventHandler, query, msg, wParam, lParam,
+                                                    cgui_application_messageCallback);
     } else {
         return DefWindowProc(query.hwnd, msg, wParam, lParam);
     }

@@ -21,6 +21,7 @@
 
 typedef struct UIFactoryCluster CGUI_UIFactoryCluster;
 typedef void* CGUI_AnyComponent;
+
 typedef CGUI_Result (* CGUI_UIFactory)(int argc, CGUI_Box* argv);
 
 typedef struct UIFactoryClusterConfig {
@@ -35,20 +36,27 @@ typedef struct UIFactoryCluster {
     HashTable* factories;
 
     CGUI_Result (* registerFactory)(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
+
     CGUI_Result (* unregisterFactory)(CGUI_UIFactoryCluster* cluster, const char* name);
 
     CGUI_Result (* createComponent)(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
 } CGUI_UIFactoryCluster;
 
 CGUI_UIFactoryCluster* cgui_createUIFactoryCluster();
+
 void cgui_destroyUIFactoryCluster(CGUI_UIFactoryCluster* cluster);
+
 CGUI_UIFactoryCluster* cgui_getUIFactoryClusterInstance();
 
 #define cgui_uiFactoryCluster() cgui_getUIFactoryClusterInstance()
 
-CGUI_Result cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
+CGUI_Result
+cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory);
+
 CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster, const char* name);
-CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
+
+CGUI_Result
+cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv);
 
 void cgui_initFactoryCluster(CGUI_UIFactoryCluster* cluster);
 

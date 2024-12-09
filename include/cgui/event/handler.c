@@ -48,17 +48,23 @@ void cgui_destroyEventHandler(CGUI_EventHandler* handler) {
     free(handler);
 }
 
-int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWND hwnd, UINT msg, WPARAM wParam,
+                             LPARAM lParam) {
     if (handle(handler->handlerFlag, CGUI_LocalHandler_WindowRoot)) {
-        return into(CGUI_WindowHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+        return into(CGUI_WindowHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg,
+                                                                                 wParam, lParam);
     } else if (handle(handler->handlerFlag, CGUI_LocalHandler_Button)) {
-        return into(CGUI_ButtonHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+        return into(CGUI_ButtonHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg,
+                                                                                 wParam, lParam);
     } else if (handle(handler->handlerFlag, CGUI_LocalHandler_TextBox)) {
-        return into(CGUI_TextBoxHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+        return into(CGUI_TextBoxHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg,
+                                                                                  wParam, lParam);
     } else if (handle(handler->handlerFlag, CGUI_LocalHandler_Label)) {
-        return into(CGUI_LabelHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+        return into(CGUI_LabelHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg,
+                                                                                wParam, lParam);
     } else if (handle(handler->handlerFlag, CGUI_LocalHandler_ListView)) {
-        return into(CGUI_ListViewHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg, wParam, lParam);
+        return into(CGUI_ListViewHandler, handler->localHandler)->handleEventLocal(localHandler, handler, hwnd, msg,
+                                                                                   wParam, lParam);
     } else {
         panic("Invalid handler type.");
     }
@@ -68,7 +74,8 @@ int cgui_routeToLocalHandler(CGUI_EventHandler* handler, void* localHandler, HWN
 WM_CTLCOLORLISTBOX, WM_CTLCOLORSCROLLBAR, WM_CTLCOLORSTATIC, WM_CTLCOLORDLG)
 
 long long int
-cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
+cgui_eventHandler_handleEvent(CGUI_EventHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam,
+                              LPARAM lParam, CGUI_ApplicationMessageCallback callback) {
     if (msg == WM_COMMAND) {
         HWND hComponent = (HWND) lParam;
         if (likely(query.hwnd != hComponent)) {
@@ -396,7 +403,7 @@ void cgui_destroyButtonHandler(void* handler) {
 }
 
 long long cgui_buttonHandler_handleEventLocal(void* pSelf, CGUI_EventHandler* parent, HWND hwnd, UINT msg,
-                                        WPARAM wParam, LPARAM lParam) {
+                                              WPARAM wParam, LPARAM lParam) {
     CGUI_ButtonHandler* self = (CGUI_ButtonHandler*) pSelf;
 
     if (eq_wm(msg)) {
@@ -627,10 +634,11 @@ long long int cgui_listViewHandler_handleEventLocal(void* pSelf, CGUI_EventHandl
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-CGUI_LocalHandlerContext cgui_createLocalHandlerContext(void* localHandler, LocalHandlerFlag handlerFlag, LocalHandlerDestructor destructor) {
+CGUI_LocalHandlerContext
+cgui_createLocalHandlerContext(void* localHandler, LocalHandlerFlag handlerFlag, LocalHandlerDestructor destructor) {
     return (CGUI_LocalHandlerContext) {
-        .localHandler = localHandler,
-        .handlerFlag = handlerFlag,
-        .destructor = destructor
+            .localHandler = localHandler,
+            .handlerFlag = handlerFlag,
+            .destructor = destructor
     };
 }

@@ -8,13 +8,13 @@
 
 CGUI_Color cgui_rgbaToColor(int r, int g, int b) {
     CGUI_Color color = {
-        .rgb = RGB(r, g, b),
-        ._inner = {
-                .r = r,
-                .g = g,
-                .b = b,
-        },
-        .transparent = false
+            .rgb = RGB(r, g, b),
+            ._inner = {
+                    .r = r,
+                    .g = g,
+                    .b = b,
+            },
+            .transparent = false
     };
     return color;
 }
@@ -25,13 +25,13 @@ HBRUSH cgui_intoSolidBrush(CGUI_Color color) {
 
 CGUI_Color cgui_transparentColor() {
     CGUI_Color color = {
-        .rgb = 0,
-        ._inner = {
-                .r = 0,
-                .g = 0,
-                .b = 0,
-        },
-        .transparent = true
+            .rgb = 0,
+            ._inner = {
+                    .r = 0,
+                    .g = 0,
+                    .b = 0,
+            },
+            .transparent = true
     };
     return color;
 }
@@ -259,26 +259,26 @@ CGUI_ImageLike cgui_loadBitmap(LPCSTR path) {
     HBITMAP hBmp = (HBITMAP) LoadImage(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     if (!hBmp) {
         return (CGUI_ImageLike) {
-            .imageGeometry = (CGUI_Rectangle) {
-                .x = 0,
-                .y = 0,
-                .width = 0,
-                .height = 0,
-            },
-            .type = CGUI_ImageLike_Failed,
+                .imageGeometry = (CGUI_Rectangle) {
+                        .x = 0,
+                        .y = 0,
+                        .width = 0,
+                        .height = 0,
+                },
+                .type = CGUI_ImageLike_Failed,
         };
     }
 
     SIZE size;
     GetBitmapDimensionEx(hBmp, &size);
     return (CGUI_ImageLike) {
-        .imageGeometry = (CGUI_Rectangle) {
-            .x = 0,
-            .y = 0,
-            .width = size.cx,
-            .height = size.cy,
-        },
-        .type = CGUI_ImageLike_Bitmap,
-        .bitmap = hBmp,
+            .imageGeometry = (CGUI_Rectangle) {
+                    .x = 0,
+                    .y = 0,
+                    .width = size.cx,
+                    .height = size.cy,
+            },
+            .type = CGUI_ImageLike_Bitmap,
+            .bitmap = hBmp,
     };
 }

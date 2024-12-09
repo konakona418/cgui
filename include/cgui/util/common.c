@@ -69,7 +69,7 @@ LPCSTR cgui_digitToString(long long digit) {
     return result;
 }
 
-bool eq_any(int value, size_t count, ...)  {
+bool eq_any(int value, size_t count, ...) {
     va_list args;
     va_start(args, count);
 

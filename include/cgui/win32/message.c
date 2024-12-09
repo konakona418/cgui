@@ -141,7 +141,8 @@ cgui_messageHandler_winProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 long long int
-cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam, LPARAM lParam) {
+cgui_messageHandler_routeToApplication(CGUI_MessageHandler* self, CGUI_ComponentQuery query, UINT msg, WPARAM wParam,
+                                       LPARAM lParam) {
     if (self->applicationCallback == NULL) {
         panic("Fatal! Application message callback is not set.");
     }

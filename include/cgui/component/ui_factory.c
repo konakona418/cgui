@@ -50,7 +50,8 @@ void cgui_destroyUIFactoryCluster(CGUI_UIFactoryCluster* cluster) {
     free(cluster);
 }
 
-CGUI_Result cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory) {
+CGUI_Result
+cgui_factoryCluster_registerFactory(CGUI_UIFactoryCluster* cluster, const char* name, CGUI_UIFactory factory) {
     if (cluster->factories->insert(cluster->factories, cgui_toLowercase(name), factory))
         return create_ok(NULL);
     return create_err(createError(1, "Failed to register factory."));
@@ -62,7 +63,8 @@ CGUI_Result cgui_factoryCluster_unregisterFactory(CGUI_UIFactoryCluster* cluster
     return create_err(createError(1, "Failed to unregister factory."));
 }
 
-CGUI_Result cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv) {
+CGUI_Result
+cgui_factoryCluster_createComponent(CGUI_UIFactoryCluster* cluster, const char* name, int argc, CGUI_Box* argv) {
     CGUI_UIFactory factory = cluster->factories->find(cluster->factories, cgui_toLowercase(name));
     if (unlikely(factory == NULL)) {
         return create_err(CGUI_Error_FactoryNotFound());
@@ -126,7 +128,7 @@ CGUI_Result cgui_uiFactory_createWindow(int argc, CGUI_Box* argv) {
         wndClassFactory->setWindowClassName(wndClassFactory, options->className);
         wndClassFactory->setWindowInstance(wndClassFactory, app->ctx->hInstance);
         wndClassFactory->setWindowProc(wndClassFactory, cgui_application_getWindowProc());
-        wndClassFactory->setWindowBackgroundBrush(wndClassFactory, (HBRUSH)(COLOR_WINDOW + 1));
+        wndClassFactory->setWindowBackgroundBrush(wndClassFactory, (HBRUSH) (COLOR_WINDOW + 1));
 
         if (options->menuName) {
             wndClassFactory->setWindowMenuName(wndClassFactory, options->menuName);
@@ -509,6 +511,7 @@ CGUI_Result cgui_uiFactory_createListView(int argc, CGUI_Box* argv) {
 }
 
 CGUI_UINativeImageLabel* cgui_wrapImageLabel(CGUI_UINativeLabel* standardLabel) {
-    standardLabel->window->setWindowStyle(standardLabel->window, standardLabel->window->getWindowStyle(standardLabel->window) | SS_BITMAP);
+    standardLabel->window->setWindowStyle(standardLabel->window,
+                                          standardLabel->window->getWindowStyle(standardLabel->window) | SS_BITMAP);
     return (CGUI_UINativeImageLabel*) standardLabel;
 }

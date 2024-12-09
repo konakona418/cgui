@@ -369,7 +369,8 @@ IterPredicateResult cgui_componentManager_predicateName(const char* key, void* v
 
 CGUI_Result cgui_componentManager_removeComponentByName(CGUI_ComponentManager* manager, LPCSTR name) {
     char* name_copy = strdup(name);
-    CGUI_UIComponent* component = manager->components->find_if(manager->components, name_copy, cgui_componentManager_predicateName);
+    CGUI_UIComponent* component = manager->components->find_if(manager->components, name_copy,
+                                                               cgui_componentManager_predicateName);
     cgui_componentManager_removeComponentById(manager, component->id);
     return create_ok(NULL);
 }
@@ -390,7 +391,8 @@ CGUI_Result cgui_componentManager_getComponentById(CGUI_ComponentManager* manage
 }
 
 CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* manager, const char* name) {
-    CGUI_UIComponent* result = manager->components->find_if(manager->components, (void*) name, cgui_componentManager_predicateName);
+    CGUI_UIComponent* result = manager->components->find_if(manager->components, (void*) name,
+                                                            cgui_componentManager_predicateName);
     if (result == NULL) {
         return create_err(CGUI_Error_ComponentNotFound());
     } else {
@@ -398,7 +400,8 @@ CGUI_Result cgui_componentManager_getComponentByName(CGUI_ComponentManager* mana
     }
 }
 
-CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target, ComponentPredicate predicate) {
+CGUI_Result cgui_componentManager_getComponentPredicate(CGUI_ComponentManager* manager, void* target,
+                                                        ComponentPredicate predicate) {
     CGUI_UIComponent* result = manager->components->find_if(manager->components, target, predicate);
     if (result == NULL) {
         return create_err(CGUI_Error_ComponentNotFound());
