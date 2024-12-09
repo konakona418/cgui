@@ -75,6 +75,7 @@ CGUI_UINativeLabel* cgui_createUINativeLabel(CGUI_UIComponent* parent, CGUI_Inte
 
 void cgui_destroyUINativeLabel(CGUI_UINativeLabel* label) {
     cgui_destroyWindowInstance(label->window);
+    cgui_destroyGdiTextContext(label->gdiTextContext);
     free(label);
 }
 

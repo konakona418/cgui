@@ -73,6 +73,7 @@ CGUI_UINativeTextBox* cgui_createUINativeTextbox(CGUI_UIComponent* parent, CGUI_
 
 void cgui_destroyUINativeTextbox(CGUI_UINativeTextBox* textbox) {
     cgui_destroyWindowInstance(textbox->window);
+    cgui_destroyGdiTextContext(textbox->gdiTextContext);
     free(textbox);
 }
 

@@ -79,6 +79,7 @@ CGUI_UINativeListView* cgui_createUINativeListView(CGUI_UIComponent* parent, CGU
 
 void cgui_destroyUINativeListView(CGUI_UINativeListView* listView) {
     cgui_destroyWindowInstance(listView->window);
+    cgui_destroyGdiTextContext(listView->gdiTextContext);
     free(listView);
 }
 
