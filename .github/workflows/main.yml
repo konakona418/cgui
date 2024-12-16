@@ -1,0 +1,41 @@
+name: Count Code Lines
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  count-lines:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install cloc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cloc
+
+      - name: Count Code Lines
+        id: count_lines
+        run: |
+          echo "Running cloc to count lines..."
+          cloc . --exclude-dir=.git --exclude-lang=JSON --json > cloc_report.json
+          echo "Code line statistics:"
+          cat cloc_report.json
+          
+      - name: Upload Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-lines-report
+          path: cloc_report.json
+
+      - name: Print Summary
+        run: |
+          echo "### Code Line Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat cloc_report.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
